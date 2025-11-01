@@ -1,11 +1,11 @@
-# Systematic Trading System for SGX
+# Systematic Trading System for US Markets
 
-A Python-based systematic trading system for Singapore Exchange (SGX) stocks, implementing principles from Robert Carver's "Systematic Trading: A Unique New Method for Designing Trading and Investing Systems".
+A Python-based systematic trading system for US equity markets, implementing principles from Robert Carver's "Systematic Trading: A Unique New Method for Designing Trading and Investing Systems".
 
 ## Overview
 
 This project provides a complete framework for:
-- Downloading and managing SGX stock data
+- Downloading and managing US stock data
 - Implementing trend-following strategies (EWMAC, Moving Average Crossover)
 - Backtesting with realistic cost modeling
 - Position sizing using volatility targeting
@@ -19,10 +19,10 @@ This project provides a complete framework for:
 - **Cost Awareness**: Transaction costs and slippage built into backtests
 - **Diversification**: Multi-timeframe and multi-asset approaches
 
-### 2. **SGX-Specific Implementation**
-- Yahoo Finance integration for SGX stocks (`.SI` suffix)
-- Configurable for Singapore market hours and trading costs
-- Example stocks: DBS.SI, O39.SI, ES3.SI
+### 2. **US Market Implementation**
+- Yahoo Finance integration for US stocks
+- Configurable for US market hours and trading costs
+- Example stocks: GOOG, MSFT, TSLA
 
 ### 3. **Modular Architecture**
 - Clean separation of concerns (data, strategy, risk, backtesting)
@@ -117,7 +117,7 @@ python main.py
 ```
 
 This will:
-1. Download historical data for DBS.SI, O39.SI, and ES3.SI
+1. Download historical data for GOOG, MSFT, and TSLA
 2. Run backtests with EWMAC and MA Crossover strategies
 3. Compare strategy performance
 4. Generate performance charts (equity_curve.png, positions.png)
@@ -129,7 +129,7 @@ This will:
 [STEP 1] Downloading historical data from Yahoo Finance...
  Successfully downloaded data for 3 stocks
 
-[STEP 2] Running backtest on DBS.SI with EWMAC strategy...
+[STEP 2] Running backtest on GOOG with EWMAC strategy...
 
 [STEP 3] Analyzing performance...
 
@@ -164,14 +164,14 @@ from data.data_manager import DataManager
 dm = DataManager()
 
 # Download single stock
-data = dm.download_stock_data('DBS.SI', save=True)
+data = dm.download_stock_data('GOOG', save=True)
 
 # Download multiple stocks
-stocks = ['DBS.SI', 'O39.SI', 'ES3.SI', 'D05.SI']
+stocks = ['GOOG', 'MSFT', 'TSLA', 'AAPL']
 data_dict = dm.download_multiple_stocks(stocks, save=True)
 
 # Load previously downloaded data
-data = dm.load_data('DBS.SI')
+data = dm.load_data('GOOG')
 ```
 
 ### 2. Create and Test a Strategy
@@ -286,12 +286,12 @@ RISK_FREE_RATE=0.03
 MA_FAST=16
 MA_SLOW=64
 
-# Trading Costs (adjust for SGX)
+# Trading Costs (adjust for US markets)
 TRANSACTION_COST=0.001
 SLIPPAGE=0.0005
 
 # Stocks to trade
-SGX_STOCKS=DBS.SI,O39.SI,ES3.SI,D05.SI,C6L.SI
+US_STOCKS=GOOG,MSFT,TSLA,AAPL,AMZN
 ```
 
 ## Key Concepts (Robert Carver's Approach)
@@ -333,8 +333,8 @@ Carver recommends combining:
 ### Add More Assets
 
 ```python
-# Add more SGX stocks to .env
-SGX_STOCKS=DBS.SI,O39.SI,ES3.SI,D05.SI,C6L.SI,U11.SI,Z74.SI
+# Add more US stocks to .env
+US_STOCKS=GOOG,MSFT,TSLA,AAPL,AMZN,NVDA,META
 ```
 
 ### Implement Forecast Combination
@@ -362,17 +362,17 @@ strategy = MultipleEWMAC(
 4. **Diversify**: Multiple assets and rules improve Sharpe ratio
 5. **Monitor Turnover**: High turnover = high costs
 
-## Common SGX Stocks
+## Common US Tech Stocks
 
 | Ticker | Name | Sector |
 |--------|------|--------|
-| DBS.SI | DBS Bank | Financial |
-| O39.SI | OCBC Bank | Financial |
-| D05.SI | DBS Group Holdings | Financial |
-| U11.SI | UOB | Financial |
-| C6L.SI | Singapore Airlines | Transportation |
-| ES3.SI | STI ETF | Index Fund |
-| Z74.SI | Singtel | Telecommunications |
+| GOOG | Alphabet Inc. | Technology |
+| MSFT | Microsoft Corporation | Technology |
+| TSLA | Tesla Inc. | Automotive/Technology |
+| AAPL | Apple Inc. | Technology |
+| AMZN | Amazon.com Inc. | E-commerce/Technology |
+| NVDA | NVIDIA Corporation | Technology |
+| META | Meta Platforms Inc. | Technology |
 
 ## Troubleshooting
 
@@ -380,9 +380,9 @@ strategy = MultipleEWMAC(
 
 If data download fails:
 ```python
-# Check ticker format (must have .SI suffix)
-ticker = 'DBS.SI'  # Correct
-ticker = 'DBS'     # Wrong
+# Check ticker format (use standard US ticker symbols)
+ticker = 'GOOG'  # Correct
+ticker = 'GOOGL' # Also valid (Class A shares)
 
 # Check date ranges
 DATA_START_DATE=2018-01-01  # Not too far back
@@ -408,9 +408,10 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 - **Blog**: [qoppac.blogspot.com](https://qoppac.blogspot.com)
 - **GitHub**: [robcarver17/pysystemtrade](https://github.com/robcarver17/pysystemtrade)
 
-### SGX Information
-- **SGX Website**: [www.sgx.com](https://www.sgx.com)
-- **Yahoo Finance**: Add `.SI` suffix to tickers
+### US Market Information
+- **NYSE**: [www.nyse.com](https://www.nyse.com)
+- **NASDAQ**: [www.nasdaq.com](https://www.nasdaq.com)
+- **Yahoo Finance**: Use standard US ticker symbols
 
 ## License
 

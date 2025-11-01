@@ -121,9 +121,9 @@ A complete, production-ready systematic trading system for Singapore Exchange (S
 - Data caching to CSV
 
 ✅ **Example Stocks**
-- DBS.SI (DBS Bank)
-- O39.SI (OCBC Bank)
-- ES3.SI (STI ETF)
+- GOOG (Alphabet Inc.)
+- MSFT (Microsoft Corporation)
+- TSLA (Tesla Inc.)
 - Easily extensible to more stocks
 
 ### Software Engineering Best Practices

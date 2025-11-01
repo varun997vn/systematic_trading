@@ -38,7 +38,7 @@ python main.py
 ```
 
 This will:
-- Download historical data for DBS.SI, O39.SI, and ES3.SI
+- Download historical data for GOOG, MSFT, and TSLA
 - Run multiple backtests with different strategies
 - Generate performance charts
 - Display comprehensive performance metrics
@@ -61,18 +61,18 @@ pytest -v
 
 ```
 ============================================================
-SYSTEMATIC TRADING SYSTEM - SGX DEMO
+SYSTEMATIC TRADING SYSTEM - US TECH STOCKS DEMO
 Based on Robert Carver's 'Systematic Trading'
 ============================================================
 
-Testing with SGX stocks: ['DBS.SI', 'O39.SI', 'ES3.SI']
+Testing with US stocks: ['GOOG', 'MSFT', 'TSLA']
 
 [STEP 1] Downloading historical data from Yahoo Finance...
-Downloading DBS.SI from 2018-01-01 to 2024-12-31
-Downloaded 1234 rows for DBS.SI
+Downloading GOOG from 2018-01-01 to 2024-12-31
+Downloaded 1234 rows for GOOG
 ✓ Successfully downloaded data for 3 stocks
 
-[STEP 2] Running backtest on DBS.SI with EWMAC strategy...
+[STEP 2] Running backtest on GOOG with EWMAC strategy...
 
 [STEP 3] Analyzing performance...
 
@@ -97,9 +97,9 @@ After running the demo, you'll see these new files:
 ```
 systematic_trading/
 ├── data/historical/          # Downloaded stock data
-│   ├── DBS_SI.csv
-│   ├── O39_SI.csv
-│   └── ES3_SI.csv
+│   ├── GOOG.csv
+│   ├── MSFT.csv
+│   └── TSLA.csv
 ├── logs/                     # Log files
 │   └── systematic_trading.log
 ├── equity_curve.png         # Performance chart
@@ -137,7 +137,7 @@ pip install -r requirements.txt
 
 **Solution**:
 - Check internet connection
-- Verify tickers have .SI suffix (e.g., DBS.SI not DBS)
+- Verify tickers are valid US symbols (e.g., GOOG, MSFT, TSLA)
 - Try again later if Yahoo Finance is down
 
 ### Issue 3: "Import Error" when running main.py
@@ -180,7 +180,7 @@ MA_SLOW=128
 
 ```bash
 # Edit .env
-SGX_STOCKS=DBS.SI,O39.SI,ES3.SI,D05.SI,C6L.SI,U11.SI,Z74.SI
+US_STOCKS=GOOG,MSFT,TSLA,AAPL,AMZN,NVDA,META
 ```
 
 ### 3. Create Custom Strategies
@@ -205,7 +205,7 @@ from backtesting.backtest_engine import BacktestEngine
 
 # Download data
 dm = DataManager()
-data = dm.download_stock_data('D05.SI')
+data = dm.download_stock_data('AAPL')
 
 # Run backtest
 strategy = EWMAC(16, 64)
@@ -224,10 +224,10 @@ PerformanceAnalyzer(results).print_summary()
 ```python
 # Download data once, then load from disk
 dm = DataManager()
-dm.download_multiple_stocks(['DBS.SI', 'O39.SI'], save=True)
+dm.download_multiple_stocks(['GOOG', 'MSFT'], save=True)
 
 # Later, just load from disk (much faster)
-data = dm.load_data('DBS.SI')
+data = dm.load_data('GOOG')
 ```
 
 ### For Multiple Backtests

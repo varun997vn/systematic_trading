@@ -433,9 +433,9 @@ systematic_trading/
 │   ├── __init__.py           # Exports DataManager
 │   ├── data_manager.py       # Data acquisition/storage
 │   └── historical/           # CSV storage (gitignored)
-│       ├── DBS_SI.csv
-│       ├── O39_SI.csv
-│       └── ES3_SI.csv
+│       ├── GOOG.csv
+│       ├── MSFT.csv
+│       └── TSLA.csv
 │
 ├── strategy/                  # Domain Layer - Strategies
 │   ├── __init__.py           # Exports all strategies
@@ -504,7 +504,7 @@ class AlternativeDataManager(DataManager):
 
 # 2. Use same interface
 manager = AlternativeDataManager()
-data = manager.download_stock_data('DBS.SI')
+data = manager.download_stock_data('GOOG')
 ```
 
 ### Adding Custom Performance Metrics

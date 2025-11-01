@@ -1,6 +1,6 @@
 """
 Centralized configuration management for the systematic trading system.
-Based on Robert Carver's principles with Singapore Exchange (SGX) adaptations.
+Based on Robert Carver's principles for US equity markets.
 """
 
 import os
@@ -42,15 +42,15 @@ class Settings:
     MA_FAST = int(os.getenv("MA_FAST", "16"))  # Carver's recommendation
     MA_SLOW = int(os.getenv("MA_SLOW", "64"))
 
-    # Trading costs (SGX-specific)
+    # Trading costs (US market-specific)
     TRANSACTION_COST = float(os.getenv("TRANSACTION_COST", "0.001"))  # 0.1%
     SLIPPAGE = float(os.getenv("SLIPPAGE", "0.0005"))  # 0.05%
 
     # Logging
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
-    # SGX stocks to trade
-    SGX_STOCKS = os.getenv("SGX_STOCKS", "DBS.SI,O39.SI,ES3.SI").split(",")
+    # US stocks to trade
+    US_STOCKS = os.getenv("US_STOCKS", "GOOG,MSFT,TSLA").split(",")
 
     # Annualization factor (Carver uses 256 for trading days)
     BUSINESS_DAYS_PER_YEAR = 256

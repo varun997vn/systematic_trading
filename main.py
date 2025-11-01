@@ -2,7 +2,7 @@
 Main demonstration script for systematic trading system.
 
 This script demonstrates:
-1. Downloading SGX stock data
+1. Downloading US tech stock data
 2. Implementing a trend-following strategy
 3. Running a backtest with proper position sizing
 4. Analyzing performance
@@ -34,16 +34,16 @@ def main():
     Main demonstration function.
     """
     logger.info("=" * 60)
-    logger.info("SYSTEMATIC TRADING SYSTEM - SGX DEMO")
+    logger.info("SYSTEMATIC TRADING SYSTEM - US TECH STOCKS DEMO")
     logger.info("Based on Robert Carver's 'Systematic Trading'")
     logger.info("=" * 60)
 
     # Validate settings
     Settings.validate()
 
-    # Define SGX stocks to test
-    sgx_stocks = ['DBS.SI', 'O39.SI', 'ES3.SI']
-    logger.info(f"\nTesting with SGX stocks: {sgx_stocks}")
+    # Define US tech stocks to test
+    us_stocks = ['GOOG', 'MSFT', 'TSLA']
+    logger.info(f"\nTesting with US stocks: {us_stocks}")
 
     # =========================================================================
     # STEP 1: Download Data
@@ -55,7 +55,7 @@ def main():
 
     # Download data for all stocks
     stock_data = data_manager.download_multiple_stocks(
-        tickers=sgx_stocks,
+        tickers=us_stocks,
         start_date=Settings.DATA_START_DATE,
         end_date=Settings.DATA_END_DATE,
         save=True
@@ -75,11 +75,11 @@ def main():
     # =========================================================================
     # STEP 2: Run Single-Stock Backtest
     # =========================================================================
-    print("\n[STEP 2] Running backtest on DBS.SI with EWMAC strategy...")
+    print("\n[STEP 2] Running backtest on GOOG with EWMAC strategy...")
     logger.info("Running single-stock backtest...")
 
-    # Select DBS for detailed analysis
-    ticker = 'DBS.SI'
+    # Select GOOG for detailed analysis
+    ticker = 'GOOG'
     data = stock_data[ticker]
 
     # Create EWMAC strategy (Carver's preferred method)
@@ -123,7 +123,7 @@ def main():
     # =========================================================================
     # STEP 4: Compare Strategies
     # =========================================================================
-    print("\n[STEP 4] Comparing different strategies on DBS.SI...")
+    print("\n[STEP 4] Comparing different strategies on GOOG...")
     logger.info("Comparing strategies...")
 
     strategies_to_test = [
@@ -197,7 +197,7 @@ def main():
     print("4. ✓ Portfolio approach across multiple assets")
     print("\nNext steps:")
     print("- Experiment with different EWMAC combinations")
-    print("- Add more SGX stocks to the portfolio")
+    print("- Add more US stocks to the portfolio")
     print("- Implement forecast combination rules")
     print("- Add carry and mean reversion strategies")
     print("=" * 60 + "\n")

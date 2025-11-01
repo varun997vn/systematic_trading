@@ -25,13 +25,13 @@ from data.data_manager import DataManager
 dm = DataManager()
 
 # Single stock
-data = dm.download_stock_data('DBS.SI', save=True)
+data = dm.download_stock_data('GOOG', save=True)
 
 # Multiple stocks
-stocks = dm.download_multiple_stocks(['DBS.SI', 'O39.SI', 'ES3.SI'])
+stocks = dm.download_multiple_stocks(['GOOG', 'MSFT', 'TSLA'])
 
 # Load cached data
-data = dm.load_data('DBS.SI')
+data = dm.load_data('GOOG')
 ```
 
 ### Run a Backtest
@@ -158,7 +158,7 @@ TRANSACTION_COST=0.001  # 0.1%
 SLIPPAGE=0.0005         # 0.05%
 
 # Stocks
-SGX_STOCKS=DBS.SI,O39.SI,ES3.SI
+US_STOCKS=GOOG,MSFT,TSLA
 ```
 
 ## Key Formulas (Carver's Method)
@@ -184,17 +184,17 @@ sharpe = (mean_return - risk_free_rate) / std_return × √252
 annual_vol = daily_vol × √252
 ```
 
-## Common SGX Tickers
+## Common US Tech Tickers
 
 | Ticker | Name | Sector |
 |--------|------|--------|
-| DBS.SI | DBS Bank | Financial |
-| O39.SI | OCBC Bank | Financial |
-| D05.SI | DBS Group | Financial |
-| U11.SI | UOB | Financial |
-| C6L.SI | SIA | Aviation |
-| ES3.SI | STI ETF | Index |
-| Z74.SI | Singtel | Telecom |
+| GOOG | Alphabet Inc. | Technology |
+| MSFT | Microsoft Corporation | Technology |
+| TSLA | Tesla Inc. | Automotive/Tech |
+| AAPL | Apple Inc. | Technology |
+| AMZN | Amazon.com Inc. | E-commerce/Tech |
+| NVDA | NVIDIA Corporation | Technology |
+| META | Meta Platforms Inc. | Technology |
 
 ## Directory Structure
 
@@ -282,7 +282,7 @@ logger.error("Error message")
 | Problem | Solution |
 |---------|----------|
 | No module named 'X' | `pip install -r requirements.txt` |
-| No data downloaded | Check internet, verify .SI suffix |
+| No data downloaded | Check internet, verify valid US tickers |
 | Import errors | Run from project root directory |
 | Matplotlib errors | Plots saved to files (no display needed) |
 | Test failures | Check logs in `logs/` directory |

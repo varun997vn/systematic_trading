@@ -877,13 +877,13 @@ def calculate_expensive_metric(ticker: str, period: int):
 
 ```python
 # Slow: List membership testing
-tickers = ['DBS.SI', 'O39.SI', 'ES3.SI']  # List
-if 'DBS.SI' in tickers:  # O(n)
+tickers = ['GOOG', 'MSFT', 'TSLA']  # List
+if 'GOOG' in tickers:  # O(n)
     pass
 
 # Fast: Set membership testing
-tickers = {'DBS.SI', 'O39.SI', 'ES3.SI'}  # Set
-if 'DBS.SI' in tickers:  # O(1)
+tickers = {'GOOG', 'MSFT', 'TSLA'}  # Set
+if 'GOOG' in tickers:  # O(1)
     pass
 ```
 

@@ -1,6 +1,6 @@
 """
 Data manager for downloading and managing market data.
-Focuses on SGX (Singapore Exchange) stocks via Yahoo Finance.
+Focuses on US equity markets via Yahoo Finance.
 """
 
 import pandas as pd
@@ -18,9 +18,9 @@ logger = setup_logger(__name__)
 
 class DataManager:
     """
-    Manages market data download and storage for SGX stocks.
+    Manages market data download and storage for US stocks.
 
-    Singapore stocks on Yahoo Finance use the .SI suffix (e.g., DBS.SI).
+    US stocks on Yahoo Finance use their standard ticker symbols (e.g., GOOG, MSFT, TSLA).
     """
 
     def __init__(self, data_dir: Optional[Path] = None):
@@ -44,7 +44,7 @@ class DataManager:
         Download historical data for a single stock from Yahoo Finance.
 
         Args:
-            ticker: Stock ticker (e.g., 'DBS.SI')
+            ticker: Stock ticker (e.g., 'GOOG', 'MSFT', 'TSLA')
             start_date: Start date in YYYY-MM-DD format
             end_date: End date in YYYY-MM-DD format
             save: If True, save data to CSV
@@ -212,8 +212,8 @@ class DataManager:
             return {
                 'name': info.get('longName', ticker),
                 'sector': info.get('sector', 'Unknown'),
-                'currency': info.get('currency', 'SGD'),
-                'exchange': info.get('exchange', 'SGX'),
+                'currency': info.get('currency', 'USD'),
+                'exchange': info.get('exchange', 'NASDAQ'),
             }
         except Exception as e:
             logger.error(f"Error getting info for {ticker}: {e}")
