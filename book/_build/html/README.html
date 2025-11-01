@@ -1,0 +1,911 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Systematic Trading Book &#8212; Systematic Trading - A Complete Guide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'README';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Systematic Trading - A Complete Guide</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="part1/overview.html">Part I: Foundations</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="part1/01_what_is_systematic_trading.html">Chapter 1: What is Systematic Trading?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part1/02_understanding_stock_markets.html">Chapter 2: Understanding Stock Markets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part1/03_why_manual_trading_fails.html">Chapter 1: Why Manual Trading Fails</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="part2/overview.html">Part II: Core Concepts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="part2/04_trend_following.html">Chapter 2: Trend Following</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part2/05_understanding_volatility.html">Chapter 2: Understanding Volatility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part2/06_position_sizing.html">Chapter 2: Position Sizing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part2/07_transaction_costs.html">Chapter 2: Transaction Costs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="part3/overview.html">Part III: Implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="part3/08_getting_data.html">Chapter 3: Getting Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part3/09_building_strategies.html">Chapter 3: Building Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part3/10_backtesting_engine.html">Chapter 3: Backtesting Engine</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="part4/overview.html">Part IV: Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="part4/11_understanding_results.html">Chapter 4: Understanding Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part4/12_performance_metrics.html">Chapter 4: Performance Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part4/13_portfolio_approach.html">Chapter 4: Portfolio Approach</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="part5/overview.html">Part V: Practical Application</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="part5/14_system_capabilities.html">Chapter 5: System Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part5/15_extending_system.html">Chapter 5: Extending System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part5/16_real_world_trading.html">Chapter 5: Real World Trading</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="appendix/glossary.html">Glossary of Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="appendix/resources.html">Resources and Further Reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="appendix/code_reference.html">Code Reference</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/yourusername/systematic_trading" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/yourusername/systematic_trading/edit/main/README.md" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/yourusername/systematic_trading/issues/new?title=Issue%20on%20page%20%2FREADME.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/README.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Systematic Trading Book</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-online">📚 Read Online</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-start">🚀 Quick Start</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-1-read-online-no-setup-required">Option 1: Read Online (No Setup Required)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-2-run-locally">Option 2: Run Locally</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-3-run-notebooks-interactively">Option 3: Run Notebooks Interactively</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-4-use-google-colab">Option 4: Use Google Colab</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#book-structure">📖 Book Structure</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-i-foundations">Part I: Foundations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-ii-core-concepts">Part II: Core Concepts</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-iii-implementation">Part III: Implementation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-iv-analysis">Part IV: Analysis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-v-practical-application">Part V: Practical Application</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-book">🛠️ Building the Book</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clean-build">Clean Build</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-rebuild">Quick Rebuild</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#view-locally">View Locally</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing">✍️ Contributing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-new-chapter">Adding a New Chapter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#chapter-template-structure">Chapter Template Structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-guidelines">Code Guidelines</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-style">Writing Style</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#troubleshooting">🔧 Troubleshooting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-errors">Build Errors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#missing-dependencies">Missing Dependencies</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kernel-issues">Kernel Issues</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-real-data">📊 Using Real Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#customization">🎨 Customization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changing-theme">Changing Theme</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-extensions">Adding Extensions</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-vs-markdown">📝 Notebook vs Markdown</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing">🧪 Testing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exporting">📄 Exporting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pdf-export">PDF Export</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#single-html">Single HTML</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#useful-links">🔗 Useful Links</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#license">📜 License</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#acknowledgments">🙏 Acknowledgments</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="systematic-trading-book">
+<h1>Systematic Trading Book<a class="headerlink" href="#systematic-trading-book" title="Link to this heading">#</a></h1>
+<p>An interactive Jupyter Book teaching systematic trading from first principles.</p>
+<section id="read-online">
+<h2>📚 Read Online<a class="headerlink" href="#read-online" title="Link to this heading">#</a></h2>
+<p>The book is built using Jupyter Book and can be read online or run locally.</p>
+</section>
+<section id="quick-start">
+<h2>🚀 Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">#</a></h2>
+<section id="option-1-read-online-no-setup-required">
+<h3>Option 1: Read Online (No Setup Required)<a class="headerlink" href="#option-1-read-online-no-setup-required" title="Link to this heading">#</a></h3>
+<p>Simply browse the chapters in your web browser after building.</p>
+</section>
+<section id="option-2-run-locally">
+<h3>Option 2: Run Locally<a class="headerlink" href="#option-2-run-locally" title="Link to this heading">#</a></h3>
+<section id="prerequisites">
+<h4>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">#</a></h4>
+<ul class="simple">
+<li><p>Python 3.8 or higher</p></li>
+<li><p>pip</p></li>
+</ul>
+</section>
+<section id="installation">
+<h4>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h4>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Clone the repository (if you haven&#39;t already)</span>
+<span class="nb">cd</span><span class="w"> </span>systematic_trading
+
+<span class="c1"># Install book dependencies</span>
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>book/requirements.txt
+
+<span class="c1"># Build the book</span>
+<span class="nb">cd</span><span class="w"> </span>book
+jupyter-book<span class="w"> </span>build<span class="w"> </span>.
+</pre></div>
+</div>
+<p>The built HTML will be in <code class="docutils literal notranslate"><span class="pre">book/_build/html/</span></code>. Open <code class="docutils literal notranslate"><span class="pre">index.html</span></code> in your browser.</p>
+</section>
+</section>
+<section id="option-3-run-notebooks-interactively">
+<h3>Option 3: Run Notebooks Interactively<a class="headerlink" href="#option-3-run-notebooks-interactively" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install dependencies</span>
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>book/requirements.txt
+
+<span class="c1"># Launch Jupyter</span>
+<span class="nb">cd</span><span class="w"> </span>book
+jupyter<span class="w"> </span>lab
+
+<span class="c1"># Navigate to any .ipynb file and run cells</span>
+</pre></div>
+</div>
+</section>
+<section id="option-4-use-google-colab">
+<h3>Option 4: Use Google Colab<a class="headerlink" href="#option-4-use-google-colab" title="Link to this heading">#</a></h3>
+<p>Click the rocket icon 🚀 at the top of any chapter when viewing online, then select “Colab” to run in Google Colab (free, no setup required).</p>
+</section>
+</section>
+<section id="book-structure">
+<h2>📖 Book Structure<a class="headerlink" href="#book-structure" title="Link to this heading">#</a></h2>
+<p>The book is organized into 5 parts:</p>
+<section id="part-i-foundations">
+<h3>Part I: Foundations<a class="headerlink" href="#part-i-foundations" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Chapter 1: What is Systematic Trading?</p></li>
+<li><p>Chapter 2: Understanding Stock Markets</p></li>
+<li><p>Chapter 3: Why Manual Trading Fails</p></li>
+</ul>
+</section>
+<section id="part-ii-core-concepts">
+<h3>Part II: Core Concepts<a class="headerlink" href="#part-ii-core-concepts" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Chapter 4: Trend Following</p></li>
+<li><p>Chapter 5: Understanding Volatility</p></li>
+<li><p>Chapter 6: Position Sizing and Risk Management</p></li>
+<li><p>Chapter 7: Transaction Costs</p></li>
+</ul>
+</section>
+<section id="part-iii-implementation">
+<h3>Part III: Implementation<a class="headerlink" href="#part-iii-implementation" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Chapter 8: Getting Market Data</p></li>
+<li><p>Chapter 9: Building Trading Strategies</p></li>
+<li><p>Chapter 10: The Backtesting Engine</p></li>
+</ul>
+</section>
+<section id="part-iv-analysis">
+<h3>Part IV: Analysis<a class="headerlink" href="#part-iv-analysis" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Chapter 11: Understanding Your Results</p></li>
+<li><p>Chapter 12: Performance Metrics</p></li>
+<li><p>Chapter 13: Portfolio Approach</p></li>
+</ul>
+</section>
+<section id="part-v-practical-application">
+<h3>Part V: Practical Application<a class="headerlink" href="#part-v-practical-application" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Chapter 14: System Capabilities and Limitations</p></li>
+<li><p>Chapter 15: Extending the System</p></li>
+<li><p>Chapter 16: Real-World Trading</p></li>
+</ul>
+</section>
+</section>
+<section id="building-the-book">
+<h2>🛠️ Building the Book<a class="headerlink" href="#building-the-book" title="Link to this heading">#</a></h2>
+<section id="clean-build">
+<h3>Clean Build<a class="headerlink" href="#clean-build" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>book
+jupyter-book<span class="w"> </span>clean<span class="w"> </span>.
+jupyter-book<span class="w"> </span>build<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+<section id="quick-rebuild">
+<h3>Quick Rebuild<a class="headerlink" href="#quick-rebuild" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>book
+jupyter-book<span class="w"> </span>build<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+<section id="view-locally">
+<h3>View Locally<a class="headerlink" href="#view-locally" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># After building</span>
+<span class="nb">cd</span><span class="w"> </span>_build/html
+python<span class="w"> </span>-m<span class="w"> </span>http.server<span class="w"> </span><span class="m">8000</span>
+<span class="c1"># Open http://localhost:8000 in browser</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="contributing">
+<h2>✍️ Contributing<a class="headerlink" href="#contributing" title="Link to this heading">#</a></h2>
+<section id="adding-a-new-chapter">
+<h3>Adding a New Chapter<a class="headerlink" href="#adding-a-new-chapter" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>Create a new <code class="docutils literal notranslate"><span class="pre">.ipynb</span></code> file in the appropriate <code class="docutils literal notranslate"><span class="pre">partN/</span></code> directory</p></li>
+<li><p>Add it to <code class="docutils literal notranslate"><span class="pre">_toc.yml</span></code> in the correct section</p></li>
+<li><p>Follow the existing chapter template structure</p></li>
+<li><p>Rebuild the book to see your changes</p></li>
+</ol>
+</section>
+<section id="chapter-template-structure">
+<h3>Chapter Template Structure<a class="headerlink" href="#chapter-template-structure" title="Link to this heading">#</a></h3>
+<p>Each chapter should include:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Cell 1: Title and learning objectives (markdown)</span>
+<span class="c1"># Cell 2+: Content sections with code examples</span>
+<span class="c1"># Last cells: Key takeaways, exercises, next steps</span>
+</pre></div>
+</div>
+</section>
+<section id="code-guidelines">
+<h3>Code Guidelines<a class="headerlink" href="#code-guidelines" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Always include comments</strong> explaining what code does</p></li>
+<li><p><strong>Use clear variable names</strong> (not <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code> - use <code class="docutils literal notranslate"><span class="pre">price</span></code>, <code class="docutils literal notranslate"><span class="pre">returns</span></code>)</p></li>
+<li><p><strong>Generate visualizations</strong> for key concepts</p></li>
+<li><p><strong>Provide real examples</strong> with actual data when possible</p></li>
+<li><p><strong>Keep cells focused</strong> - one concept per cell</p></li>
+</ul>
+</section>
+<section id="writing-style">
+<h3>Writing Style<a class="headerlink" href="#writing-style" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Assume no prior knowledge</strong> - define all terms</p></li>
+<li><p><strong>Use analogies</strong> - relate to everyday experiences</p></li>
+<li><p><strong>Show, don’t tell</strong> - visualize concepts</p></li>
+<li><p><strong>Progressive complexity</strong> - start simple, build up</p></li>
+<li><p><strong>Interactive first</strong> - let readers experiment</p></li>
+</ul>
+</section>
+</section>
+<section id="troubleshooting">
+<h2>🔧 Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">#</a></h2>
+<section id="build-errors">
+<h3>Build Errors<a class="headerlink" href="#build-errors" title="Link to this heading">#</a></h3>
+<p>If you get errors during build:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Clear cache and rebuild</span>
+jupyter-book<span class="w"> </span>clean<span class="w"> </span>.<span class="w"> </span>--all
+jupyter-book<span class="w"> </span>build<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+<section id="missing-dependencies">
+<h3>Missing Dependencies<a class="headerlink" href="#missing-dependencies" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reinstall all dependencies</span>
+pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+</pre></div>
+</div>
+</section>
+<section id="kernel-issues">
+<h3>Kernel Issues<a class="headerlink" href="#kernel-issues" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Install IPython kernel</span>
+python<span class="w"> </span>-m<span class="w"> </span>ipykernel<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>--name<span class="o">=</span>systematic_trading
+</pre></div>
+</div>
+</section>
+</section>
+<section id="using-real-data">
+<h2>📊 Using Real Data<a class="headerlink" href="#using-real-data" title="Link to this heading">#</a></h2>
+<p>The book uses the main repository’s data infrastructure:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">)</span>  <span class="c1"># Add parent directory to path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">data.data_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataManager</span>
+<span class="n">dm</span> <span class="o">=</span> <span class="n">DataManager</span><span class="p">()</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">dm</span><span class="o">.</span><span class="n">download_stock_data</span><span class="p">(</span><span class="s1">&#39;GOOG&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="customization">
+<h2>🎨 Customization<a class="headerlink" href="#customization" title="Link to this heading">#</a></h2>
+<section id="changing-theme">
+<h3>Changing Theme<a class="headerlink" href="#changing-theme" title="Link to this heading">#</a></h3>
+<p>Edit <code class="docutils literal notranslate"><span class="pre">_config.yml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">sphinx</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">html_theme</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sphinx_book_theme</span><span class="w">  </span><span class="c1"># or sphinx_rtd_theme, etc.</span>
+</pre></div>
+</div>
+</section>
+<section id="adding-extensions">
+<h3>Adding Extensions<a class="headerlink" href="#adding-extensions" title="Link to this heading">#</a></h3>
+<p>Edit <code class="docutils literal notranslate"><span class="pre">_config.yml</span></code> under <code class="docutils literal notranslate"><span class="pre">parse.myst_enable_extensions</span></code>.</p>
+</section>
+</section>
+<section id="notebook-vs-markdown">
+<h2>📝 Notebook vs Markdown<a class="headerlink" href="#notebook-vs-markdown" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Use <strong>notebooks</strong> (<code class="docutils literal notranslate"><span class="pre">.ipynb</span></code>) for chapters with code examples</p></li>
+<li><p>Use <strong>markdown</strong> (<code class="docutils literal notranslate"><span class="pre">.md</span></code>) for overview pages and appendices</p></li>
+</ul>
+</section>
+<section id="testing">
+<h2>🧪 Testing<a class="headerlink" href="#testing" title="Link to this heading">#</a></h2>
+<p>Run all notebook cells to ensure they execute without errors:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>book
+pytest<span class="w"> </span>--nbmake<span class="w"> </span>part*/*.ipynb
+</pre></div>
+</div>
+</section>
+<section id="exporting">
+<h2>📄 Exporting<a class="headerlink" href="#exporting" title="Link to this heading">#</a></h2>
+<section id="pdf-export">
+<h3>PDF Export<a class="headerlink" href="#pdf-export" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>book
+jupyter-book<span class="w"> </span>build<span class="w"> </span>.<span class="w"> </span>--builder<span class="w"> </span>pdflatex
+</pre></div>
+</div>
+</section>
+<section id="single-html">
+<h3>Single HTML<a class="headerlink" href="#single-html" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>book
+jupyter-book<span class="w"> </span>build<span class="w"> </span>.<span class="w"> </span>--builder<span class="w"> </span>singlehtml
+</pre></div>
+</div>
+</section>
+</section>
+<section id="useful-links">
+<h2>🔗 Useful Links<a class="headerlink" href="#useful-links" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://jupyterbook.org/">Jupyter Book Documentation</a></p></li>
+<li><p><a class="reference external" href="https://myst-parser.readthedocs.io/">MyST Markdown Guide</a></p></li>
+<li><p><a class="reference external" href="https://sphinx-book-theme.readthedocs.io/">Sphinx Book Theme</a></p></li>
+</ul>
+</section>
+<section id="license">
+<h2>📜 License<a class="headerlink" href="#license" title="Link to this heading">#</a></h2>
+<p>This book is part of the systematic_trading repository and follows the same license.</p>
+</section>
+<section id="acknowledgments">
+<h2>🙏 Acknowledgments<a class="headerlink" href="#acknowledgments" title="Link to this heading">#</a></h2>
+<p>Based on Robert Carver’s <em>“Systematic Trading”</em> principles and the systematic_trading codebase.</p>
+<hr class="docutils" />
+<p><strong>Happy Learning!</strong> 📚✨</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#read-online">📚 Read Online</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-start">🚀 Quick Start</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-1-read-online-no-setup-required">Option 1: Read Online (No Setup Required)</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-2-run-locally">Option 2: Run Locally</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-3-run-notebooks-interactively">Option 3: Run Notebooks Interactively</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#option-4-use-google-colab">Option 4: Use Google Colab</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#book-structure">📖 Book Structure</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-i-foundations">Part I: Foundations</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-ii-core-concepts">Part II: Core Concepts</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-iii-implementation">Part III: Implementation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-iv-analysis">Part IV: Analysis</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#part-v-practical-application">Part V: Practical Application</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-book">🛠️ Building the Book</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#clean-build">Clean Build</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-rebuild">Quick Rebuild</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#view-locally">View Locally</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing">✍️ Contributing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-new-chapter">Adding a New Chapter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#chapter-template-structure">Chapter Template Structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-guidelines">Code Guidelines</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-style">Writing Style</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#troubleshooting">🔧 Troubleshooting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-errors">Build Errors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#missing-dependencies">Missing Dependencies</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#kernel-issues">Kernel Issues</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-real-data">📊 Using Real Data</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#customization">🎨 Customization</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#changing-theme">Changing Theme</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-extensions">Adding Extensions</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-vs-markdown">📝 Notebook vs Markdown</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing">🧪 Testing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exporting">📄 Exporting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pdf-export">PDF Export</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#single-html">Single HTML</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#useful-links">🔗 Useful Links</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#license">📜 License</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#acknowledgments">🙏 Acknowledgments</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Systematic Trading Project
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

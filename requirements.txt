@@ -18,3 +18,8 @@ pytest-cov==4.1.0
 # Utilities
 pyyaml==6.0.1
 tabulate==0.9.0
+
+# Notebooks
+jupyter==1.0.0
+notebook==7.0.6
+ipywidgets==8.1.1

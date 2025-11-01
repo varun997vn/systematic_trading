@@ -3,7 +3,16 @@
     "allow": [
       "Bash(tree:*)",
       "Bash(sed:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(chmod:*)",
+      "Bash(pip install:*)",
+      "Bash(jupyter-book build:*)",
+      "Bash(python3 -m pip:*)",
+      "Bash(python test_new_features.py:*)",
+      "Bash(python3:*)",
+      "Bash(./venv/bin/python:*)",
+      "Bash(source:*)",
+      "Bash(python -m jupyter nbconvert:*)"
     ],
     "deny": [],
     "ask": []

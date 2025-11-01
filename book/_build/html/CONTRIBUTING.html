@@ -1,0 +1,1074 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Contributing to the Systematic Trading Book &#8212; Systematic Trading - A Complete Guide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'CONTRIBUTING';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Systematic Trading - A Complete Guide</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="part1/overview.html">Part I: Foundations</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="part1/01_what_is_systematic_trading.html">Chapter 1: What is Systematic Trading?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part1/02_understanding_stock_markets.html">Chapter 2: Understanding Stock Markets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part1/03_why_manual_trading_fails.html">Chapter 1: Why Manual Trading Fails</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="part2/overview.html">Part II: Core Concepts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="part2/04_trend_following.html">Chapter 2: Trend Following</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part2/05_understanding_volatility.html">Chapter 2: Understanding Volatility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part2/06_position_sizing.html">Chapter 2: Position Sizing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part2/07_transaction_costs.html">Chapter 2: Transaction Costs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="part3/overview.html">Part III: Implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="part3/08_getting_data.html">Chapter 3: Getting Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part3/09_building_strategies.html">Chapter 3: Building Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part3/10_backtesting_engine.html">Chapter 3: Backtesting Engine</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="part4/overview.html">Part IV: Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="part4/11_understanding_results.html">Chapter 4: Understanding Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part4/12_performance_metrics.html">Chapter 4: Performance Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part4/13_portfolio_approach.html">Chapter 4: Portfolio Approach</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="part5/overview.html">Part V: Practical Application</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="part5/14_system_capabilities.html">Chapter 5: System Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part5/15_extending_system.html">Chapter 5: Extending System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="part5/16_real_world_trading.html">Chapter 5: Real World Trading</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="appendix/glossary.html">Glossary of Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="appendix/resources.html">Resources and Further Reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="appendix/code_reference.html">Code Reference</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/yourusername/systematic_trading" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/yourusername/systematic_trading/edit/main/CONTRIBUTING.md" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/yourusername/systematic_trading/issues/new?title=Issue%20on%20page%20%2FCONTRIBUTING.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/CONTRIBUTING.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Contributing to the Systematic Trading Book</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-start-for-contributors">📋 Quick Start for Contributors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up">Setting Up</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#making-changes">Making Changes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#chapter-structure">📝 Chapter Structure</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-template">Notebook Template</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-cell-guidelines">Code Cell Guidelines</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-style">🎨 Writing Style</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tone">Tone</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#good-example">Good Example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bad-example">Bad Example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-analogies">Use Analogies</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizations">📊 Visualizations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements">Requirements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example">Example</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing">🧪 Testing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#before-submitting">Before Submitting</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-new-chapter">📚 Adding a New Chapter</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-create-the-notebook">Step 1: Create the Notebook</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-update-table-of-contents">Step 2: Update Table of Contents</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-write-content">Step 3: Write Content</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-4-add-cross-references">Step 4: Add Cross-References</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-5-build-and-review">Step 5: Build and Review</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linking-to-repository-code">🔗 Linking to Repository Code</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-standards">📖 Documentation Standards</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#admonitions">Admonitions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-references">Code References</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#not-handling-nan">2. Not Handling NaN</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forgetting-to-set-seeds">3. Forgetting to Set Seeds</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#poor-plot-labels">4. Poor Plot Labels</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#content-priorities">🎯 Content Priorities</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#essential-for-every-chapter">Essential for Every Chapter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nice-to-have">Nice to Have</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submitting-changes">📬 Submitting Changes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#if-using-git">If Using Git</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#if-not-using-git">If Not Using Git</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions">🙏 Questions?</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="contributing-to-the-systematic-trading-book">
+<h1>Contributing to the Systematic Trading Book<a class="headerlink" href="#contributing-to-the-systematic-trading-book" title="Link to this heading">#</a></h1>
+<p>Thank you for your interest in improving this book! This guide will help you add new content or improve existing chapters.</p>
+<section id="quick-start-for-contributors">
+<h2>📋 Quick Start for Contributors<a class="headerlink" href="#quick-start-for-contributors" title="Link to this heading">#</a></h2>
+<section id="setting-up">
+<h3>Setting Up<a class="headerlink" href="#setting-up" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Clone and navigate</span>
+<span class="nb">cd</span><span class="w"> </span>systematic_trading/book
+
+<span class="c1"># Install dependencies</span>
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+
+<span class="c1"># Test the build</span>
+make<span class="w"> </span>build
+</pre></div>
+</div>
+</section>
+<section id="making-changes">
+<h3>Making Changes<a class="headerlink" href="#making-changes" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Find the relevant file</strong> in <code class="docutils literal notranslate"><span class="pre">part1/</span></code>, <code class="docutils literal notranslate"><span class="pre">part2/</span></code>, etc.</p></li>
+<li><p><strong>Edit the notebook</strong> using Jupyter Lab or your favorite editor</p></li>
+<li><p><strong>Test your changes</strong> by running all cells</p></li>
+<li><p><strong>Rebuild the book</strong> to see how it looks</p></li>
+</ol>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>clean
+make<span class="w"> </span>build
+make<span class="w"> </span>serve<span class="w">  </span><span class="c1"># View at http://localhost:8000</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="chapter-structure">
+<h2>📝 Chapter Structure<a class="headerlink" href="#chapter-structure" title="Link to this heading">#</a></h2>
+<section id="notebook-template">
+<h3>Notebook Template<a class="headerlink" href="#notebook-template" title="Link to this heading">#</a></h3>
+<p>Every chapter should follow this structure:</p>
+<div class="highlight-markdown notranslate"><div class="highlight"><pre><span></span><span class="gh"># Chapter N: Title</span>
+
+<span class="gu">## Learning Objectives</span>
+<span class="k">-</span><span class="w"> </span>What readers will learn
+<span class="k">-</span><span class="w"> </span>Specific skills they&#39;ll gain
+
+<span class="gu">## Section 1: Introduction</span>
+[Motivation and context]
+
+<span class="gu">## Section 2: Concept Explanation</span>
+[Core concept with analogies]
+
+<span class="gu">### Interactive Example</span>
+[Code cells with visualizations]
+
+<span class="gu">## Section 3: Implementation</span>
+[Real code from the repository]
+
+<span class="gu">## Key Takeaways</span>
+[Summary of main points]
+
+<span class="gu">## Exercises</span>
+[Practice problems for readers]
+
+<span class="gu">## Next Steps</span>
+[Link to next chapter]
+</pre></div>
+</div>
+</section>
+<section id="code-cell-guidelines">
+<h3>Code Cell Guidelines<a class="headerlink" href="#code-cell-guidelines" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p><strong>Import at the top</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Set reproducible seeds</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Use clear variable names</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Good</span>
+<span class="n">daily_returns</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
+
+<span class="c1"># Bad</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Add comments explaining WHY</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Normalize by price to make signals comparable across stocks</span>
+<span class="n">normalized_signal</span> <span class="o">=</span> <span class="n">raw_signal</span> <span class="o">/</span> <span class="n">price</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>Generate visualizations</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">equity_curve</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Strategy Performance&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Days&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Equity ($)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="writing-style">
+<h2>🎨 Writing Style<a class="headerlink" href="#writing-style" title="Link to this heading">#</a></h2>
+<section id="tone">
+<h3>Tone<a class="headerlink" href="#tone" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p><strong>Conversational but professional</strong></p></li>
+<li><p><strong>Assume no prior knowledge</strong></p></li>
+<li><p><strong>Build complexity gradually</strong></p></li>
+</ul>
+</section>
+<section id="good-example">
+<h3>Good Example<a class="headerlink" href="#good-example" title="Link to this heading">#</a></h3>
+<div class="highlight-markdown notranslate"><div class="highlight"><pre><span></span>A moving average is simply the average price over a period of time.
+
+For example, the 5-day moving average of Google stock is:
+(Day1_price + Day2_price + Day3_price + Day4_price + Day5_price) / 5
+
+This smooths out daily noise and reveals the underlying trend.
+</pre></div>
+</div>
+</section>
+<section id="bad-example">
+<h3>Bad Example<a class="headerlink" href="#bad-example" title="Link to this heading">#</a></h3>
+<div class="highlight-markdown notranslate"><div class="highlight"><pre><span></span>We compute the n-period SMA using a rolling window function applied to the time series.
+</pre></div>
+</div>
+</section>
+<section id="use-analogies">
+<h3>Use Analogies<a class="headerlink" href="#use-analogies" title="Link to this heading">#</a></h3>
+<div class="highlight-markdown notranslate"><div class="highlight"><pre><span></span>Think of volatility like a speedometer:
+<span class="k">-</span><span class="w"> </span>Low volatility = Driving at steady 60 mph
+<span class="k">-</span><span class="w"> </span>High volatility = Accelerating to 100 mph, braking to 20 mph
+</pre></div>
+</div>
+</section>
+</section>
+<section id="visualizations">
+<h2>📊 Visualizations<a class="headerlink" href="#visualizations" title="Link to this heading">#</a></h2>
+<section id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Every major concept should have a visualization</p></li>
+<li><p>Use clear labels, titles, and legends</p></li>
+<li><p>Include grid for easier reading</p></li>
+<li><p>Use colorblind-friendly palettes</p></li>
+</ul>
+</section>
+<section id="example">
+<h3>Example<a class="headerlink" href="#example" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+
+<span class="c1"># Set style</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+
+<span class="c1"># Create plot</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">prices</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Stock Price&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">ma_fast</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Fast MA&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">ma_slow</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Slow MA&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+
+<span class="c1"># Formatting</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Date&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Price ($)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Moving Average Crossover Strategy&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="testing">
+<h2>🧪 Testing<a class="headerlink" href="#testing" title="Link to this heading">#</a></h2>
+<section id="before-submitting">
+<h3>Before Submitting<a class="headerlink" href="#before-submitting" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p><strong>Run all cells in order</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># In Jupyter</span>
+Kernel<span class="w"> </span>-&gt;<span class="w"> </span>Restart<span class="w"> </span><span class="p">&amp;</span><span class="w"> </span>Run<span class="w"> </span>All
+</pre></div>
+</div>
+</li>
+<li><p><strong>Check for errors</strong></p>
+<ul class="simple">
+<li><p>No cell should produce errors</p></li>
+<li><p>All outputs should be meaningful</p></li>
+</ul>
+</li>
+<li><p><strong>Test the build</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>clean
+make<span class="w"> </span>build
+</pre></div>
+</div>
+</li>
+<li><p><strong>Review the HTML</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>serve
+<span class="c1"># Check that formatting looks good</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+</section>
+<section id="adding-a-new-chapter">
+<h2>📚 Adding a New Chapter<a class="headerlink" href="#adding-a-new-chapter" title="Link to this heading">#</a></h2>
+<section id="step-1-create-the-notebook">
+<h3>Step 1: Create the Notebook<a class="headerlink" href="#step-1-create-the-notebook" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Copy template</span>
+cp<span class="w"> </span>templates/chapter_template.ipynb<span class="w"> </span>part3/11_my_new_chapter.ipynb
+</pre></div>
+</div>
+</section>
+<section id="step-2-update-table-of-contents">
+<h3>Step 2: Update Table of Contents<a class="headerlink" href="#step-2-update-table-of-contents" title="Link to this heading">#</a></h3>
+<p>Edit <code class="docutils literal notranslate"><span class="pre">_toc.yml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">part3/overview</span>
+<span class="w">  </span><span class="nt">sections</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">part3/10_existing_chapter</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">part3/11_my_new_chapter</span><span class="w">  </span><span class="c1"># Add this line</span>
+</pre></div>
+</div>
+</section>
+<section id="step-3-write-content">
+<h3>Step 3: Write Content<a class="headerlink" href="#step-3-write-content" title="Link to this heading">#</a></h3>
+<p>Follow the chapter structure above.</p>
+</section>
+<section id="step-4-add-cross-references">
+<h3>Step 4: Add Cross-References<a class="headerlink" href="#step-4-add-cross-references" title="Link to this heading">#</a></h3>
+<div class="highlight-markdown notranslate"><div class="highlight"><pre><span></span>See [<span class="nt">Chapter 4</span>](<span class="na">../part2/04_trend_following.ipynb</span>) for more on EWMAC.
+
+Refer back to [<span class="nt">volatility calculations</span>](<span class="na">05_understanding_volatility.ipynb#calculating-volatility</span>).
+</pre></div>
+</div>
+</section>
+<section id="step-5-build-and-review">
+<h3>Step 5: Build and Review<a class="headerlink" href="#step-5-build-and-review" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>clean
+make<span class="w"> </span>build
+make<span class="w"> </span>serve
+</pre></div>
+</div>
+</section>
+</section>
+<section id="linking-to-repository-code">
+<h2>🔗 Linking to Repository Code<a class="headerlink" href="#linking-to-repository-code" title="Link to this heading">#</a></h2>
+<p>When referencing code from the main repository:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add parent directory to path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;../..&#39;</span><span class="p">)</span>
+
+<span class="c1"># Now you can import</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">strategy.trend_following</span><span class="w"> </span><span class="kn">import</span> <span class="n">EWMAC</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data.data_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataManager</span>
+</pre></div>
+</div>
+<p>Always show where the code comes from:</p>
+<div class="highlight-markdown notranslate"><div class="highlight"><pre><span></span>This implementation is in [<span class="sb">`strategy/trend_following.py:118`</span>](../../strategy/trend_following.py#L118)
+</pre></div>
+</div>
+</section>
+<section id="documentation-standards">
+<h2>📖 Documentation Standards<a class="headerlink" href="#documentation-standards" title="Link to this heading">#</a></h2>
+<section id="admonitions">
+<h3>Admonitions<a class="headerlink" href="#admonitions" title="Link to this heading">#</a></h3>
+<p>Use MyST admonitions for callouts:</p>
+<div class="highlight-markdown notranslate"><div class="highlight"><pre><span></span>```{admonition} Key Insight
+:class: tip
+Volatility targeting ensures equal risk across all positions.
+</pre></div>
+</div>
+<div class="warning admonition">
+<p class="admonition-title">Warning</p>
+<p>Never use future data in backtests - this creates lookahead bias!</p>
+</div>
+<div class="note admonition">
+<p class="admonition-title">Note</p>
+<p>The Sharpe ratio measures risk-adjusted returns.</p>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+### Math Equations
+
+Use LaTeX for formulas:
+
+```markdown
+The Sharpe ratio is calculated as:
+
+$$
+\text{Sharpe} = \frac{\mu - r_f}{\sigma}
+$$
+
+where:
+- $\mu$ = mean return
+- $r_f$ = risk-free rate
+- $\sigma$ = standard deviation of returns
+</pre></div>
+</div>
+</section>
+<section id="code-references">
+<h3>Code References<a class="headerlink" href="#code-references" title="Link to this heading">#</a></h3>
+<div class="highlight-markdown notranslate"><div class="highlight"><pre><span></span>The position sizer calculates shares as:
+
+```python
+shares = (capital * target_vol) / (price * asset_vol)
+</pre></div>
+</div>
+<p>This ensures that each position contributes equal volatility.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+## 🐛 Common Mistakes to Avoid
+
+### 1. Lookahead Bias
+```python
+# WRONG - uses future data
+signal = (future_price &gt; current_price)
+
+# RIGHT - only uses past data
+signal = (fast_ma &gt; slow_ma)
+</pre></div>
+</div>
+</section>
+<section id="not-handling-nan">
+<h3>2. Not Handling NaN<a class="headerlink" href="#not-handling-nan" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># WRONG - fails on missing data</span>
+<span class="n">returns</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
+
+<span class="c1"># RIGHT - handles NaN properly</span>
+<span class="n">returns</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="forgetting-to-set-seeds">
+<h3>3. Forgetting to Set Seeds<a class="headerlink" href="#forgetting-to-set-seeds" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># WRONG - non-reproducible</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># RIGHT - reproducible</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="poor-plot-labels">
+<h3>4. Poor Plot Labels<a class="headerlink" href="#poor-plot-labels" title="Link to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># WRONG</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="c1"># RIGHT</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">equity_curve</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Strategy Equity&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Trading Days&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Portfolio Value ($)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Backtest Results: EWMAC 16/64&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="content-priorities">
+<h2>🎯 Content Priorities<a class="headerlink" href="#content-priorities" title="Link to this heading">#</a></h2>
+<section id="essential-for-every-chapter">
+<h3>Essential for Every Chapter<a class="headerlink" href="#essential-for-every-chapter" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>[ ] Clear learning objectives</p></li>
+<li><p>[ ] Interactive code examples</p></li>
+<li><p>[ ] Visualizations of key concepts</p></li>
+<li><p>[ ] Connection to repository code</p></li>
+<li><p>[ ] Key takeaways summary</p></li>
+<li><p>[ ] Exercises for practice</p></li>
+</ul>
+</section>
+<section id="nice-to-have">
+<h3>Nice to Have<a class="headerlink" href="#nice-to-have" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Multiple examples</p></li>
+<li><p>Advanced variations</p></li>
+<li><p>Performance comparisons</p></li>
+<li><p>Real-world case studies</p></li>
+</ul>
+</section>
+</section>
+<section id="submitting-changes">
+<h2>📬 Submitting Changes<a class="headerlink" href="#submitting-changes" title="Link to this heading">#</a></h2>
+<section id="if-using-git">
+<h3>If Using Git<a class="headerlink" href="#if-using-git" title="Link to this heading">#</a></h3>
+<ol class="arabic">
+<li><p>Create a feature branch</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>add-chapter-11
+</pre></div>
+</div>
+</li>
+<li><p>Make your changes</p></li>
+<li><p>Test thoroughly</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>clean
+make<span class="w"> </span>build
+make<span class="w"> </span><span class="nb">test</span>
+</pre></div>
+</div>
+</li>
+<li><p>Commit with clear messages</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>add<span class="w"> </span>book/part3/11_my_chapter.ipynb
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Add Chapter 11: Advanced Position Sizing&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Push and create pull request</p></li>
+</ol>
+</section>
+<section id="if-not-using-git">
+<h3>If Not Using Git<a class="headerlink" href="#if-not-using-git" title="Link to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Email the notebook file</p></li>
+<li><p>Include description of changes</p></li>
+<li><p>Note any new dependencies</p></li>
+</ul>
+</section>
+</section>
+<section id="questions">
+<h2>🙏 Questions?<a class="headerlink" href="#questions" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Open an issue on GitHub</p></li>
+<li><p>Ask in discussions</p></li>
+<li><p>Email the maintainers</p></li>
+</ul>
+<p>Thank you for contributing to make this book better! 🚀</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-start-for-contributors">📋 Quick Start for Contributors</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#setting-up">Setting Up</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#making-changes">Making Changes</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#chapter-structure">📝 Chapter Structure</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#notebook-template">Notebook Template</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-cell-guidelines">Code Cell Guidelines</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#writing-style">🎨 Writing Style</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tone">Tone</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#good-example">Good Example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bad-example">Bad Example</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#use-analogies">Use Analogies</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualizations">📊 Visualizations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#requirements">Requirements</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#example">Example</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#testing">🧪 Testing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#before-submitting">Before Submitting</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-a-new-chapter">📚 Adding a New Chapter</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-1-create-the-notebook">Step 1: Create the Notebook</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-2-update-table-of-contents">Step 2: Update Table of Contents</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-3-write-content">Step 3: Write Content</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-4-add-cross-references">Step 4: Add Cross-References</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#step-5-build-and-review">Step 5: Build and Review</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#linking-to-repository-code">🔗 Linking to Repository Code</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-standards">📖 Documentation Standards</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#admonitions">Admonitions</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-references">Code References</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#not-handling-nan">2. Not Handling NaN</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#forgetting-to-set-seeds">3. Forgetting to Set Seeds</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#poor-plot-labels">4. Poor Plot Labels</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#content-priorities">🎯 Content Priorities</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#essential-for-every-chapter">Essential for Every Chapter</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nice-to-have">Nice to Have</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submitting-changes">📬 Submitting Changes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#if-using-git">If Using Git</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#if-not-using-git">If Not Using Git</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#questions">🙏 Questions?</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Systematic Trading Project
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

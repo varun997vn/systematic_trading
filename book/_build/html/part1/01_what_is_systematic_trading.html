@@ -1,0 +1,1405 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Chapter 1: What is Systematic Trading? &#8212; Systematic Trading - A Complete Guide</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'part1/01_what_is_systematic_trading';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Chapter 2: Understanding Stock Markets" href="02_understanding_stock_markets.html" />
+    <link rel="prev" title="Part I: Foundations" href="overview.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Systematic Trading - A Complete Guide</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="overview.html">Part I: Foundations</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Chapter 1: What is Systematic Trading?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_understanding_stock_markets.html">Chapter 2: Understanding Stock Markets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="03_why_manual_trading_fails.html">Chapter 1: Why Manual Trading Fails</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../part2/overview.html">Part II: Core Concepts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../part2/04_trend_following.html">Chapter 2: Trend Following</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../part2/05_understanding_volatility.html">Chapter 2: Understanding Volatility</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../part2/06_position_sizing.html">Chapter 2: Position Sizing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../part2/07_transaction_costs.html">Chapter 2: Transaction Costs</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../part3/overview.html">Part III: Implementation</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../part3/08_getting_data.html">Chapter 3: Getting Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../part3/09_building_strategies.html">Chapter 3: Building Strategies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../part3/10_backtesting_engine.html">Chapter 3: Backtesting Engine</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../part4/overview.html">Part IV: Analysis</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../part4/11_understanding_results.html">Chapter 4: Understanding Results</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../part4/12_performance_metrics.html">Chapter 4: Performance Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../part4/13_portfolio_approach.html">Chapter 4: Portfolio Approach</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../part5/overview.html">Part V: Practical Application</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../part5/14_system_capabilities.html">Chapter 5: System Capabilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../part5/15_extending_system.html">Chapter 5: Extending System</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../part5/16_real_world_trading.html">Chapter 5: Real World Trading</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/glossary.html">Glossary of Terms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/resources.html">Resources and Further Reading</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appendix/code_reference.html">Code Reference</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/yourusername/systematic_trading" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/yourusername/systematic_trading/edit/main/part1/01_what_is_systematic_trading.ipynb" target="_blank"
+   class="btn btn-sm btn-source-edit-button dropdown-item"
+   title="Suggest edit"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-pencil-alt"></i>
+  </span>
+<span class="btn__text-container">Suggest edit</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/yourusername/systematic_trading/issues/new?title=Issue%20on%20page%20%2Fpart1/01_what_is_systematic_trading.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/part1/01_what_is_systematic_trading.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Chapter 1: What is Systematic Trading?</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-objectives">Learning Objectives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gambling-problem">The Gambling Problem</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interactive-example-coin-flip-simulation">Interactive Example: Coin Flip Simulation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-systematic-trading">What is Systematic Trading?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#real-world-comparison">Real-World Comparison</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-does-systematic-trading-work">Why Does Systematic Trading Work?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#consistency">1. Consistency</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#backtesting">2. Backtesting</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#who-is-robert-carver">Who is Robert Carver?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#carvers-key-innovations">Carver’s Key Innovations</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#volatility-targeting">1. Volatility Targeting</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#forecast-scaling">2. Forecast Scaling</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-awareness">3. Cost Awareness</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diversification">4. Diversification</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-repository-demonstrates">What This Repository Demonstrates</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#repository-structure">Repository Structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-components">Key Components</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-preview-running-the-system">A Preview: Running the System</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-takeaways">Key Takeaways</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">Exercises</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#next-steps">Next Steps</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="chapter-1-what-is-systematic-trading">
+<h1>Chapter 1: What is Systematic Trading?<a class="headerlink" href="#chapter-1-what-is-systematic-trading" title="Link to this heading">#</a></h1>
+<section id="learning-objectives">
+<h2>Learning Objectives<a class="headerlink" href="#learning-objectives" title="Link to this heading">#</a></h2>
+<p>By the end of this chapter, you’ll understand:</p>
+<ul class="simple">
+<li><p>The difference between manual and systematic trading</p></li>
+<li><p>Why systematic trading works</p></li>
+<li><p>Robert Carver’s key principles</p></li>
+<li><p>What this repository demonstrates</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="the-gambling-problem">
+<h2>The Gambling Problem<a class="headerlink" href="#the-gambling-problem" title="Link to this heading">#</a></h2>
+<p>Imagine you’re at a casino playing blackjack. You have a system:</p>
+<ul class="simple">
+<li><p>“I’ll bet $10 when I feel confident”</p></li>
+<li><p>“I’ll bet $50 when I’m really sure”</p></li>
+<li><p>“I’ll stop when I’m tired”</p></li>
+</ul>
+<p><strong>This is how most people trade stocks.</strong></p>
+<p>The problems?</p>
+<ol class="arabic simple">
+<li><p><strong>“Feeling confident”</strong> - Emotions change based on recent wins/losses</p></li>
+<li><p><strong>“Really sure”</strong> - Humans are terrible at judging probability</p></li>
+<li><p><strong>“When I’m tired”</strong> - You make worse decisions when emotional or exhausted</p></li>
+</ol>
+<section id="interactive-example-coin-flip-simulation">
+<h3>Interactive Example: Coin Flip Simulation<a class="headerlink" href="#interactive-example-coin-flip-simulation" title="Link to this heading">#</a></h3>
+<p>Let’s simulate two approaches to a simple coin flip game:</p>
+<ul class="simple">
+<li><p><strong>Emotional trader</strong>: Varies bet size based on recent results</p></li>
+<li><p><strong>Systematic trader</strong>: Always bets the same amount</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="c1"># Set random seed for reproducibility</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="c1"># Simulation parameters</span>
+<span class="n">n_flips</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">win_probability</span> <span class="o">=</span> <span class="mf">0.55</span>  <span class="c1"># Slight edge (like a good trading strategy)</span>
+<span class="n">initial_capital</span> <span class="o">=</span> <span class="mi">10000</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">emotional_trader</span><span class="p">(</span><span class="n">n_flips</span><span class="p">,</span> <span class="n">win_prob</span><span class="p">,</span> <span class="n">initial_capital</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulates an emotional trader who varies bet size based on recent results&quot;&quot;&quot;</span>
+    <span class="n">capital</span> <span class="o">=</span> <span class="n">initial_capital</span>
+    <span class="n">equity_curve</span> <span class="o">=</span> <span class="p">[</span><span class="n">capital</span><span class="p">]</span>
+    
+    <span class="n">base_bet</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">recent_wins</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Track recent performance</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_flips</span><span class="p">):</span>
+        <span class="c1"># Vary bet size based on recent wins</span>
+        <span class="k">if</span> <span class="n">recent_wins</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">bet</span> <span class="o">=</span> <span class="n">base_bet</span> <span class="o">*</span> <span class="mi">2</span>  <span class="c1"># &quot;I&#39;m on a hot streak!&quot;</span>
+        <span class="k">elif</span> <span class="n">recent_wins</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">3</span><span class="p">:</span>
+            <span class="n">bet</span> <span class="o">=</span> <span class="n">base_bet</span> <span class="o">*</span> <span class="mf">0.5</span>  <span class="c1"># &quot;I need to be cautious&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">bet</span> <span class="o">=</span> <span class="n">base_bet</span>
+        
+        <span class="c1"># Flip coin</span>
+        <span class="n">win</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">win_prob</span>
+        
+        <span class="k">if</span> <span class="n">win</span><span class="p">:</span>
+            <span class="n">capital</span> <span class="o">+=</span> <span class="n">bet</span>
+            <span class="n">recent_wins</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">capital</span> <span class="o">-=</span> <span class="n">bet</span>
+            <span class="n">recent_wins</span> <span class="o">-=</span> <span class="mi">1</span>
+        
+        <span class="c1"># Reset counter if too extreme</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">recent_wins</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">recent_wins</span> <span class="o">=</span> <span class="mi">0</span>
+        
+        <span class="n">equity_curve</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">capital</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">equity_curve</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">systematic_trader</span><span class="p">(</span><span class="n">n_flips</span><span class="p">,</span> <span class="n">win_prob</span><span class="p">,</span> <span class="n">initial_capital</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulates a systematic trader with fixed bet size&quot;&quot;&quot;</span>
+    <span class="n">capital</span> <span class="o">=</span> <span class="n">initial_capital</span>
+    <span class="n">equity_curve</span> <span class="o">=</span> <span class="p">[</span><span class="n">capital</span><span class="p">]</span>
+    
+    <span class="n">bet</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># Always the same</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_flips</span><span class="p">):</span>
+        <span class="n">win</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">win_prob</span>
+        
+        <span class="k">if</span> <span class="n">win</span><span class="p">:</span>
+            <span class="n">capital</span> <span class="o">+=</span> <span class="n">bet</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">capital</span> <span class="o">-=</span> <span class="n">bet</span>
+        
+        <span class="n">equity_curve</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">capital</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">equity_curve</span>
+
+<span class="c1"># Run simulations</span>
+<span class="n">emotional_equity</span> <span class="o">=</span> <span class="n">emotional_trader</span><span class="p">(</span><span class="n">n_flips</span><span class="p">,</span> <span class="n">win_probability</span><span class="p">,</span> <span class="n">initial_capital</span><span class="p">)</span>
+<span class="n">systematic_equity</span> <span class="o">=</span> <span class="n">systematic_trader</span><span class="p">(</span><span class="n">n_flips</span><span class="p">,</span> <span class="n">win_probability</span><span class="p">,</span> <span class="n">initial_capital</span><span class="p">)</span>
+
+<span class="c1"># Plot results</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">emotional_equity</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Emotional Trader&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">systematic_equity</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Systematic Trader&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="n">initial_capital</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Starting Capital&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Number of Flips&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Capital ($)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Emotional vs Systematic Trading: Coin Flip Game (55% Win Rate)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Summary statistics</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Final Results after </span><span class="si">{</span><span class="n">n_flips</span><span class="si">}</span><span class="s2"> flips:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Emotional Trader: $</span><span class="si">{</span><span class="n">emotional_equity</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="p">(</span><span class="n">emotional_equity</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">initial_capital</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">+.1f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Systematic Trader: $</span><span class="si">{</span><span class="n">systematic_equity</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="p">(</span><span class="n">systematic_equity</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">initial_capital</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">+.1f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Expected profit: $</span><span class="si">{</span><span class="n">n_flips</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">win_probability</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">2</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/tmp/ipykernel_13565/297351446.py:3: DeprecationWarning: 
+Pyarrow will become a required dependency of pandas in the next major release of pandas (pandas 3.0),
+(to allow more performant data types, such as the Arrow string type, and better interoperability with other libraries)
+but was not found to be installed on your system.
+If this would cause problems for you,
+please provide us feedback at https://github.com/pandas-dev/pandas/issues/54466
+        
+  import pandas as pd
+</pre></div>
+</div>
+<img alt="../_images/6a6549319ad5be8a73b8848f164dc4835eb02b8089235e90ec602dc64db5bff7.png" src="../_images/6a6549319ad5be8a73b8848f164dc4835eb02b8089235e90ec602dc64db5bff7.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Final Results after 100 flips:
+Emotional Trader: $12,200.00 (+22.0%)
+Systematic Trader: $11,400.00 (+14.0%)
+
+Expected profit: $1,000.00
+</pre></div>
+</div>
+</div>
+</div>
+<div class="tip admonition">
+<p class="admonition-title">Key Insight</p>
+<p>Notice how the emotional trader’s equity curve is more volatile? By varying bet sizes based on recent results (which are mostly random), they introduced unnecessary risk. The systematic trader, despite using a simple fixed bet, achieved more consistent results.</p>
+</div>
+</section>
+</section>
+<section id="what-is-systematic-trading">
+<h2>What is Systematic Trading?<a class="headerlink" href="#what-is-systematic-trading" title="Link to this heading">#</a></h2>
+<p><strong>Systematic Trading</strong> is a method where:</p>
+<ol class="arabic simple">
+<li><p><strong>Rules are defined in advance</strong> - You decide exactly what conditions trigger a trade</p></li>
+<li><p><strong>Rules are followed mechanically</strong> - No emotional overrides</p></li>
+<li><p><strong>Everything is measurable</strong> - You can test if your rules actually work</p></li>
+<li><p><strong>Risk is managed mathematically</strong> - Position sizes calculated by formula, not gut feel</p></li>
+</ol>
+<section id="real-world-comparison">
+<h3>Real-World Comparison<a class="headerlink" href="#real-world-comparison" title="Link to this heading">#</a></h3>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Manual Trader</p></th>
+<th class="head"><p>Systematic Trader</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Watches news about Tesla</p></td>
+<td><p>Has a rule: “Buy when 16-day avg &gt; 64-day avg”</p></td>
+</tr>
+<tr class="row-odd"><td><p>Feels optimistic after Elon’s tweet</p></td>
+<td><p>Computer calculates this daily</p></td>
+</tr>
+<tr class="row-even"><td><p>Buys $10,000 worth (“feels right”)</p></td>
+<td><p>Buys calculated position size based on volatility</p></td>
+</tr>
+<tr class="row-odd"><td><p>Gets nervous when price drops 5%</p></td>
+<td><p>No emotions - follows rules</p></td>
+</tr>
+<tr class="row-even"><td><p>Sells at a loss</p></td>
+<td><p>Holds until signal reverses</p></td>
+</tr>
+<tr class="row-odd"><td><p>Repeats emotional cycle</p></td>
+<td><p>Consistent execution every time</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+<section id="why-does-systematic-trading-work">
+<h2>Why Does Systematic Trading Work?<a class="headerlink" href="#why-does-systematic-trading-work" title="Link to this heading">#</a></h2>
+<section id="consistency">
+<h3>1. Consistency<a class="headerlink" href="#consistency" title="Link to this heading">#</a></h3>
+<p>Humans are inconsistent. You might be brave on Monday and scared on Friday. A computer applies the same logic every time.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Demonstration: Human inconsistency in decision-making</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">human_decision</span><span class="p">(</span><span class="n">market_condition</span><span class="p">,</span> <span class="n">mood</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Simulates inconsistent human decision making&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mood</span> <span class="o">==</span> <span class="s1">&#39;confident&#39;</span><span class="p">:</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.3</span>  <span class="c1"># Lower bar for buying</span>
+    <span class="k">elif</span> <span class="n">mood</span> <span class="o">==</span> <span class="s1">&#39;scared&#39;</span><span class="p">:</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.8</span>  <span class="c1"># Higher bar for buying</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span>
+    
+    <span class="k">return</span> <span class="n">market_condition</span> <span class="o">&gt;</span> <span class="n">threshold</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">systematic_decision</span><span class="p">(</span><span class="n">market_condition</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Consistent systematic decision&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">market_condition</span> <span class="o">&gt;</span> <span class="mf">0.5</span>  <span class="c1"># Always the same threshold</span>
+
+<span class="c1"># Simulate 20 decision points with the same market conditions</span>
+<span class="n">market_conditions</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">]</span> <span class="o">*</span> <span class="mi">20</span>  <span class="c1"># Same condition repeated</span>
+<span class="n">moods</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">([</span><span class="s1">&#39;confident&#39;</span><span class="p">,</span> <span class="s1">&#39;neutral&#39;</span><span class="p">,</span> <span class="s1">&#39;scared&#39;</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="n">human_decisions</span> <span class="o">=</span> <span class="p">[</span><span class="n">human_decision</span><span class="p">(</span><span class="n">mc</span><span class="p">,</span> <span class="n">mood</span><span class="p">)</span> <span class="k">for</span> <span class="n">mc</span><span class="p">,</span> <span class="n">mood</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">market_conditions</span><span class="p">,</span> <span class="n">moods</span><span class="p">)]</span>
+<span class="n">systematic_decisions</span> <span class="o">=</span> <span class="p">[</span><span class="n">systematic_decision</span><span class="p">(</span><span class="n">mc</span><span class="p">)</span> <span class="k">for</span> <span class="n">mc</span> <span class="ow">in</span> <span class="n">market_conditions</span><span class="p">]</span>
+
+<span class="c1"># Visualize</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">ax1</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="n">human_decisions</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;green&#39;</span> <span class="k">if</span> <span class="n">d</span> <span class="k">else</span> <span class="s1">&#39;red&#39;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">human_decisions</span><span class="p">],</span> 
+            <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s1">&#39;Sell&#39;</span><span class="p">,</span> <span class="s1">&#39;Buy&#39;</span><span class="p">])</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Decision Number&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Human Trader (Same Market Condition)&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span> <span class="n">systematic_decisions</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;green&#39;</span> <span class="k">if</span> <span class="n">d</span> <span class="k">else</span> <span class="s1">&#39;red&#39;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">systematic_decisions</span><span class="p">],</span>
+            <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s1">&#39;Sell&#39;</span><span class="p">,</span> <span class="s1">&#39;Buy&#39;</span><span class="p">])</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Decision Number&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Systematic Trader (Same Market Condition)&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Human trader made </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">human_decisions</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">human_decisions</span><span class="p">)</span><span class="si">}</span><span class="s2"> buy decisions&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Systematic trader made </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">systematic_decisions</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">systematic_decisions</span><span class="p">)</span><span class="si">}</span><span class="s2"> buy decisions&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Inconsistency: Human varied despite identical market conditions!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/9fd27b33542bed71452111daf7732a9c023cdbdaa7d268d2fbc64dcda2bf1a1f.png" src="../_images/9fd27b33542bed71452111daf7732a9c023cdbdaa7d268d2fbc64dcda2bf1a1f.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Human trader made 10/20 buy decisions
+Systematic trader made 20/20 buy decisions
+
+Inconsistency: Human varied despite identical market conditions!
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="backtesting">
+<h3>2. Backtesting<a class="headerlink" href="#backtesting" title="Link to this heading">#</a></h3>
+<p>You can test your rules on historical data. Did your strategy make money over the last 10 years? You can actually find out before risking real money.</p>
+<p>Let’s preview what backtesting looks like (we’ll dive deep into this in Chapter 10):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Simple backtest preview - we&#39;ll build the full system later!</span>
+<span class="c1"># For now, let&#39;s just show the concept with synthetic data</span>
+
+<span class="c1"># Generate synthetic price data</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">days</span> <span class="o">=</span> <span class="mi">252</span> <span class="o">*</span> <span class="mi">2</span>  <span class="c1"># 2 years of trading days</span>
+<span class="n">price</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">prices</span> <span class="o">=</span> <span class="p">[</span><span class="n">price</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">days</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="c1"># Random walk with slight upward drift</span>
+    <span class="n">change</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">)</span>  <span class="c1"># 0.1% drift, 2% volatility</span>
+    <span class="n">price</span> <span class="o">=</span> <span class="n">price</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">change</span><span class="p">)</span>
+    <span class="n">prices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">price</span><span class="p">)</span>
+
+<span class="n">prices</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">prices</span><span class="p">)</span>
+
+<span class="c1"># Simple moving average strategy</span>
+<span class="n">fast_ma</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">slow_ma</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1"># Generate signals</span>
+<span class="n">signal</span> <span class="o">=</span> <span class="p">(</span><span class="n">fast_ma</span> <span class="o">&gt;</span> <span class="n">slow_ma</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>  <span class="c1"># 1 = buy, 0 = sell</span>
+
+<span class="c1"># Calculate returns</span>
+<span class="n">returns</span> <span class="o">=</span> <span class="n">prices</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
+<span class="n">strategy_returns</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">returns</span>  <span class="c1"># Shift to avoid lookahead bias</span>
+
+<span class="c1"># Calculate cumulative returns</span>
+<span class="n">buy_hold</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">returns</span><span class="p">)</span><span class="o">.</span><span class="n">cumprod</span><span class="p">()</span>
+<span class="n">strategy</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">strategy_returns</span><span class="p">)</span><span class="o">.</span><span class="n">cumprod</span><span class="p">()</span>
+
+<span class="c1"># Plot</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+<span class="c1"># Price and moving averages</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">prices</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Price&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fast_ma</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Fast MA (20 days)&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">slow_ma</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Slow MA (50 days)&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">signal</span><span class="p">)),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">prices</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> 
+                 <span class="n">where</span><span class="o">=</span><span class="n">signal</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Long Position&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Trading Days&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Price ($)&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Simple Moving Average Strategy&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Performance comparison</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">buy_hold</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Buy &amp; Hold&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">strategy</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;MA Strategy&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Trading Days&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Cumulative Return (1 = 100%)&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Strategy Performance vs Buy &amp; Hold&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Buy &amp; Hold Return: </span><span class="si">{</span><span class="p">(</span><span class="n">buy_hold</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Strategy Return: </span><span class="si">{</span><span class="p">(</span><span class="n">strategy</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Note: This is a simple example. Real backtesting includes costs, slippage, etc.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/46263b89d054ccb854b1ba5b1aa1785c591ec5e658ff76608b5c9e8aa2e1b795.png" src="../_images/46263b89d054ccb854b1ba5b1aa1785c591ec5e658ff76608b5c9e8aa2e1b795.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Buy &amp; Hold Return: 65.33%
+Strategy Return: 21.03%
+
+Note: This is a simple example. Real backtesting includes costs, slippage, etc.
+</pre></div>
+</div>
+</div>
+</div>
+<div class="warning admonition">
+<p class="admonition-title">Important</p>
+<p>This is a simplified example! Real backtesting must account for:</p>
+<ul class="simple">
+<li><p>Transaction costs (commissions, spreads)</p></li>
+<li><p>Slippage (price movement during order execution)</p></li>
+<li><p>Market impact (your orders affecting price)</p></li>
+<li><p>Realistic position sizing</p></li>
+</ul>
+<p>We’ll cover all of this properly in later chapters!</p>
+</div>
+</section>
+</section>
+<section id="who-is-robert-carver">
+<h2>Who is Robert Carver?<a class="headerlink" href="#who-is-robert-carver" title="Link to this heading">#</a></h2>
+<p><strong>Robert Carver</strong> is a former portfolio manager who worked at AHL, a multi-billion dollar quantitative hedge fund. In 2015, he wrote <em>“Systematic Trading: A Unique New Method for Designing Trading and Investing Systems”</em>.</p>
+<section id="carvers-key-innovations">
+<h3>Carver’s Key Innovations<a class="headerlink" href="#carvers-key-innovations" title="Link to this heading">#</a></h3>
+<section id="volatility-targeting">
+<h4>1. Volatility Targeting<a class="headerlink" href="#volatility-targeting" title="Link to this heading">#</a></h4>
+<p><strong>Problem:</strong> Some stocks move 1% per day, others 10% per day. Equal dollar investments = unequal risk.</p>
+<p><strong>Solution:</strong> Adjust position size based on volatility to take consistent risk.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Demonstration: Volatility Targeting</span>
+
+<span class="c1"># Three stocks with different volatilities</span>
+<span class="n">stocks</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Utility (Low Vol)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;daily_vol&#39;</span><span class="p">:</span> <span class="mf">0.005</span><span class="p">},</span>  <span class="c1"># 0.5% daily</span>
+    <span class="s1">&#39;Tech (Medium Vol)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;daily_vol&#39;</span><span class="p">:</span> <span class="mf">0.020</span><span class="p">},</span>  <span class="c1"># 2% daily</span>
+    <span class="s1">&#39;Biotech (High Vol)&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;price&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;daily_vol&#39;</span><span class="p">:</span> <span class="mf">0.050</span><span class="p">},</span> <span class="c1"># 5% daily</span>
+<span class="p">}</span>
+
+<span class="n">capital</span> <span class="o">=</span> <span class="mi">100000</span>
+<span class="n">target_vol</span> <span class="o">=</span> <span class="mf">0.20</span>  <span class="c1"># 20% annual volatility target</span>
+
+<span class="c1"># Equal dollar allocation (WRONG)</span>
+<span class="n">equal_allocation</span> <span class="o">=</span> <span class="n">capital</span> <span class="o">/</span> <span class="mi">3</span>
+
+<span class="c1"># Volatility-based allocation (RIGHT)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">stocks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="c1"># Equal dollar risk</span>
+    <span class="n">shares_equal</span> <span class="o">=</span> <span class="n">equal_allocation</span> <span class="o">/</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span>
+    <span class="n">risk_equal</span> <span class="o">=</span> <span class="n">equal_allocation</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;daily_vol&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">252</span><span class="p">)</span>
+    
+    <span class="c1"># Volatility targeted</span>
+    <span class="n">annual_vol</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;daily_vol&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">252</span><span class="p">)</span>
+    <span class="n">target_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">capital</span> <span class="o">*</span> <span class="n">target_vol</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">annual_vol</span><span class="p">)</span>
+    <span class="n">allocation_vol</span> <span class="o">=</span> <span class="n">target_position</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span>
+    <span class="n">risk_vol</span> <span class="o">=</span> <span class="n">allocation_vol</span> <span class="o">*</span> <span class="n">annual_vol</span>
+    
+    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+        <span class="s1">&#39;Stock&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+        <span class="s1">&#39;Equal $ Allocation&#39;</span><span class="p">:</span> <span class="n">equal_allocation</span><span class="p">,</span>
+        <span class="s1">&#39;Equal $ Risk&#39;</span><span class="p">:</span> <span class="n">risk_equal</span><span class="p">,</span>
+        <span class="s1">&#39;Vol-Targeted Allocation&#39;</span><span class="p">:</span> <span class="n">allocation_vol</span><span class="p">,</span>
+        <span class="s1">&#39;Vol-Targeted Risk&#39;</span><span class="p">:</span> <span class="n">risk_vol</span>
+    <span class="p">})</span>
+
+<span class="n">df_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+<span class="c1"># Visualize</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># Equal dollar allocation</span>
+<span class="n">x</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df_results</span><span class="p">))</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;Equal $ Allocation&#39;</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Allocation&#39;</span><span class="p">)</span>
+<span class="n">ax1_twin</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">ax1_twin</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;Equal $ Risk&#39;</span><span class="p">],</span> <span class="s1">&#39;ro-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Risk&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;Stock&#39;</span><span class="p">],</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Allocation ($)&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+<span class="n">ax1_twin</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Annual Risk ($)&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Equal Dollar Allocation</span><span class="se">\n</span><span class="s1">(UNEQUAL RISK!)&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="c1"># Volatility-targeted allocation</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;Vol-Targeted Allocation&#39;</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Allocation&#39;</span><span class="p">)</span>
+<span class="n">ax2_twin</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">ax2_twin</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;Vol-Targeted Risk&#39;</span><span class="p">],</span> <span class="s1">&#39;ro-&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Risk&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;Stock&#39;</span><span class="p">],</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;right&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Allocation ($)&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">)</span>
+<span class="n">ax2_twin</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Annual Risk ($)&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Volatility-Targeted Allocation</span><span class="se">\n</span><span class="s1">(EQUAL RISK!)&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Equal Dollar Allocation:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df_results</span><span class="p">[[</span><span class="s1">&#39;Stock&#39;</span><span class="p">,</span> <span class="s1">&#39;Equal $ Allocation&#39;</span><span class="p">,</span> <span class="s1">&#39;Equal $ Risk&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Risk range: $</span><span class="si">{</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;Equal $ Risk&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> to $</span><span class="si">{</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;Equal $ Risk&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Risk ratio: </span><span class="si">{</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;Equal $ Risk&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;Equal $ Risk&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Volatility-Targeted Allocation:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df_results</span><span class="p">[[</span><span class="s1">&#39;Stock&#39;</span><span class="p">,</span> <span class="s1">&#39;Vol-Targeted Allocation&#39;</span><span class="p">,</span> <span class="s1">&#39;Vol-Targeted Risk&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">All positions have equal risk: ~$</span><span class="si">{</span><span class="n">df_results</span><span class="p">[</span><span class="s1">&#39;Vol-Targeted Risk&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/118eb9f7e1fbaf28b764a704dc2cead03e1346d0c8a3ac952046f3171fed33a2.png" src="../_images/118eb9f7e1fbaf28b764a704dc2cead03e1346d0c8a3ac952046f3171fed33a2.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Equal Dollar Allocation:
+             Stock  Equal $ Allocation  Equal $ Risk
+ Utility (Low Vol)        33333.333333   2645.751311
+ Tech (Medium Vol)        33333.333333  10583.005244
+Biotech (High Vol)        33333.333333  26457.513111
+
+Risk range: $2646 to $26458
+Risk ratio: 10.0x
+
+
+Volatility-Targeted Allocation:
+             Stock  Vol-Targeted Allocation  Vol-Targeted Risk
+ Utility (Low Vol)            251976.315339            20000.0
+ Tech (Medium Vol)             62994.078835            20000.0
+Biotech (High Vol)             25197.631534            20000.0
+
+All positions have equal risk: ~$20000
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="forecast-scaling">
+<h4>2. Forecast Scaling<a class="headerlink" href="#forecast-scaling" title="Link to this heading">#</a></h4>
+<p><strong>Problem:</strong> Different strategies produce signals on different scales. How do you compare them?</p>
+<p><strong>Solution:</strong> Standardize all signals to -20 to +20 range, with average absolute value of 10.</p>
+<p>We’ll cover this in detail in Chapter 4.</p>
+</section>
+<section id="cost-awareness">
+<h4>3. Cost Awareness<a class="headerlink" href="#cost-awareness" title="Link to this heading">#</a></h4>
+<p><strong>Problem:</strong> Most backtests ignore costs. A strategy that trades 100 times/year might be unprofitable after commissions.</p>
+<p><strong>Solution:</strong> Build transaction costs into every backtest from day one.</p>
+<p>We’ll explore this thoroughly in Chapter 7.</p>
+</section>
+<section id="diversification">
+<h4>4. Diversification<a class="headerlink" href="#diversification" title="Link to this heading">#</a></h4>
+<p><strong>Problem:</strong> Single strategy + single stock = high risk</p>
+<p><strong>Solution:</strong> Combine multiple strategies, timeframes, and instruments.</p>
+</section>
+</section>
+</section>
+<section id="what-this-repository-demonstrates">
+<h2>What This Repository Demonstrates<a class="headerlink" href="#what-this-repository-demonstrates" title="Link to this heading">#</a></h2>
+<p>This codebase implements Carver’s principles for US stock markets (NASDAQ/NYSE stocks like Google, Microsoft, Tesla).</p>
+<section id="repository-structure">
+<h3>Repository Structure<a class="headerlink" href="#repository-structure" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Let&#39;s explore the repository structure</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="c1"># Go up two levels from book directory to repo root</span>
+<span class="n">repo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="k">if</span> <span class="s1">&#39;book&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">())</span> <span class="k">else</span> <span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">show_tree</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">current_depth</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Display directory tree&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">current_depth</span> <span class="o">&gt;=</span> <span class="n">max_depth</span><span class="p">:</span>
+        <span class="k">return</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">contents</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">directory</span><span class="o">.</span><span class="n">iterdir</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">PermissionError</span><span class="p">:</span>
+        <span class="k">return</span>
+    
+    <span class="c1"># Filter out unwanted directories</span>
+    <span class="n">ignore</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;.git&#39;</span><span class="p">,</span> <span class="s1">&#39;__pycache__&#39;</span><span class="p">,</span> <span class="s1">&#39;.pytest_cache&#39;</span><span class="p">,</span> <span class="s1">&#39;logs&#39;</span><span class="p">,</span> <span class="s1">&#39;.venv&#39;</span><span class="p">,</span> <span class="s1">&#39;venv&#39;</span><span class="p">,</span> <span class="s1">&#39;_build&#39;</span><span class="p">}</span>
+    <span class="n">contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">contents</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ignore</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)]</span>
+    
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">contents</span><span class="p">):</span>
+        <span class="n">is_last</span> <span class="o">=</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">current_prefix</span> <span class="o">=</span> <span class="s2">&quot;└── &quot;</span> <span class="k">if</span> <span class="n">is_last</span> <span class="k">else</span> <span class="s2">&quot;├── &quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">current_prefix</span><span class="si">}{</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="n">extension</span> <span class="o">=</span> <span class="s2">&quot;    &quot;</span> <span class="k">if</span> <span class="n">is_last</span> <span class="k">else</span> <span class="s2">&quot;│   &quot;</span>
+            <span class="n">show_tree</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">extension</span><span class="p">,</span> <span class="n">max_depth</span><span class="p">,</span> <span class="n">current_depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Repository Structure:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">repo_root</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="n">show_tree</span><span class="p">(</span><span class="n">repo_root</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Repository Structure:
+systematic_trading
+├── ARCHITECTURE.md
+├── BOOK_QUICKSTART.md
+├── DEVELOPERS_GUIDE.md
+├── INDEX.md
+├── PROJECT_SUMMARY.md
+├── QUICK_REFERENCE.md
+├── README.md
+├── SETUP.md
+├── SYSTEMATIC_TRADING_BOOK.md
+├── backtesting
+│   ├── __init__.py
+│   ├── backtest_engine.py
+│   └── performance.py
+├── book
+│   ├── CONTRIBUTING.md
+│   ├── FRAMEWORK_SUMMARY.md
+│   ├── Makefile
+│   ├── README.md
+│   ├── VISUAL_STRUCTURE.txt
+│   ├── _config.yml
+│   ├── _static
+│   ├── _toc.yml
+│   ├── appendix
+│   ├── images
+│   ├── intro.md
+│   ├── part1
+│   ├── part2
+│   ├── part3
+│   ├── part4
+│   ├── part5
+│   ├── requirements.txt
+│   └── setup_book.sh
+├── config
+│   ├── __init__.py
+│   └── settings.py
+├── data
+│   ├── __init__.py
+│   ├── data_manager.py
+│   └── historical
+├── equity_curve.png
+├── main.py
+├── positions.png
+├── pytest.ini
+├── requirements.txt
+├── risk_management
+│   ├── __init__.py
+│   └── position_sizer.py
+├── strategy
+│   ├── __init__.py
+│   ├── base_strategy.py
+│   └── trend_following.py
+├── tests
+│   ├── __init__.py
+│   ├── test_calculations.py
+│   ├── test_position_sizer.py
+│   └── test_strategy.py
+└── utils
+    ├── __init__.py
+    ├── calculations.py
+    └── logger.py
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="key-components">
+<h3>Key Components<a class="headerlink" href="#key-components" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p><strong>Data Management</strong> (<code class="docutils literal notranslate"><span class="pre">data/data_manager.py</span></code>)</p>
+<ul class="simple">
+<li><p>Downloads historical stock prices from Yahoo Finance</p></li>
+<li><p>Stores data locally for analysis</p></li>
+</ul>
+</li>
+<li><p><strong>Trading Strategies</strong> (<code class="docutils literal notranslate"><span class="pre">strategy/trend_following.py</span></code>)</p>
+<ul class="simple">
+<li><p>EWMAC: Exponentially Weighted Moving Average Crossover</p></li>
+<li><p>MA Crossover: Simple Moving Average Crossover</p></li>
+<li><p>Multiple EWMAC: Combining different timeframes</p></li>
+</ul>
+</li>
+<li><p><strong>Risk Management</strong> (<code class="docutils literal notranslate"><span class="pre">risk_management/position_sizer.py</span></code>)</p>
+<ul class="simple">
+<li><p>Volatility targeting</p></li>
+<li><p>Position size calculations</p></li>
+<li><p>Maximum position limits</p></li>
+</ul>
+</li>
+<li><p><strong>Backtesting</strong> (<code class="docutils literal notranslate"><span class="pre">backtesting/backtest_engine.py</span></code>)</p>
+<ul class="simple">
+<li><p>Simulates trading with historical data</p></li>
+<li><p>Includes transaction costs and slippage</p></li>
+<li><p>Tracks equity curve and performance</p></li>
+</ul>
+</li>
+<li><p><strong>Performance Analysis</strong> (<code class="docutils literal notranslate"><span class="pre">backtesting/performance.py</span></code>)</p>
+<ul class="simple">
+<li><p>Calculates returns, Sharpe ratio, drawdowns</p></li>
+<li><p>Generates charts and reports</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+<section id="a-preview-running-the-system">
+<h2>A Preview: Running the System<a class="headerlink" href="#a-preview-running-the-system" title="Link to this heading">#</a></h2>
+<p>Here’s a glimpse of how the complete system works (we’ll build this step-by-step in later chapters):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Note: This is a preview only - we&#39;ll implement each piece in detail later!</span>
+<span class="c1"># For now, this shows the high-level workflow</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">Systematic Trading Workflow:</span>
+<span class="s2">===========================</span>
+
+<span class="s2">Step 1: Download Data</span>
+<span class="s2">  ↓</span>
+<span class="s2">  from data.data_manager import DataManager</span>
+<span class="s2">  dm = DataManager()</span>
+<span class="s2">  data = dm.download_stock_data(&#39;GOOG&#39;, save=True)</span>
+
+<span class="s2">Step 2: Create Strategy</span>
+<span class="s2">  ↓</span>
+<span class="s2">  from strategy.trend_following import EWMAC</span>
+<span class="s2">  strategy = EWMAC(fast_span=16, slow_span=64)</span>
+<span class="s2">  signals = strategy.generate_signals(data)</span>
+
+<span class="s2">Step 3: Size Positions</span>
+<span class="s2">  ↓</span>
+<span class="s2">  from risk_management.position_sizer import PositionSizer</span>
+<span class="s2">  sizer = PositionSizer(capital=100000, volatility_target=0.20)</span>
+<span class="s2">  position = sizer.calculate_position(signal, price, volatility)</span>
+
+<span class="s2">Step 4: Run Backtest</span>
+<span class="s2">  ↓</span>
+<span class="s2">  from backtesting.backtest_engine import BacktestEngine</span>
+<span class="s2">  engine = BacktestEngine(initial_capital=100000)</span>
+<span class="s2">  results = engine.run(strategy, data, sizer)</span>
+
+<span class="s2">Step 5: Analyze Performance</span>
+<span class="s2">  ↓</span>
+<span class="s2">  from backtesting.performance import PerformanceAnalyzer</span>
+<span class="s2">  analyzer = PerformanceAnalyzer(results)</span>
+<span class="s2">  analyzer.print_summary()</span>
+<span class="s2">  analyzer.plot_equity_curve()</span>
+
+<span class="s2">Each of these steps will be covered in detail in upcoming chapters!</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Systematic Trading Workflow:
+===========================
+
+Step 1: Download Data
+  ↓
+  from data.data_manager import DataManager
+  dm = DataManager()
+  data = dm.download_stock_data(&#39;GOOG&#39;, save=True)
+
+Step 2: Create Strategy
+  ↓
+  from strategy.trend_following import EWMAC
+  strategy = EWMAC(fast_span=16, slow_span=64)
+  signals = strategy.generate_signals(data)
+
+Step 3: Size Positions
+  ↓
+  from risk_management.position_sizer import PositionSizer
+  sizer = PositionSizer(capital=100000, volatility_target=0.20)
+  position = sizer.calculate_position(signal, price, volatility)
+
+Step 4: Run Backtest
+  ↓
+  from backtesting.backtest_engine import BacktestEngine
+  engine = BacktestEngine(initial_capital=100000)
+  results = engine.run(strategy, data, sizer)
+
+Step 5: Analyze Performance
+  ↓
+  from backtesting.performance import PerformanceAnalyzer
+  analyzer = PerformanceAnalyzer(results)
+  analyzer.print_summary()
+  analyzer.plot_equity_curve()
+
+Each of these steps will be covered in detail in upcoming chapters!
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="key-takeaways">
+<h2>Key Takeaways<a class="headerlink" href="#key-takeaways" title="Link to this heading">#</a></h2>
+<div class="note admonition">
+<p class="admonition-title">Summary</p>
+<ol class="arabic simple">
+<li><p><strong>Systematic trading uses rules, not emotions</strong></p>
+<ul class="simple">
+<li><p>Decisions made in advance</p></li>
+<li><p>Executed mechanically</p></li>
+<li><p>Measurable and testable</p></li>
+</ul>
+</li>
+<li><p><strong>It works because of:</strong></p>
+<ul class="simple">
+<li><p>Consistency (no emotional variation)</p></li>
+<li><p>Backtesting (test before risking money)</p></li>
+<li><p>Proper risk management (mathematical position sizing)</p></li>
+</ul>
+</li>
+<li><p><strong>Robert Carver’s principles:</strong></p>
+<ul class="simple">
+<li><p>Volatility targeting for consistent risk</p></li>
+<li><p>Forecast scaling for strategy combination</p></li>
+<li><p>Cost awareness prevents over-trading</p></li>
+<li><p>Diversification smooths returns</p></li>
+</ul>
+</li>
+<li><p><strong>This repository provides:</strong></p>
+<ul class="simple">
+<li><p>Complete implementation of Carver’s approach</p></li>
+<li><p>Real market data integration</p></li>
+<li><p>Realistic backtesting with costs</p></li>
+<li><p>Production-ready code</p></li>
+</ul>
+</li>
+</ol>
+</div>
+</section>
+<section id="exercises">
+<h2>Exercises<a class="headerlink" href="#exercises" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Modify the coin flip simulation</strong>: Change the win probability to 0.48 (losing edge). What happens to both traders?</p></li>
+<li><p><strong>Experiment with the consistency demo</strong>: What happens if the human is always confident? Always scared?</p></li>
+<li><p><strong>Think critically</strong>: Can you identify a situation where emotional trading might outperform systematic trading? (Hint: think about rare events)</p></li>
+<li><p><strong>Explore the code</strong>: Browse the repository structure. Which file do you think contains the core strategy logic?</p></li>
+</ol>
+</section>
+<section id="next-steps">
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h2>
+<p>In <a class="reference internal" href="02_understanding_stock_markets.html"><span class="std std-doc">Chapter 2: Understanding Stock Markets</span></a>, we’ll learn:</p>
+<ul class="simple">
+<li><p>What stocks actually are</p></li>
+<li><p>How prices are determined</p></li>
+<li><p>Reading OHLCV data</p></li>
+<li><p>Why trends exist</p></li>
+</ul>
+<p>This foundation is essential before we dive into strategy building!</p>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./part1"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="overview.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Part I: Foundations</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="02_understanding_stock_markets.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Chapter 2: Understanding Stock Markets</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#learning-objectives">Learning Objectives</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gambling-problem">The Gambling Problem</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#interactive-example-coin-flip-simulation">Interactive Example: Coin Flip Simulation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-systematic-trading">What is Systematic Trading?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#real-world-comparison">Real-World Comparison</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#why-does-systematic-trading-work">Why Does Systematic Trading Work?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#consistency">1. Consistency</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#backtesting">2. Backtesting</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#who-is-robert-carver">Who is Robert Carver?</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#carvers-key-innovations">Carver’s Key Innovations</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#volatility-targeting">1. Volatility Targeting</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#forecast-scaling">2. Forecast Scaling</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#cost-awareness">3. Cost Awareness</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#diversification">4. Diversification</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-repository-demonstrates">What This Repository Demonstrates</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#repository-structure">Repository Structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#key-components">Key Components</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#a-preview-running-the-system">A Preview: Running the System</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-takeaways">Key Takeaways</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#exercises">Exercises</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#next-steps">Next Steps</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Systematic Trading Project
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

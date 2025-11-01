@@ -1,0 +1,40 @@
+# Table of Contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: intro
+chapters:
+  - file: part1/overview
+    sections:
+      - file: part1/01_what_is_systematic_trading
+      - file: part1/02_understanding_stock_markets
+      - file: part1/03_why_manual_trading_fails
+
+  - file: part2/overview
+    sections:
+      - file: part2/04_trend_following
+      - file: part2/05_understanding_volatility
+      - file: part2/06_position_sizing
+      - file: part2/07_transaction_costs
+
+  - file: part3/overview
+    sections:
+      - file: part3/08_getting_data
+      - file: part3/09_building_strategies
+      - file: part3/10_backtesting_engine
+
+  - file: part4/overview
+    sections:
+      - file: part4/11_understanding_results
+      - file: part4/12_performance_metrics
+      - file: part4/13_portfolio_approach
+
+  - file: part5/overview
+    sections:
+      - file: part5/14_system_capabilities
+      - file: part5/15_extending_system
+      - file: part5/16_real_world_trading
+
+  - file: appendix/glossary
+  - file: appendix/resources
+  - file: appendix/code_reference
