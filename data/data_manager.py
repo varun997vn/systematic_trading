@@ -97,6 +97,11 @@ class DataManager(BaseModel):
         """Save stock data to CSV."""
         filename = f"{ticker.replace('.', '_')}.csv"
         filepath = Path(self.data_dir) / filename
+
+        # flatten multi-level columns if present: (0: ohlcv, 1: ticker-name)
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = [col[0].strip() for col in df.columns.values]
+
         df.to_csv(filepath)
         logger.info(f"Saved {ticker} data to {filepath}")
 
@@ -142,7 +147,7 @@ class DataManager(BaseModel):
             return pd.DataFrame()
 
         price_df = pd.DataFrame(close_prices)
-        price_df = price_df.fillna(method='ffill')
+        price_df = price_df.ffill()
         return price_df
 
     def get_stock_info(self, ticker: str) -> Optional[StockInfo]:
