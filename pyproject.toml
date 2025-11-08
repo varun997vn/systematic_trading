@@ -24,6 +24,7 @@ dependencies = [
     "seaborn>=0.13.0",
     # Configuration
     "python-dotenv>=1.2.0",
+    "pydantic>=2.12.4",
     # Utilities
     "pyyaml>=6.0",
     "tabulate>=0.9.0",
@@ -56,3 +57,15 @@ include = [
     "book",
     "notebooks"
 ]
+
+[tool.ruff]
+# Linting configuration
+line-length = 88                      # Same as Black default
+target-version = "py312"              # Adjust to your Python version (e.g., py310)
+extend-select = ["I"]                 # Enable import sorting (isort equivalent)
+fix = true                            # Allow Ruff to auto-fix lint errors
+show-fixes = true
+
+[tool.mypy]
+strict = true
+disallow_untyped_defs = true
