@@ -11,7 +11,7 @@ Thank you for your interest in improving this book! This guide will help you add
 cd systematic_trading/book
 
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -e .
 
 # Test the build
 make build

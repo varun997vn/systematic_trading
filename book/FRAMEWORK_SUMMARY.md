@@ -111,7 +111,7 @@ pip (Python package manager)
 cd systematic_trading/book
 
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -e .
 ```
 
 ### Building the Book
