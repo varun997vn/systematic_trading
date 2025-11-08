@@ -159,7 +159,7 @@ A complete, production-ready systematic trading system for Singapore Exchange (S
 
 ### 1. Run the Demo (2 minutes)
 ```bash
-pip install -r requirements.txt
+uv pip install -e .
 python main.py
 ```
 

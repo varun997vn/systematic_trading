@@ -95,7 +95,7 @@ systematic_trading/
 
 3. **Install dependencies**
    ```bash
-   pip install -r requirements.txt
+   uv pip install -e .
    ```
 
 4. **Configure environment variables**

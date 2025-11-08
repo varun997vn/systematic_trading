@@ -46,7 +46,7 @@ source venv/bin/activate      # Linux/Mac
 venv\Scripts\activate         # Windows
 
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -e .
 
 # Install development dependencies (optional)
 pip install black flake8 mypy ipython jupyter
@@ -200,7 +200,7 @@ git commit -m "Add: my new feature"
 
 ```bash
 # Morning: Update dependencies
-pip install -r requirements.txt --upgrade
+uv pip install -e . --upgrade
 
 # During development: Run specific tests
 pytest tests/test_strategy.py -v
@@ -830,7 +830,7 @@ export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 **Issue: Tests fail with "No module named 'config'"**
 ```bash
 # Solution: Install package in editable mode
-pip install -e .
+uv pip install -e .
 
 # Or run pytest from project root
 pytest

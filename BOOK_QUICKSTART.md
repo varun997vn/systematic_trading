@@ -20,7 +20,7 @@ An interactive Jupyter Book with:
 cd book
 
 # Install dependencies
-pip install -r requirements.txt
+uv pip install -e .
 
 # Build the book
 make build
@@ -35,7 +35,7 @@ make serve
 ```bash
 # Install dependencies
 cd book
-pip install -r requirements.txt
+uv pip install -e .
 
 # Launch Jupyter Lab
 jupyter lab

@@ -17,7 +17,7 @@ venv\Scripts\activate
 source venv/bin/activate
 
 # Install required packages
-pip install -r requirements.txt
+uv pip install -e .
 ```
 
 ### Step 2: Configure Environment (Optional)
@@ -125,7 +125,7 @@ systematic_trading/
 ```bash
 cd systematic_trading
 source venv/bin/activate  # or venv\Scripts\activate on Windows
-pip install -r requirements.txt
+uv pip install -e .
 ```
 
 ### Issue 2: "No data retrieved for ticker"

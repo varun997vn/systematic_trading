@@ -28,7 +28,7 @@ This directory contains Jupyter notebooks demonstrating the complete systematic 
 ### Prerequisites
 ```bash
 # Install dependencies
-pip install -r ../requirements.txt
+uv pip install -e ../.
 
 # Activate virtual environment (if using)
 source ../venv/bin/activate  # Linux/Mac
@@ -142,7 +142,7 @@ tickers = ['AAPL', 'MSFT', 'GOOGL']  # More reliable
 ```bash
 # Ensure you're in the right directory
 cd /path/to/systematic_trading
-pip install -r requirements.txt
+uv pip install -e .
 ```
 
 ### Memory Issues

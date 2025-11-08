@@ -155,7 +155,7 @@ jupyter-book build .
 
 ```bash
 # Reinstall all dependencies
-pip install --upgrade -r requirements.txt
+pip install --upgrade -e .
 ```
 
 ### Kernel Issues
