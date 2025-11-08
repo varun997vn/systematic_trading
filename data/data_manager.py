@@ -2,6 +2,7 @@
 Data manager for downloading and managing market data via Yahoo Finance.
 """
 
+import re
 from pathlib import Path
 from typing import List, Optional, Dict
 
@@ -28,17 +29,14 @@ class StockInfo(BaseModel):
 class DownloadRequest(BaseModel):
     """Request parameters for downloading stock data."""
     ticker: str = Field(..., description="Stock ticker (e.g., GOOG, TSLA, AAPL)")
-    start_date: str = Field(
-        default_factory=lambda: str(pd.Timestamp.utcnow() - pd.Timedelta(days=548)),
-        description="Start date (YYYY-MM-DD)"
-    )
-    end_date: str = Field(default_factory=lambda: str(pd.Timestamp.utcnow()), description="End date (YYYY-MM-DD)")
+    start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
+    end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
     save: bool = Field(True, description="Save data to CSV")
 
     @field_validator("ticker")
     @classmethod
     def validate_ticker(cls, v):
-        if not v.isalnum() and "." not in v:
+        if not re.match(r"^[A-Za-z0-9.\-]+$", v):
             raise ValueError("Invalid ticker format")
         return v
 
@@ -50,11 +48,11 @@ class DataManager(BaseModel):
     Manages market data download and storage for US stocks using Yahoo Finance.
     """
 
-    data_dir: Path = Field(default_factory=lambda: str(Settings.DATA_DIR))
+    data_dir: str = Field(default_factory=lambda: str(Settings.DATA_DIR))
 
     def __init__(self, **data):
         super().__init__(**data)
-        self.data_dir.mkdir(parents=True, exist_ok=True)
+        Path(self.data_dir).mkdir(parents=True, exist_ok=True)
 
     # ---------------------------
     # Core download/load methods
@@ -68,8 +66,7 @@ class DataManager(BaseModel):
         logger.info(f"Downloading {req.ticker} from {start} to {end}")
 
         try:
-            stock = yf.Ticker(req.ticker)
-            df = stock.history(start=start, end=end, auto_adjust=True)
+            df = yf.download(req.ticker, start=start, end=end, auto_adjust=True, progress=False)
 
             if df.empty:
                 logger.warning(f"No data retrieved for {req.ticker}")
@@ -77,15 +74,15 @@ class DataManager(BaseModel):
 
             df = df[['Open', 'High', 'Low', 'Close', 'Volume']]
             df.index.name = 'Date'
-
-            logger.info(f"Downloaded {len(df)} rows for {req.ticker}")
+            df.index = df.index.tz_localize(None)  # maintaining timezone
 
             if req.save:
                 self.save_data(req.ticker, df)
 
+            logger.info(f"Downloaded {len(df)} rows for {req.ticker}")
             return df
         except Exception as e:
-            logger.error(f"Error downloading {req.ticker}: {e}")
+            logger.error(f"Error downloading {req.ticker}: {e}", exc_info=True)
             return pd.DataFrame()
 
     def download_multiple_stocks(self, req: List[DownloadRequest]) -> Dict[str, pd.DataFrame]:
@@ -99,14 +96,14 @@ class DataManager(BaseModel):
     def save_data(self, ticker: str, df: pd.DataFrame) -> None:
         """Save stock data to CSV."""
         filename = f"{ticker.replace('.', '_')}.csv"
-        filepath = self.data_dir / filename
+        filepath = Path(self.data_dir) / filename
         df.to_csv(filepath)
         logger.info(f"Saved {ticker} data to {filepath}")
 
     def load_data(self, ticker: str) -> pd.DataFrame:
         """Load stock data from CSV."""
         filename = f"{ticker.replace('.', '_')}.csv"
-        filepath = self.data_dir / filename
+        filepath = Path(self.data_dir) / filename
 
         if not filepath.exists():
             logger.warning(f"Data file not found for {ticker}: {filepath}")
@@ -152,7 +149,7 @@ class DataManager(BaseModel):
         """Get stock information from Yahoo Finance."""
         try:
             stock = yf.Ticker(ticker)
-            info = stock.info
+            info = stock.get_info()
             return StockInfo(
                 name=info.get('longName', ticker),
                 sector=info.get('sector', 'Unknown'),
