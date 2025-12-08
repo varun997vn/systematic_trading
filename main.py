@@ -16,12 +16,12 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from data.data_manager import DataManager
+from st.data import DataManager
 from strategy.trend_following import EWMAC, MovingAverageCrossover
 from risk_management.position_sizer import PositionSizer
 from backtesting.backtest_engine import BacktestEngine
 from backtesting.performance import PerformanceAnalyzer
-from config.settings import Settings
+from st.config.settings import Settings
 from utils.logger import setup_logger
 
 

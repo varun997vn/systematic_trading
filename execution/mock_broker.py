@@ -10,7 +10,7 @@ from typing import Dict, List, Optional
 from datetime import datetime
 
 from .order import Order, OrderType, OrderStatus
-from config.settings import Settings
+from st.config.settings import Settings
 from utils.logger import setup_logger
 
 

@@ -199,7 +199,7 @@ class MyStrategy(BaseStrategy):
 ### 4. Analyze Individual Stocks
 
 ```python
-from data.data_manager import DataManager
+from st.data import DataManager
 from strategy.trend_following import EWMAC
 from backtesting.backtest_engine import BacktestEngine
 
@@ -214,6 +214,7 @@ results = engine.run(strategy, data)
 
 # Analyze
 from backtesting.performance import PerformanceAnalyzer
+
 PerformanceAnalyzer(results).print_summary()
 ```
 

@@ -7,10 +7,9 @@ They buy assets that have performed well and sell assets that have performed poo
 
 import pandas as pd
 import numpy as np
-from typing import Optional, List
+from typing import List
 
 from .base_strategy import BaseStrategy
-from config.settings import Settings
 from utils.logger import setup_logger
 
 

@@ -47,8 +47,8 @@ Start here if you're new to the project:
 1. Start: [ARCHITECTURE.md](ARCHITECTURE.md) - System overview
 2. Deep dive: [ARCHITECTURE.md](ARCHITECTURE.md) → "Component Architecture"
 3. Code: Read source files in order:
-   - [config/settings.py](config/settings.py)
-   - [data/data_manager.py](data/data_manager.py)
+   - [config/settings.py](st/config/settings.py)
+   - [data/data_manager.py](st/data/data_manager.py)
    - [strategy/base_strategy.py](strategy/base_strategy.py)
    - [backtesting/backtest_engine.py](backtesting/backtest_engine.py)
 

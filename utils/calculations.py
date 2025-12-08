@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from typing import Union
 
-from config.settings import Settings
+from st.config.settings import Settings
 
 
 def calculate_returns(

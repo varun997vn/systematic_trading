@@ -9,7 +9,7 @@ from typing import Dict, Optional
 from pathlib import Path
 
 from utils.calculations import calculate_max_drawdown
-from config.settings import Settings
+from st.config.settings import Settings
 from utils.logger import setup_logger
 
 

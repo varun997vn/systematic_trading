@@ -9,9 +9,8 @@ Carver's key principles:
 
 import numpy as np
 import pandas as pd
-from typing import Union, Optional
 
-from config.settings import Settings
+from st.config.settings import Settings
 from utils.calculations import calculate_volatility
 from utils.logger import setup_logger
 

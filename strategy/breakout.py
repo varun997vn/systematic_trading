@@ -7,10 +7,8 @@ support/resistance levels or trading ranges.
 
 import pandas as pd
 import numpy as np
-from typing import Optional
 
 from .base_strategy import BaseStrategy
-from config.settings import Settings
 from utils.logger import setup_logger
 
 

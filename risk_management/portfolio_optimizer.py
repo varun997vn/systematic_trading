@@ -10,10 +10,10 @@ Implements various portfolio construction techniques including:
 
 import pandas as pd
 import numpy as np
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 from scipy.optimize import minimize
 
-from config.settings import Settings
+from st.config.settings import Settings
 from utils.logger import setup_logger
 
 

@@ -4,10 +4,9 @@ Logging configuration for the systematic trading system.
 
 import logging
 import sys
-from pathlib import Path
 from typing import Optional
 
-from config.settings import Settings
+from st.config.settings import Settings
 
 
 def setup_logger(

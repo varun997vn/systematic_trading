@@ -243,11 +243,12 @@ When referencing code from the main repository:
 ```python
 # Add parent directory to path
 import sys
+
 sys.path.insert(0, '../..')
 
 # Now you can import
 from strategy.trend_following import EWMAC
-from data.data_manager import DataManager
+from st.data import DataManager
 ```
 
 Always show where the code comes from:

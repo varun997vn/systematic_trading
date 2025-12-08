@@ -324,11 +324,12 @@ IMPLEMENTATION_SUMMARY.md   # This file
 ## 📊 Usage Examples
 
 ### Quick Start
+
 ```python
 from strategy import EWMAC, BollingerBands, MACD
 from backtesting.backtest_engine import BacktestEngine
 from risk_management.position_sizer import PositionSizer
-from data.data_manager import DataManager
+from st.data import DataManager
 
 # Get data
 data_manager = DataManager()

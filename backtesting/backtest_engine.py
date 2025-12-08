@@ -14,7 +14,7 @@ from typing import Optional, Dict
 
 from strategy.base_strategy import BaseStrategy
 from risk_management.position_sizer import PositionSizer
-from config.settings import Settings
+from st.config.settings import Settings
 from utils.logger import setup_logger
 
 

@@ -13,7 +13,6 @@ from .mock_broker import MockBroker
 from .order import Order, OrderType
 from strategy.base_strategy import BaseStrategy
 from risk_management.position_sizer import PositionSizer
-from config.settings import Settings
 from utils.logger import setup_logger
 
 
