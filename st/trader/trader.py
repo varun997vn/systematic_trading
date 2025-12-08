@@ -211,12 +211,12 @@ class Trader(BaseModel):
             )
             df = self.data_manager.download_stock_data(req)
 
-        # Filter by date range if specified
-        if not df.empty:
-            start = start_date or self.start_date
-            end = end_date or self.end_date
-            if start or end:
-                df = self.data_manager.filter_by_date(df, start, end)
+        # # Filter by date range if specified
+        # if not df.empty:
+        #     start = start_date or self.start_date
+        #     end = end_date or self.end_date
+        #     if start or end:
+        #         df = self.data_manager.filter_by_date(df, start, end)
 
         # Cache the data
         if use_cache and not df.empty:
