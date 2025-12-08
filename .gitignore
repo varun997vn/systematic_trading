@@ -41,8 +41,8 @@ logs/
 *.log
 
 # Data
-data/historical/*.csv
-data/historical/*.pkl
+st/data/historical/*.csv
+st/data/historical/*.pkl
 data/historical/*.parquet
 
 # Jupyter Notebook
