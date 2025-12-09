@@ -37,7 +37,9 @@ dependencies = [
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",
     "pytest-xdist>=3.8.0",
-    "pre-commit>=4.5.0"
+    "pre-commit>=4.5.0",
+    # api
+    "fastapi>=0.124.0",
 ]
 
 [tool.coverage.run]
