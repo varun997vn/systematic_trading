@@ -1,4 +1,4 @@
-from database import init_db
+from .database import init_db
 
 # Auto-initialize database on package import with failsafe mechanism
 try:
