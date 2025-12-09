@@ -19,6 +19,7 @@ dependencies = [
     "pandas>=2.2.0",
     "numpy>=2.2.0",
     "scipy>=1.16.0",
+    "sqlalchemy>=2.0.44",
     # Visualization
     "matplotlib>=3.10.0",
     "seaborn>=0.13.0",
