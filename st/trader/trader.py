@@ -1,529 +1,351 @@
 """
-Trader class for managing the complete trading workflow with enhanced data management.
-Reorganized with proper class hierarchy for Portfolio and Universe.
+Trader Class - Main Trading System
+Loads data, applies strategies, generates signals
 """
 
-from datetime import datetime
+import polars as pl
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
-
-import pandas as pd
-from pydantic import BaseModel, Field
-
-from st.config.settings import Settings
-from st.data import (
-    DataCache,
-    DataManager,
-    DownloadRequest,
-    Portfolio,
-    StockInfo,
-    Universe,
-)
-from utils.logger import setup_logger
-
-logger = setup_logger(__name__)
+from typing import List, Dict, Any, Optional
+from datetime import datetime
+from st.strategy import Strategy
 
 
-# ==========================================
-# Main Trader Class
-# ==========================================
-
-
-class Trader(BaseModel):
+class Trader:
     """
-    Main trader class orchestrating the complete trading workflow.
-    Manages data, universe, portfolio, and trading operations.
+    Main trading class that:
+    1. Loads OHLCV data from CSV
+    2. Applies multiple strategies
+    3. Generates consolidated buy/sell signals (-20 to 20)
     """
 
-    # Core components
-    data_manager: DataManager = Field(default_factory=DataManager)
-    universe: Universe = Field(default_factory=Universe)
-    portfolio: Portfolio = Field(default_factory=Portfolio)
-
-    # Data management
-    data_cache: DataCache = Field(default_factory=DataCache)
-    stock_info_cache: Dict[str, StockInfo] = Field(default_factory=dict)
-
-    # Configuration
-    start_date: Optional[str] = Field(None, description="Default start date for data")
-    end_date: Optional[str] = Field(None, description="Default end date for data")
-    auto_download: bool = Field(True, description="Auto-download missing data")
-
-    model_config = {"arbitrary_types_allowed": True}
-
-    # ==========================================
-    # Initialization & Setup
-    # ==========================================
-
-    def __init__(self, **data):
-        """Initialize trader with optional universe and portfolio."""
-        super().__init__(**data)
-        if not self.start_date:
-            self.start_date = Settings.DATA_START_DATE
-        if not self.end_date:
-            self.end_date = Settings.DATA_END_DATE
-        logger.info("Trader initialized")
-
-    @classmethod
-    def with_universe(cls, tickers: List[str], **kwargs) -> "Trader":
-        """Create trader with a predefined universe."""
-        universe = Universe(tickers=tickers)
-        return cls(universe=universe, **kwargs)
-
-    @classmethod
-    def with_portfolio(
-        cls, positions: Dict[str, Tuple[float, float]], cash: float = 100000.0, **kwargs
-    ) -> "Trader":
+    def __init__(self, strategies: List[Strategy] = None):
         """
-        Create trader with existing portfolio.
+        Initialize Trader with strategies
 
         Args:
-            positions: Dict of {ticker: (quantity, avg_price)}
-            cash: Available cash
+            strategies: List of Strategy objects to apply
         """
-        portfolio = Portfolio(cash=cash, initial_cash=cash)
-        for ticker, (quantity, price) in positions.items():
-            portfolio.add_position(ticker, quantity, price, update_cash=False)
+        self.strategies = strategies or []
+        self.data: Optional[pl.DataFrame] = None
+        self.signals: Optional[pl.DataFrame] = None
 
-        return cls(portfolio=portfolio, **kwargs)
-
-    # ==========================================
-    # Universe Management (delegates to Universe)
-    # ==========================================
-
-    def set_universe(self, tickers: List[str]) -> None:
-        """Set the trading universe."""
-        self.universe.set_tickers(tickers)
-
-    def add_to_universe(self, ticker: str) -> None:
-        """Add ticker to universe."""
-        self.universe.add_ticker(ticker)
-
-    def remove_from_universe(self, ticker: str) -> None:
-        """Remove ticker from universe."""
-        self.universe.remove_ticker(ticker)
-
-    def get_universe_tickers(self) -> List[str]:
-        """Get list of all tickers in universe."""
-        return self.universe.get_tickers()
-
-    def get_universe_summary(self) -> Dict:
-        """Get universe summary."""
-        return self.universe.get_summary()
-
-    # ==========================================
-    # Portfolio Management (delegates to Portfolio)
-    # ==========================================
-
-    def buy(self, ticker: str, quantity: float, price: Optional[float] = None) -> None:
+    def load_data(self, csv_path: str) -> pl.DataFrame:
         """
-        Buy shares of a stock.
+        Load OHLCV data from CSV using Polars
+
+        Expected CSV format: date, open, high, low, close, volume
 
         Args:
-            ticker: Stock ticker
-            quantity: Number of shares to buy
-            price: Purchase price (if None, uses latest price)
-        """
-        ticker = ticker.upper()
-
-        if price is None:
-            price = self.get_latest_price(ticker)
-            if price is None:
-                raise ValueError(f"No price available for {ticker}")
-
-        self.portfolio.add_position(ticker, quantity, price, update_cash=True)
-
-    def sell(
-        self,
-        ticker: str,
-        quantity: Optional[float] = None,
-        price: Optional[float] = None,
-    ) -> Optional[float]:
-        """
-        Sell shares of a stock.
-
-        Args:
-            ticker: Stock ticker
-            quantity: Number of shares to sell (None = sell all)
-            price: Sale price (if None, uses latest price)
+            csv_path: Path to CSV file
 
         Returns:
-            Realized P&L from the sale
+            DataFrame with loaded data
         """
-        ticker = ticker.upper()
+        # Load CSV with Polars
+        df = pl.read_csv(csv_path)
 
-        if price is None:
-            price = self.get_latest_price(ticker)
-            if price is None:
-                raise ValueError(f"No price available for {ticker}")
+        # Standardize column names (lowercase)
+        df = df.rename({col: col.lower() for col in df.columns})
 
-        return self.portfolio.remove_position(ticker, quantity, price, update_cash=True)
+        # Parse date column (try multiple formats)
+        try:
+            df = df.with_columns([
+                pl.col("date").str.strptime(pl.Date, format="%Y-%m-%d").alias("date")
+            ])
+        except:
+            try:
+                df = df.with_columns([
+                    pl.col("date").str.strptime(pl.Date, format="%m/%d/%Y").alias("date")
+                ])
+            except:
+                # If date is already datetime, keep as is
+                pass
 
-    def get_portfolio_summary(self) -> Dict:
-        """Get comprehensive portfolio summary."""
-        # Update prices first
-        self.update_portfolio_prices()
-        return self.portfolio.get_summary()
+        # Sort by date
+        df = df.sort("date")
 
-    def get_portfolio_value(self) -> float:
-        """Get total portfolio value."""
-        self.update_portfolio_prices()
-        return self.portfolio.total_value
+        # Store data
+        self.data = df
 
-    def update_portfolio_prices(self) -> None:
-        """Update current prices for all portfolio positions."""
-        if not self.portfolio.positions:
-            return
-
-        tickers = self.portfolio.get_tickers()
-        prices = self.get_latest_prices(tickers)
-        self.portfolio.update_prices(prices)
-
-    # ==========================================
-    # Data Retrieval & Management
-    # ==========================================
-
-    def get_data(
-        self,
-        ticker: str,
-        start_date: Optional[str] = None,
-        end_date: Optional[str] = None,
-        use_cache: bool = True,
-    ) -> pd.DataFrame:
-        """
-        Get historical data for a ticker with caching support.
-        """
-        ticker = ticker.upper()
-
-        # Check cache first
-        if use_cache:
-            cached_data = self.data_cache.get(ticker)
-            if cached_data is not None:
-                logger.debug(f"Using cached data for {ticker}")
-                return cached_data
-
-        # Try loading from disk
-        df = self.data_manager.load_data(ticker)
-
-        # Download if missing and auto_download is enabled
-        if df.empty and self.auto_download:
-            logger.info(f"Downloading data for {ticker}")
-            req = DownloadRequest(
-                ticker=ticker,
-                start_date=start_date or self.start_date,
-                end_date=end_date or self.end_date,
-                save=True,
-            )
-            df = self.data_manager.download_stock_data(req)
-
-        # # Filter by date range if specified
-        # if not df.empty:
-        #     start = start_date or self.start_date
-        #     end = end_date or self.end_date
-        #     if start or end:
-        #         df = self.data_manager.filter_by_date(df, start, end)
-
-        # Cache the data
-        if use_cache and not df.empty:
-            self.data_cache.set(ticker, df)
+        print(f"✓ Loaded {len(df)} rows of data from {csv_path}")
+        print(f"  Date range: {df['date'][0]} to {df['date'][-1]}")
+        print(f"  Columns: {df.columns}")
 
         return df
 
-    def get_universe_data(self) -> Dict[str, pd.DataFrame]:
-        """Get data for all tickers in universe."""
-        data = {}
-        for ticker in self.universe.tickers:
-            df = self.get_data(ticker)
-            if not df.empty:
-                data[ticker] = df
-        return data
+    def add_strategy(self, strategy: Strategy):
+        """Add a strategy to the trader"""
+        self.strategies.append(strategy)
+        print(f"✓ Added strategy: {strategy.name}")
 
-    def get_portfolio_data(self) -> Dict[str, pd.DataFrame]:
-        """Get data for all tickers in portfolio."""
-        data = {}
-        for ticker in self.portfolio.get_tickers():
-            df = self.get_data(ticker)
-            if not df.empty:
-                data[ticker] = df
-        return data
-
-    def get_close_prices(self, tickers: Optional[List[str]] = None) -> pd.DataFrame:
+    def prepare_data(self) -> pl.DataFrame:
         """
-        Get close prices for multiple tickers as a DataFrame.
+        Prepare data by adding all indicators from all strategies
+
+        Returns:
+            DataFrame with all indicators added
         """
-        if tickers is None:
-            tickers = self.universe.tickers
+        if self.data is None:
+            raise ValueError("No data loaded. Call load_data() first.")
 
-        prices = {}
-        for ticker in tickers:
-            df = self.get_data(ticker)
-            if not df.empty and "Close" in df.columns:
-                prices[ticker] = df["Close"]
+        df = self.data.clone()
 
-        if not prices:
-            return pd.DataFrame()
+        print("\nPreparing data with indicators...")
+        for strategy in self.strategies:
+            print(f"  - Adding indicators for: {strategy.name}")
+            df = strategy.add_indicators(df)
 
-        return pd.DataFrame(prices)
+        print(f"✓ Data prepared with {len(df.columns)} columns")
+        return df
 
-    def get_latest_price(self, ticker: str) -> Optional[float]:
-        """Get the most recent price for a ticker."""
-        df = self.get_data(ticker)
-        if df.empty or "Close" not in df.columns:
-            return None
-        return float(df["Close"].iloc[-1])
-
-    def get_latest_prices(self, tickers: List[str]) -> Dict[str, float]:
-        """Get latest prices for multiple tickers."""
-        prices = {}
-        for ticker in tickers:
-            price = self.get_latest_price(ticker)
-            if price is not None:
-                prices[ticker] = price
-        return prices
-
-    # ==========================================
-    # Stock Information
-    # ==========================================
-
-    def get_stock_info(
-        self, ticker: str, use_cache: bool = True
-    ) -> Optional[StockInfo]:
-        """Get stock information with caching."""
-        ticker = ticker.upper()
-
-        if use_cache and ticker in self.stock_info_cache:
-            return self.stock_info_cache[ticker]
-
-        info = self.data_manager.get_stock_info(ticker)
-        if info and use_cache:
-            self.stock_info_cache[ticker] = info
-
-        return info
-
-    def get_universe_info(self) -> Dict[str, StockInfo]:
-        """Get information for all stocks in universe."""
-        info_dict = {}
-        for ticker in self.universe.tickers:
-            info = self.get_stock_info(ticker)
-            if info:
-                info_dict[ticker] = info
-        return info_dict
-
-    def update_universe_metadata(self) -> None:
-        """Update universe metadata with stock info."""
-        info_dict = self.get_universe_info()
-        metadata = {}
-
-        for ticker, info in info_dict.items():
-            metadata[ticker] = {
-                "sector": info.sector,
-                "industry": info.industry,
-                "market_cap": info.market_cap,
-                "price": info.current_price,
-                "volume": info.average_volume,
-            }
-
-        self.universe.update_metadata(metadata)
-        logger.info(f"Updated metadata for {len(metadata)} tickers")
-
-    # ==========================================
-    # Data Quality & Validation
-    # ==========================================
-
-    def check_data_quality(self, ticker: str) -> Dict[str, any]:
+    def generate_signals(self, mode: str = "aggregate") -> pl.DataFrame:
         """
-        Check data quality for a ticker.
-        Returns dict with quality metrics.
+        Generate trading signals using all strategies
+
+        Args:
+            mode: "aggregate" (average all), "max" (strongest), "consensus" (majority)
+
+        Returns:
+            DataFrame with signals for each strategy and final signal
         """
-        df = self.get_data(ticker)
+        if self.data is None:
+            raise ValueError("No data loaded. Call load_data() first.")
 
-        if df.empty:
-            return {"status": "no_data", "ticker": ticker}
+        if not self.strategies:
+            raise ValueError("No strategies added. Add strategies first.")
 
-        quality = {
-            "ticker": ticker,
-            "status": "ok",
-            "rows": len(df),
-            "start_date": str(df.index[0]),
-            "end_date": str(df.index[-1]),
-            "missing_values": df.isnull().sum().to_dict(),
-            "zero_volume_days": int((df["Volume"] == 0).sum()),
-            "price_anomalies": 0,
-        }
+        # Prepare data with all indicators
+        df = self.prepare_data()
 
-        # Check for price anomalies (e.g., huge gaps)
-        if "Close" in df.columns:
-            returns = df["Close"].pct_change()
-            quality["price_anomalies"] = int(
-                (abs(returns) > 0.5).sum()
-            )  # >50% daily change
+        print(f"\nGenerating signals using {len(self.strategies)} strategies...")
+        print(f"Signal aggregation mode: {mode}")
 
-        return quality
+        # Create signals dataframe
+        signals = pl.DataFrame({
+            "date": df["date"],
+            "close": df["close"]
+        })
 
-    def validate_universe_data(self) -> Dict[str, Dict]:
-        """Validate data quality for entire universe."""
-        validation = {}
-        for ticker in self.universe.tickers:
-            validation[ticker] = self.check_data_quality(ticker)
-        return validation
+        # Generate signals for each strategy
+        for strategy in self.strategies:
+            strategy_signals = []
 
-    def validate_portfolio_data(self) -> Dict[str, Dict]:
-        """Validate data quality for portfolio tickers."""
-        validation = {}
-        for ticker in self.portfolio.get_tickers():
-            validation[ticker] = self.check_data_quality(ticker)
-        return validation
+            for i in range(len(df)):
+                signal = strategy.calculate_signal(df, i)
+                strategy_signals.append(signal)
 
-    # ==========================================
-    # Data Analysis Helpers
-    # ==========================================
+            # Add strategy signals to dataframe
+            column_name = f"signal_{strategy.name.lower().replace(' ', '_')}"
+            signals = signals.with_columns([
+                pl.Series(name=column_name, values=strategy_signals)
+            ])
 
-    def calculate_returns(
-        self, tickers: Optional[List[str]] = None, period: str = "1D"
-    ) -> pd.DataFrame:
-        """
-        Calculate returns for tickers.
-        period: '1D', '1W', '1M', etc.
-        """
-        prices = self.get_close_prices(tickers)
-        if prices.empty:
-            return pd.DataFrame()
+            print(f"  ✓ {strategy.name}: {len([s for s in strategy_signals if s != 0])} non-zero signals")
 
-        returns: pd.DataFrame = prices.pct_change()
-        return returns
+        # Calculate final signal based on mode
+        strategy_columns = [col for col in signals.columns if col.startswith("signal_")]
 
-    def calculate_correlation_matrix(
-        self, tickers: Optional[List[str]] = None
-    ) -> pd.DataFrame:
-        """Calculate correlation matrix of returns."""
-        returns = self.calculate_returns(tickers)
-        if returns.empty:
-            return pd.DataFrame()
+        if mode == "aggregate":
+            # Average of all strategy signals
+            signals = signals.with_columns([
+                pl.concat_list(strategy_columns)
+                .list.mean()
+                .round()
+                .cast(pl.Int32)
+                .alias("final_signal")
+            ])
 
-        return returns.corr()
+        elif mode == "max":
+            # Take strongest signal (furthest from 0)
+            signals = signals.with_columns([
+                pl.concat_list(strategy_columns)
+                .list.eval(pl.element().abs().arg_max())
+                .list.first()
+                .alias("max_idx")
+            ])
 
-    def get_data_summary(self, ticker: str) -> Dict:
-        """Get summary statistics for a ticker."""
-        df = self.get_data(ticker)
+            # Get the actual signal at max index
+            for i, col in enumerate(strategy_columns):
+                if i == 0:
+                    signals = signals.with_columns([
+                        pl.when(pl.col("max_idx") == i)
+                        .then(pl.col(col))
+                        .otherwise(0)
+                        .alias("final_signal")
+                    ])
+                else:
+                    signals = signals.with_columns([
+                        pl.when(pl.col("max_idx") == i)
+                        .then(pl.col(col))
+                        .otherwise(pl.col("final_signal"))
+                        .alias("final_signal")
+                    ])
 
-        if df.empty:
-            return {}
+            signals = signals.drop("max_idx")
+
+        elif mode == "consensus":
+            # Majority voting with strength
+            signals = signals.with_columns([
+                pl.concat_list(strategy_columns)
+                .list.eval(pl.element().sign())  # Get direction only
+                .list.mean()  # Average of directions
+                .alias("consensus_direction")
+            ])
+
+            # Get average strength
+            signals = signals.with_columns([
+                pl.concat_list(strategy_columns)
+                .list.eval(pl.element().abs())
+                .list.mean()
+                .alias("consensus_strength")
+            ])
+
+            # Combine direction and strength
+            signals = signals.with_columns([
+                (pl.col("consensus_direction") * pl.col("consensus_strength"))
+                .round()
+                .cast(pl.Int32)
+                .alias("final_signal")
+            ])
+
+            signals = signals.drop(["consensus_direction", "consensus_strength"])
+
+        else:
+            raise ValueError(f"Unknown mode: {mode}. Use 'aggregate', 'max', or 'consensus'")
+
+        # Add signal interpretation
+        signals = signals.with_columns([
+            pl.when(pl.col("final_signal") >= 15)
+            .then(pl.lit("VERY STRONG BUY"))
+            .when(pl.col("final_signal") >= 10)
+            .then(pl.lit("STRONG BUY"))
+            .when(pl.col("final_signal") >= 5)
+            .then(pl.lit("BUY"))
+            .when(pl.col("final_signal") <= -15)
+            .then(pl.lit("VERY STRONG SELL"))
+            .when(pl.col("final_signal") <= -10)
+            .then(pl.lit("STRONG SELL"))
+            .when(pl.col("final_signal") <= -5)
+            .then(pl.lit("SELL"))
+            .otherwise(pl.lit("NEUTRAL"))
+            .alias("signal_label")
+        ])
+
+        self.signals = signals
+
+        # Print summary
+        buy_signals = len(signals.filter(pl.col("final_signal") > 0))
+        sell_signals = len(signals.filter(pl.col("final_signal") < 0))
+        neutral_signals = len(signals.filter(pl.col("final_signal") == 0))
+
+        print(f"\n✓ Signal generation complete!")
+        print(f"  Buy signals: {buy_signals}")
+        print(f"  Sell signals: {sell_signals}")
+        print(f"  Neutral: {neutral_signals}")
+
+        return signals
+
+    def get_latest_signal(self) -> Dict[str, Any]:
+        """Get the most recent trading signal"""
+        if self.signals is None:
+            raise ValueError("No signals generated. Call generate_signals() first.")
+
+        latest = self.signals[-1]
 
         return {
-            "ticker": ticker,
-            "start": str(df.index[0]),
-            "end": str(df.index[-1]),
-            "rows": len(df),
-            "close_mean": float(df["Close"].mean()),
-            "close_std": float(df["Close"].std()),
-            "volume_mean": float(df["Volume"].mean()),
-            "high": float(df["High"].max()),
-            "low": float(df["Low"].min()),
+            "date": latest["date"][0],
+            "close": latest["close"][0],
+            "signal": latest["final_signal"][0],
+            "label": latest["signal_label"][0],
+            "individual_signals": {
+                col.replace("signal_", ""): latest[col][0]
+                for col in self.signals.columns
+                if col.startswith("signal_") and col != "signal_label"
+            }
         }
 
-    # ==========================================
-    # Export & Reporting
-    # ==========================================
+    def get_signal_history(self, last_n: int = None) -> pl.DataFrame:
+        """
+        Get signal history
 
-    def export_universe_data(self, filename: Optional[str] = None) -> str:
-        """Export all universe data to a single file."""
-        data = self.get_universe_data()
+        Args:
+            last_n: Number of recent signals to return (None for all)
 
-        if not data:
-            logger.warning("No data to export")
-            return ""
+        Returns:
+            DataFrame with signal history
+        """
+        if self.signals is None:
+            raise ValueError("No signals generated. Call generate_signals() first.")
 
-        # Combine all close prices
-        combined = pd.DataFrame({ticker: df["Close"] for ticker, df in data.items()})
+        if last_n:
+            return self.signals.tail(last_n)
+        return self.signals
 
-        if filename is None:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"universe_data_{timestamp}.csv"
+    def get_buy_sell_points(self, min_signal_strength: int = 10) -> Dict[str, pl.DataFrame]:
+        """
+        Get distinct buy and sell points above a threshold
 
-        filepath = Path(self.data_manager.data_dir) / filename
-        combined.to_csv(filepath)
+        Args:
+            min_signal_strength: Minimum absolute signal strength (default 10)
 
-        logger.info(f"Exported universe data to {filepath}")
-        return str(filepath)
+        Returns:
+            Dictionary with 'buy' and 'sell' DataFrames
+        """
+        if self.signals is None:
+            raise ValueError("No signals generated. Call generate_signals() first.")
 
-    def export_portfolio_data(self, filename: Optional[str] = None) -> str:
-        """Export portfolio positions to CSV."""
-        df = self.portfolio.to_dataframe()
+        buy_points = self.signals.filter(pl.col("final_signal") >= min_signal_strength)
+        sell_points = self.signals.filter(pl.col("final_signal") <= -min_signal_strength)
 
-        if df.empty:
-            logger.warning("No portfolio data to export")
-            return ""
+        return {
+            "buy": buy_points,
+            "sell": sell_points
+        }
 
-        if filename is None:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"portfolio_{timestamp}.csv"
+    def save_signals(self, output_path: str):
+        """Save signals to CSV"""
+        if self.signals is None:
+            raise ValueError("No signals generated. Call generate_signals() first.")
 
-        filepath = Path(self.data_manager.data_dir) / filename
-        df.to_csv(filepath, index=False)
+        self.signals.write_csv(output_path)
+        print(f"✓ Signals saved to {output_path}")
 
-        logger.info(f"Exported portfolio to {filepath}")
-        return str(filepath)
+    def print_summary(self):
+        """Print detailed summary of trading signals"""
+        if self.signals is None:
+            print("No signals generated yet.")
+            return
 
-    def generate_report(self) -> str:
-        """Generate a comprehensive trading report."""
-        report_lines = [
-            "=" * 60,
-            "TRADING REPORT",
-            "=" * 60,
-            f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-            "",
-            "UNIVERSE:",
-            "-" * 60,
-            f"  Size: {len(self.universe)} tickers",
-            f"  Tickers: {', '.join(self.universe.tickers[:10])}{'...' if len(self.universe) > 10 else ''}",
-            "",
-            "PORTFOLIO:",
-            "-" * 60,
-        ]
+        print("\n" + "="*60)
+        print("TRADER SUMMARY")
+        print("="*60)
 
-        # Add portfolio summary
-        summary = self.get_portfolio_summary()
-        report_lines.extend(
-            [
-                f"  Total Value: ${summary['total_value']:,.2f}",
-                f"  Cash: ${summary['cash']:,.2f} ({summary['cash_weight']:.1f}%)",
-                f"  Positions Value: ${summary['positions_value']:,.2f}",
-                f"  Positions: {summary['num_positions']}",
-                f"  Total Return: {self.portfolio.total_return:.2f}%",
-                f"  Unrealized P&L: ${summary['total_unrealized_pnl']:,.2f}",
-                "",
-            ]
-        )
+        print(f"\nStrategies ({len(self.strategies)}):")
+        for i, strategy in enumerate(self.strategies, 1):
+            print(f"  {i}. {strategy.name}")
 
-        # Add position details
-        if summary["positions"]:
-            report_lines.append("POSITIONS:")
-            report_lines.append("-" * 60)
-            for ticker, pos in summary["positions"].items():
-                report_lines.append(
-                    f"  {ticker}: {pos['quantity']:.0f} shares @ ${pos['avg_entry']:.2f} "
-                    f"| Current: ${pos['current_price']:.2f} "
-                    f"| P&L: ${pos['unrealized_pnl']:.2f} ({pos['unrealized_pnl_pct']:.1f}%) "
-                    f"| Weight: {pos['weight']:.1f}%"
-                )
+        print(f"\nData Range:")
+        print(f"  Start: {self.signals['date'][0]}")
+        print(f"  End: {self.signals['date'][-1]}")
+        print(f"  Total days: {len(self.signals)}")
 
-        # Add data quality section
-        report_lines.extend(
-            [
-                "",
-                "DATA CACHE:",
-                "-" * 60,
-                f"  Cached tickers: {len(self.data_cache.cache)}",
-                f"  Cache TTL: {self.data_cache.cache_ttl_minutes} minutes",
-            ]
-        )
+        print(f"\nSignal Distribution:")
+        for label in ["VERY STRONG BUY", "STRONG BUY", "BUY", "NEUTRAL", "SELL", "STRONG SELL", "VERY STRONG SELL"]:
+            count = len(self.signals.filter(pl.col("signal_label") == label))
+            pct = count / len(self.signals) * 100
+            print(f"  {label:20s}: {count:4d} ({pct:5.1f}%)")
 
-        return "\n".join(report_lines)
+        # Latest signal
+        latest = self.get_latest_signal()
+        print(f"\nLatest Signal:")
+        print(f"  Date: {latest['date']}")
+        print(f"  Price: ${latest['close']:.2f}")
+        print(f"  Signal: {latest['signal']} ({latest['label']})")
+        print(f"  Individual strategies:")
+        for strategy, signal in latest['individual_signals'].items():
+            print(f"    - {strategy}: {signal}")
 
-    def __repr__(self) -> str:
-        """String representation."""
-        return (
-            f"Trader(universe={len(self.universe)} tickers, "
-            f"portfolio={len(self.portfolio)} positions, "
-            f"value=${self.portfolio.total_value:,.2f})"
-        )
+        print("\n" + "="*60)
+
+    def __repr__(self):
+        return f"Trader(strategies={len(self.strategies)}, data_loaded={self.data is not None})"
