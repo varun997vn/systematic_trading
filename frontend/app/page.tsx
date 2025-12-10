@@ -1,65 +1,136 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+import {useState, useEffect} from 'react';
+import api from '@/lib/api';
+import PortfolioSummary from '@/components/PortfolioSummary';
+import SignalMonitor from '@/components/SignalMonitor';
+import TickerSearch from '@/components/TickerSearch';
+
+export default function DashboardPage() {
+    const [portfolioData, setPortfolioData] = useState<any>(null);
+    const [activeStrategies, setActiveStrategies] = useState<string[]>([]);
+    const [marketStatus, setMarketStatus] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        loadDashboardData();
+    }, []);
+
+    const loadDashboardData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const [portfolio, strategies, market] = await Promise.all([
+                api.portfolio.getSummary().catch(() => null),
+                api.strategies.getActive().catch(() => ({strategies: [], count: 0})),
+                api.market.getStatus().catch(() => null),
+            ]);
+
+            setPortfolioData(portfolio);
+            setActiveStrategies(strategies.strategies);
+            setMarketStatus(market);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                    <p className="mt-4 text-gray-600">Loading dashboard...</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {/* Header */}
+            <header className="bg-white shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">Trading System</h1>
+                            <p className="text-sm text-gray-500 mt-1">
+                                Algorithmic Trading Dashboard
+                            </p>
+                        </div>
+                        {marketStatus && (
+                            <div className="flex items-center space-x-2">
+                                <div
+                                    className={`w-3 h-3 rounded-full ${marketStatus.is_open ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                <span className="text-sm font-medium text-gray-700">
+                  Market {marketStatus.is_open ? 'Open' : 'Closed'}
+                </span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </header>
+
+            {error && (
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div className="flex">
+                            <div className="flex-shrink-0">
+                                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd"
+                                          d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                          clipRule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div className="ml-3">
+                                <h3 className="text-sm font-medium text-red-800">Error loading data</h3>
+                                <p className="text-sm text-red-700 mt-1">{error}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {/* Quick Actions */}
+                <div className="mb-8">
+                    <TickerSearch/>
+                </div>
+
+                {/* Active Strategies */}
+                {activeStrategies.length > 0 && (
+                    <div className="mb-8">
+                        <h2 className="text-xl font-semibold text-gray-900 mb-4">Active Strategies</h2>
+                        <div className="bg-white rounded-lg shadow p-6">
+                            <div className="flex flex-wrap gap-2">
+                                {activeStrategies.map((strategy) => (
+                                    <span
+                                        key={strategy}
+                                        className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800"
+                                    >
+                    {strategy}
+                  </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Portfolio Summary */}
+                {portfolioData && (
+                    <div className="mb-8">
+                        <PortfolioSummary data={portfolioData}/>
+                    </div>
+                )}
+
+                {/* Signal Monitor */}
+                <div className="mb-8">
+                    <SignalMonitor/>
+                </div>
+            </main>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+    );
 }
