@@ -6,7 +6,10 @@ sidebar_label: Frontend Dev Info
 
 # Frontend Overview
 
+> Prioritize Server Side Rendering, faster performance and UX
+
 ## Technology Stack
+
 - **Next.js** (app router)
 - **Material UI** (UI components and styling)
 - **Prisma** (ORM)
@@ -20,9 +23,11 @@ sidebar_label: Frontend Dev Info
 # Application Pages
 
 ## 1. Dashboard (`/dashboard`)
+
 Purpose: High-level portfolio overview.
 
 Key elements:
+
 - Portfolio summary: total value, P&L, cash balance
 - Open positions overview list
 - Recent trades summary
@@ -32,9 +37,11 @@ Key elements:
 ---
 
 ## 2. Chart Analysis (`/charts`)
+
 Purpose: Main charting and signal visualization page.
 
 Features:
+
 - Ticker selector (dropdown/autocomplete)
 - Plotly.js candlestick chart
 - Buy/sell signal markers
@@ -47,9 +54,11 @@ Features:
 ---
 
 ## 3. Positions (`/positions`)
+
 Purpose: View and manage open positions.
 
 Features:
+
 - Table of current positions (MUI DataGrid)
 - Real-time P&L
 - Actions: close position, update
@@ -58,9 +67,11 @@ Features:
 ---
 
 ## 4. Trades (`/trades`)
+
 Purpose: Display and filter trade history.
 
 Features:
+
 - Trade table with filters (strategy, symbol, status)
 - Trade details modal
 - Performance metrics: win rate, average P&L
@@ -70,9 +81,11 @@ Features:
 ---
 
 ## 5. Strategies (`/strategies`)
+
 Purpose: Create and manage trading strategies.
 
 Features:
+
 - Strategy list
 - Create/Edit forms
 - Strategy performance metrics
@@ -83,9 +96,11 @@ Features:
 ---
 
 ## 6. Data Management (`/data`)
+
 Purpose: Manage downloaded market data.
 
 Features:
+
 - List of stored tickers
 - Download new ticker data
 - Storage usage information
@@ -95,9 +110,11 @@ Features:
 ---
 
 ## 7. Signals (`/signals`)
+
 Purpose: Generate and review trading signals.
 
 Features:
+
 - Generate signals for selected tickers
 - Signal history table
 - Latest signals summary
@@ -107,9 +124,11 @@ Features:
 ---
 
 ## 8. Settings (`/settings`)
+
 Purpose: System configuration.
 
 Features:
+
 - Broker configuration (API keys, live/paper mode)
 - Cash balance management
 - Initial capital settings

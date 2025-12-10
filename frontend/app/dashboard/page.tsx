@@ -9,7 +9,6 @@ import {
     Alert,
     CircularProgress,
 } from '@mui/material';
-import DashboardLayout from '@/components/layout/DashboardLayout';
 import PortfolioSummaryCard from '@/components/dashboard/PortfolioSummaryCard';
 import PositionsOverview from '@/components/dashboard/PositionsOverview';
 import RecentTrades from '@/components/dashboard/RecentTrades';
@@ -57,54 +56,50 @@ export default function DashboardPage() {
 
     if (loading) {
         return (
-            <DashboardLayout>
-                <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-                    <CircularProgress />
-                </Box>
-            </DashboardLayout>
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+                <CircularProgress />
+            </Box>
         );
     }
 
     return (
-        <DashboardLayout>
-            <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-                <Typography variant="h4" gutterBottom fontWeight={600}>
-                    Dashboard
-                </Typography>
+        <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+            <Typography variant="h4" gutterBottom fontWeight={600}>
+                Dashboard
+            </Typography>
 
-                {error && (
-                    <Alert severity="error" sx={{ mb: 3 }}>
-                        {error}
-                    </Alert>
-                )}
+            {error && (
+                <Alert severity="error" sx={{ mb: 3 }}>
+                    {error}
+                </Alert>
+            )}
 
-                <Grid container spacing={3}>
-                    {/* Market Status */}
-                    <Grid item xs={12}>
-                        <MarketStatus status={marketStatus} />
-                    </Grid>
-
-                    {/* Portfolio Summary */}
-                    <Grid item xs={12} md={8}>
-                        <PortfolioSummaryCard portfolio={portfolio} />
-                    </Grid>
-
-                    {/* Quick Actions */}
-                    <Grid item xs={12} md={4}>
-                        <QuickActions onRefresh={loadDashboardData} />
-                    </Grid>
-
-                    {/* Open Positions */}
-                    <Grid item xs={12} lg={7}>
-                        <PositionsOverview positions={positions} onRefresh={loadDashboardData} />
-                    </Grid>
-
-                    {/* Recent Trades */}
-                    <Grid item xs={12} lg={5}>
-                        <RecentTrades trades={recentTrades} />
-                    </Grid>
+            <Grid container spacing={3}>
+                {/* Market Status */}
+                <Grid item xs={12}>
+                    <MarketStatus status={marketStatus} />
                 </Grid>
-            </Container>
-        </DashboardLayout>
+
+                {/* Portfolio Summary */}
+                <Grid item xs={12} md={8}>
+                    <PortfolioSummaryCard portfolio={portfolio} />
+                </Grid>
+
+                {/* Quick Actions */}
+                <Grid item xs={12} md={4}>
+                    <QuickActions onRefresh={loadDashboardData} />
+                </Grid>
+
+                {/* Open Positions */}
+                <Grid item xs={12} lg={7}>
+                    <PositionsOverview positions={positions} onRefresh={loadDashboardData} />
+                </Grid>
+
+                {/* Recent Trades */}
+                <Grid item xs={12} lg={5}>
+                    <RecentTrades trades={recentTrades} />
+                </Grid>
+            </Grid>
+        </Container>
     );
 }
