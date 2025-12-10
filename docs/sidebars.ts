@@ -7,6 +7,7 @@ const sidebars: SidebarsConfig = {
     'systematic-trading/strategies',
     'systematic-trading/package-architecture',
     'systematic-trading/database',
+    'systematic-trading/frontend-dev-info'
   ],
 };
 
