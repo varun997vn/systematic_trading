@@ -3,10 +3,11 @@ Trader Class - Main Trading System
 Loads data, applies strategies, generates signals
 """
 
-import polars as pl
-from pathlib import Path
 from typing import List, Dict, Any, Optional
-from datetime import datetime
+
+import polars as pl
+
+from st.data import DataManager, DownloadRequest
 from st.strategy import Strategy
 
 
@@ -18,48 +19,115 @@ class Trader:
     3. Generates consolidated buy/sell signals (-20 to 20)
     """
 
-    def __init__(self, strategies: List[Strategy] = None):
+    def __init__(self, strategies: List[Strategy] = None, data_manager: DataManager = None):
         """
-        Initialize Trader with strategies
+        Initialize Trader with strategies and data manager
 
         Args:
             strategies: List of Strategy objects to apply
+            data_manager: DataManager instance (creates new one if not provided)
         """
         self.strategies = strategies or []
+        self.data_manager = data_manager or DataManager()
         self.data: Optional[pl.DataFrame] = None
         self.signals: Optional[pl.DataFrame] = None
+        self.current_ticker: Optional[str] = None
 
-    def load_data(self, csv_path: str) -> pl.DataFrame:
+    def load_data(self,
+                  ticker: str = None,
+                  csv_path: str = None,
+                  start_date: Optional[str] = None,
+                  end_date: Optional[str] = None,
+                  auto_download: bool = True) -> pl.DataFrame:
         """
-        Load OHLCV data from CSV using Polars
-
-        Expected CSV format: date, open, high, low, close, volume
+        Load OHLCV data using DataManager or from CSV directly
 
         Args:
-            csv_path: Path to CSV file
+            ticker: Stock ticker (e.g., 'AAPL', 'GOOGL')
+            csv_path: Path to CSV file (alternative to ticker)
+            start_date: Start date for data (YYYY-MM-DD)
+            end_date: End date for data (YYYY-MM-DD)
+            auto_download: If True, download data if not available locally
 
         Returns:
             DataFrame with loaded data
         """
-        # Load CSV with Polars
-        df = pl.read_csv(csv_path)
+        if ticker is None and csv_path is None:
+            raise ValueError("Must provide either ticker or csv_path")
 
-        # Standardize column names (lowercase)
-        df = df.rename({col: col.lower() for col in df.columns})
+        # Load via DataManager if ticker is provided
+        if ticker:
+            self.current_ticker = ticker
 
-        # Parse date column (try multiple formats)
-        try:
-            df = df.with_columns([
-                pl.col("date").str.strptime(pl.Date, format="%Y-%m-%d").alias("date")
-            ])
-        except:
+            # Check if data exists locally
+            if self.data_manager.data_exists(ticker) and not auto_download:
+                print(f"Loading {ticker} from local storage...")
+                pandas_df = self.data_manager.get_ohlcv(ticker, start_date, end_date)
+            else:
+                # Check if data is stale or doesn't exist
+                if not self.data_manager.data_exists(ticker):
+                    print(f"No local data for {ticker}, downloading...")
+                    pandas_df = self.data_manager.download_stock_data(
+                        DownloadRequest(
+                            ticker=ticker,
+                            start_date=start_date,
+                            end_date=end_date,
+                            save=True
+                        )
+                    )
+                elif self.data_manager.is_data_stale(ticker):
+                    print(f"Data for {ticker} is stale, updating...")
+                    pandas_df = self.data_manager.download_stock_data(
+                        DownloadRequest(
+                            ticker=ticker,
+                            start_date=start_date,
+                            end_date=end_date,
+                            save=True
+                        )
+                    )
+                else:
+                    print(f"Loading {ticker} from local storage...")
+                    pandas_df = self.data_manager.get_ohlcv(ticker, start_date, end_date)
+
+            if pandas_df.empty:
+                raise ValueError(f"No data available for {ticker}")
+
+            # Convert pandas DataFrame to Polars
+            df = pl.from_pandas(pandas_df.reset_index())
+
+            # Standardize column names
+            df = df.rename({col: col.lower() for col in df.columns})
+
+            # Ensure date column is proper format
+            if "date" in df.columns:
+                try:
+                    df = df.with_columns([
+                        pl.col("date").cast(pl.Date).alias("date")
+                    ])
+                except:
+                    pass  # Already in correct format
+
+        # Load from CSV path if provided
+        else:
+            # Load CSV with Polars
+            df = pl.read_csv(csv_path)
+
+            # Standardize column names (lowercase)
+            df = df.rename({col: col.lower() for col in df.columns})
+
+            # Parse date column (try multiple formats)
             try:
                 df = df.with_columns([
-                    pl.col("date").str.strptime(pl.Date, format="%m/%d/%Y").alias("date")
+                    pl.col("date").str.strptime(pl.Date, format="%Y-%m-%d").alias("date")
                 ])
             except:
-                # If date is already datetime, keep as is
-                pass
+                try:
+                    df = df.with_columns([
+                        pl.col("date").str.strptime(pl.Date, format="%m/%d/%Y").alias("date")
+                    ])
+                except:
+                    # If date is already datetime, keep as is
+                    pass
 
         # Sort by date
         df = df.sort("date")
@@ -67,7 +135,8 @@ class Trader:
         # Store data
         self.data = df
 
-        print(f"✓ Loaded {len(df)} rows of data from {csv_path}")
+        data_source = ticker or csv_path
+        print(f"✓ Loaded {len(df)} rows of data for {data_source}")
         print(f"  Date range: {df['date'][0]} to {df['date'][-1]}")
         print(f"  Columns: {df.columns}")
 
@@ -77,6 +146,61 @@ class Trader:
         """Add a strategy to the trader"""
         self.strategies.append(strategy)
         print(f"✓ Added strategy: {strategy.name}")
+
+    def get_available_tickers(self) -> List[str]:
+        """Get list of all available tickers in local storage"""
+        return self.data_manager.list_available_tickers()
+
+    def get_data_info(self, ticker: str = None) -> Dict[str, Any]:
+        """
+        Get information about stored data
+
+        Args:
+            ticker: Specific ticker to get info for (None for all)
+
+        Returns:
+            Dictionary with data information
+        """
+        if ticker:
+            if not self.data_manager.data_exists(ticker):
+                return {"ticker": ticker, "exists": False}
+
+            date_range = self.data_manager.get_data_date_range(ticker)
+            is_stale = self.data_manager.is_data_stale(ticker)
+
+            return {
+                "ticker": ticker,
+                "exists": True,
+                "date_range": date_range,
+                "is_stale": is_stale
+            }
+        else:
+            return self.data_manager.get_storage_info()
+
+    def update_data(self, ticker: str = None, force: bool = False):
+        """
+        Update data for current or specified ticker
+
+        Args:
+            ticker: Ticker to update (uses current_ticker if None)
+            force: Force update even if data is not stale
+        """
+        ticker = ticker or self.current_ticker
+        if not ticker:
+            raise ValueError("No ticker specified and no current ticker set")
+
+        if force or self.data_manager.is_data_stale(ticker):
+            print(f"Updating data for {ticker}...")
+            df = self.data_manager.download_stock_data(
+                DownloadRequest(ticker=ticker, save=True)
+            )
+            if not df.empty:
+                print(f"✓ Updated {ticker} with {len(df)} rows")
+                # Reload into Trader if it's the current ticker
+                if ticker == self.current_ticker:
+                    self.load_data(ticker=ticker, auto_download=False)
+        else:
+            print(f"Data for {ticker} is up to date")
 
     def prepare_data(self) -> pl.DataFrame:
         """
@@ -316,9 +440,9 @@ class Trader:
             print("No signals generated yet.")
             return
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("TRADER SUMMARY")
-        print("="*60)
+        print("=" * 60)
 
         print(f"\nStrategies ({len(self.strategies)}):")
         for i, strategy in enumerate(self.strategies, 1):
@@ -345,7 +469,8 @@ class Trader:
         for strategy, signal in latest['individual_signals'].items():
             print(f"    - {strategy}: {signal}")
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
 
     def __repr__(self):
-        return f"Trader(strategies={len(self.strategies)}, data_loaded={self.data is not None})"
+        ticker_info = f", ticker={self.current_ticker}" if self.current_ticker else ""
+        return f"Trader(strategies={len(self.strategies)}, data_loaded={self.data is not None}{ticker_info})"
