@@ -127,7 +127,7 @@ export default function AppDashboardLayout({
                 </Box>
                 <Box>
                     <Typography variant="h6" fontWeight={700} sx={{lineHeight: 1.2}}>
-                        TradeFlow
+                        Systematic Trading
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                         Professional Trading
@@ -216,14 +216,14 @@ export default function AppDashboardLayout({
     );
 
     return (
-        <html lang="en">
-        <head>
-            <link rel="preconnect" href="https://fonts.googleapis.com"/>
-            <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
-        </head>
-        <body>
         <QueryClientProvider client={queryClient}>
             <ThemeProvider theme={theme}>
+                <html lang="en">
+                <head>
+                    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+                    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous"/>
+                </head>
+                <body>
                 <CssBaseline/>
                 <Box sx={{display: 'flex', minHeight: '100vh'}}>
                     {/* App Bar */}
@@ -355,9 +355,9 @@ export default function AppDashboardLayout({
                 {process.env.NODE_ENV === 'development' && (
                     <ReactQueryDevtools initialIsOpen={false}/>
                 )}
+                </body>
+                </html>
             </ThemeProvider>
         </QueryClientProvider>
-        </body>
-        </html>
     );
 }
