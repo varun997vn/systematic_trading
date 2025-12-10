@@ -44,6 +44,8 @@ logs/
 st/data/historical/*.csv
 st/data/historical/*.pkl
 data/historical/*.parquet
+*.db
+*.csv
 
 # Jupyter Notebook
 .ipynb_checkpoints

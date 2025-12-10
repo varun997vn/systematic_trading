@@ -2,9 +2,6 @@
 Unit tests for position sizing.
 """
 
-import pytest
-import pandas as pd
-import numpy as np
 from risk_management.position_sizer import PositionSizer
 
 
@@ -14,9 +11,7 @@ class TestPositionSizer:
     def test_initialization(self):
         """Test position sizer initialization."""
         sizer = PositionSizer(
-            capital=100000,
-            volatility_target=0.20,
-            max_position_size=0.10
+            capital=100000, volatility_target=0.20, max_position_size=0.10
         )
 
         assert sizer.capital == 100000
@@ -29,9 +24,7 @@ class TestPositionSizer:
 
         # Test with typical values
         shares = sizer.calculate_instrument_weight(
-            price=100.0,
-            volatility=0.25,
-            forecast=10.0
+            price=100.0, volatility=0.25, forecast=10.0
         )
 
         assert isinstance(shares, float)
@@ -42,9 +35,7 @@ class TestPositionSizer:
         sizer = PositionSizer(capital=100000, volatility_target=0.20)
 
         shares = sizer.calculate_instrument_weight(
-            price=100.0,
-            volatility=0.25,
-            forecast=-10.0
+            price=100.0, volatility=0.25, forecast=-10.0
         )
 
         assert shares < 0  # Should be negative for short position
@@ -52,21 +43,21 @@ class TestPositionSizer:
     def test_position_size_limits(self):
         """Test that position sizes respect maximum limits."""
         sizer = PositionSizer(
-            capital=100000,
-            volatility_target=0.20,
-            max_position_size=0.10
+            capital=100000, volatility_target=0.20, max_position_size=0.10
         )
 
         # Try to create a very large position with low volatility
         shares = sizer.calculate_instrument_weight(
             price=10.0,
             volatility=0.01,  # Very low volatility
-            forecast=20.0  # Strong signal
+            forecast=20.0,  # Strong signal
         )
 
         # Position value should not exceed max_position_size * capital
         position_value = abs(shares * 10.0)
-        assert position_value <= sizer.capital * sizer.max_position_size * 1.01  # Allow small rounding
+        assert (
+            position_value <= sizer.capital * sizer.max_position_size * 1.01
+        )  # Allow small rounding
 
     def test_invalid_inputs(self):
         """Test handling of invalid inputs."""
@@ -74,17 +65,13 @@ class TestPositionSizer:
 
         # Zero volatility
         shares = sizer.calculate_instrument_weight(
-            price=100.0,
-            volatility=0.0,
-            forecast=10.0
+            price=100.0, volatility=0.0, forecast=10.0
         )
         assert shares == 0.0
 
         # Zero price
         shares = sizer.calculate_instrument_weight(
-            price=0.0,
-            volatility=0.25,
-            forecast=10.0
+            price=0.0, volatility=0.25, forecast=10.0
         )
         assert shares == 0.0
 
@@ -101,17 +88,9 @@ class TestPositionSizer:
         """Test portfolio leverage calculation."""
         sizer = PositionSizer(capital=100000)
 
-        positions = {
-            'STOCK1': 100,
-            'STOCK2': 50,
-            'STOCK3': -30
-        }
+        positions = {"STOCK1": 100, "STOCK2": 50, "STOCK3": -30}
 
-        prices = {
-            'STOCK1': 100.0,
-            'STOCK2': 200.0,
-            'STOCK3': 50.0
-        }
+        prices = {"STOCK1": 100.0, "STOCK2": 200.0, "STOCK3": 50.0}
 
         leverage = sizer.calculate_portfolio_leverage(positions, prices)
 

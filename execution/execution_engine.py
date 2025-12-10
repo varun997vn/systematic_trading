@@ -4,17 +4,18 @@ Execution engine for managing order flow and execution.
 Coordinates between strategy signals, position sizing, and broker execution.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional
 from datetime import datetime
+from typing import Dict, List, Optional
+
+import numpy as np
+import pandas as pd
+
+from risk_management.position_sizer import PositionSizer
+from strategy.base_strategy import BaseStrategy
+from utils.logger import setup_logger
 
 from .mock_broker import MockBroker
 from .order import Order, OrderType
-from strategy.base_strategy import BaseStrategy
-from risk_management.position_sizer import PositionSizer
-from utils.logger import setup_logger
-
 
 logger = setup_logger(__name__)
 
@@ -59,7 +60,7 @@ class ExecutionEngine:
         self,
         signals: Dict[str, float],
         prices: Dict[str, float],
-        volatilities: Dict[str, float]
+        volatilities: Dict[str, float],
     ) -> Dict[str, float]:
         """
         Calculate target positions from signals.
@@ -81,9 +82,7 @@ class ExecutionEngine:
 
             # Calculate position size
             position = self.position_sizer.calculate_instrument_weight(
-                price=prices[symbol],
-                volatility=volatilities[symbol],
-                forecast=signal
+                price=prices[symbol], volatility=volatilities[symbol], forecast=signal
             )
 
             target_positions[symbol] = position
@@ -94,7 +93,7 @@ class ExecutionEngine:
         self,
         target_positions: Dict[str, float],
         current_positions: Dict[str, float],
-        prices: Dict[str, float]
+        prices: Dict[str, float],
     ) -> List[Order]:
         """
         Generate orders to reach target positions from current positions.
@@ -122,7 +121,9 @@ class ExecutionEngine:
             # Check if trade exceeds rebalance threshold
             if symbol in prices and prices[symbol] > 0:
                 trade_value = abs(trade_quantity) * prices[symbol]
-                threshold_value = abs(current) * prices[symbol] * self.rebalance_threshold
+                threshold_value = (
+                    abs(current) * prices[symbol] * self.rebalance_threshold
+                )
 
                 if trade_value < threshold_value:
                     # Trade too small, skip
@@ -134,9 +135,7 @@ class ExecutionEngine:
             if trade_quantity != 0:
                 # Create order
                 order = Order(
-                    symbol=symbol,
-                    quantity=trade_quantity,
-                    order_type=OrderType.MARKET
+                    symbol=symbol, quantity=trade_quantity, order_type=OrderType.MARKET
                 )
                 orders.append(order)
 
@@ -149,7 +148,7 @@ class ExecutionEngine:
         signals: Dict[str, float],
         prices: Dict[str, float],
         volatilities: Dict[str, float],
-        volumes: Optional[Dict[str, float]] = None
+        volumes: Optional[Dict[str, float]] = None,
     ) -> List[Order]:
         """
         Execute trading signals.
@@ -168,7 +167,9 @@ class ExecutionEngine:
         logger.info(f"Executing signals for {len(signals)} symbols")
 
         # Calculate target positions
-        target_positions = self.calculate_target_positions(signals, prices, volatilities)
+        target_positions = self.calculate_target_positions(
+            signals, prices, volatilities
+        )
 
         # Get current positions
         current_positions = self.broker.positions.copy()
@@ -184,29 +185,29 @@ class ExecutionEngine:
             submitted_order = self.broker.submit_order(
                 symbol=order.symbol,
                 quantity=order.quantity,
-                order_type=order.order_type
+                order_type=order.order_type,
             )
 
             # Execute immediately (market order in simulation)
             if order.symbol in prices:
                 volume = volumes.get(order.symbol) if volumes else None
                 success = self.broker.execute_order(
-                    submitted_order,
-                    current_price=prices[order.symbol],
-                    volume=volume
+                    submitted_order, current_price=prices[order.symbol], volume=volume
                 )
 
                 if success:
                     executed_orders.append(submitted_order)
 
         # Record execution
-        self.execution_history.append({
-            'timestamp': datetime.now(),
-            'num_signals': len(signals),
-            'num_orders': len(orders),
-            'num_executed': len(executed_orders),
-            'account_value': self.broker.get_portfolio_value(prices),
-        })
+        self.execution_history.append(
+            {
+                "timestamp": datetime.now(),
+                "num_signals": len(signals),
+                "num_orders": len(orders),
+                "num_executed": len(executed_orders),
+                "account_value": self.broker.get_portfolio_value(prices),
+            }
+        )
 
         logger.info(f"Executed {len(executed_orders)} out of {len(orders)} orders")
 
@@ -217,7 +218,7 @@ class ExecutionEngine:
         strategy: BaseStrategy,
         data_dict: Dict[str, pd.DataFrame],
         start_index: int = 0,
-        end_index: Optional[int] = None
+        end_index: Optional[int] = None,
     ) -> Dict:
         """
         Run backtest with realistic execution.
@@ -231,7 +232,7 @@ class ExecutionEngine:
         Returns:
             Dictionary with backtest results
         """
-        logger.info(f"Starting backtest with ExecutionEngine")
+        logger.info("Starting backtest with ExecutionEngine")
 
         # Reset broker
         self.broker.reset()
@@ -269,16 +270,18 @@ class ExecutionEngine:
 
             for symbol in data_dict.keys():
                 try:
-                    prices[symbol] = data_dict[symbol].loc[date, 'Close']
+                    prices[symbol] = data_dict[symbol].loc[date, "Close"]
 
                     # Calculate volatility
-                    returns = data_dict[symbol]['Close'].pct_change()
-                    vol = returns.loc[:date].rolling(window=25).std().iloc[-1] * np.sqrt(252)
+                    returns = data_dict[symbol]["Close"].pct_change()
+                    vol = returns.loc[:date].rolling(window=25).std().iloc[
+                        -1
+                    ] * np.sqrt(252)
                     volatilities[symbol] = vol if not pd.isna(vol) else 0.20
 
                     # Get volume if available
-                    if 'Volume' in data_dict[symbol].columns:
-                        volumes[symbol] = data_dict[symbol].loc[date, 'Volume']
+                    if "Volume" in data_dict[symbol].columns:
+                        volumes[symbol] = data_dict[symbol].loc[date, "Volume"]
 
                     # Get signal
                     if date in signals_dict[symbol].index:
@@ -309,20 +312,24 @@ class ExecutionEngine:
         trade_stats = self.broker.get_trade_statistics()
 
         results = {
-            'equity_curve': equity_series,
-            'returns': returns,
-            'total_return': total_return,
-            'annualized_return': annual_return,
-            'annualized_volatility': annual_vol,
-            'sharpe_ratio': sharpe,
-            'final_value': equity_series.iloc[-1],
-            'final_equity': equity_series.iloc[-1],
-            'start_date': str(equity_series.index[0].date()) if len(equity_series) > 0 else None,
-            'end_date': str(equity_series.index[-1].date()) if len(equity_series) > 0 else None,
-            'total_trades': trade_stats.get('total_trades', 0),
-            'total_costs': trade_stats.get('total_costs', 0),
-            'trade_statistics': trade_stats,
-            'broker_state': self.broker.get_account_summary(prices),
+            "equity_curve": equity_series,
+            "returns": returns,
+            "total_return": total_return,
+            "annualized_return": annual_return,
+            "annualized_volatility": annual_vol,
+            "sharpe_ratio": sharpe,
+            "final_value": equity_series.iloc[-1],
+            "final_equity": equity_series.iloc[-1],
+            "start_date": str(equity_series.index[0].date())
+            if len(equity_series) > 0
+            else None,
+            "end_date": str(equity_series.index[-1].date())
+            if len(equity_series) > 0
+            else None,
+            "total_trades": trade_stats.get("total_trades", 0),
+            "total_costs": trade_stats.get("total_costs", 0),
+            "trade_statistics": trade_stats,
+            "broker_state": self.broker.get_account_summary(prices),
         }
 
         logger.info(

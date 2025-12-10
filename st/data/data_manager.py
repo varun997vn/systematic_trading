@@ -6,7 +6,7 @@ Includes improvements for better integration with the Trader class.
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Dict, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 import yfinance as yf
@@ -20,8 +20,10 @@ logger = setup_logger(__name__)
 
 # ---- Pydantic Models ---- #
 
+
 class StockInfo(BaseModel):
     """Metadata for a stock."""
+
     name: str
     sector: str
     currency: str
@@ -30,6 +32,7 @@ class StockInfo(BaseModel):
 
 class DownloadRequest(BaseModel):
     """Request parameters for downloading stock data."""
+
     ticker: str = Field(..., description="Stock ticker (e.g., GOOG, TSLA, AAPL)")
     start_date: Optional[str] = Field(None, description="Start date (YYYY-MM-DD)")
     end_date: Optional[str] = Field(None, description="End date (YYYY-MM-DD)")
@@ -44,6 +47,7 @@ class DownloadRequest(BaseModel):
 
 
 # ---- Data Manager ---- #
+
 
 class DataManager(BaseModel):
     """
@@ -69,14 +73,16 @@ class DataManager(BaseModel):
         logger.info(f"Downloading {req.ticker} from {start} to {end}")
 
         try:
-            df = yf.download(req.ticker, start=start, end=end, auto_adjust=True, progress=False)
+            df = yf.download(
+                req.ticker, start=start, end=end, auto_adjust=True, progress=False
+            )
 
             if df.empty:
                 logger.warning(f"No data retrieved for {req.ticker}")
                 return pd.DataFrame()
 
-            df = df[['Open', 'High', 'Low', 'Close', 'Volume']]
-            df.index.name = 'Date'
+            df = df[["Open", "High", "Low", "Close", "Volume"]]
+            df.index.name = "Date"
             df.index = df.index.tz_localize(None)  # removing timezone
 
             if req.save:
@@ -89,9 +95,7 @@ class DataManager(BaseModel):
             return pd.DataFrame()
 
     def download_multiple_stocks(
-            self,
-            req: List[DownloadRequest],
-            parallel: bool = True
+        self, req: List[DownloadRequest], parallel: bool = True
     ) -> Dict[str, pd.DataFrame]:
         """
         Download data for multiple stocks.
@@ -109,7 +113,9 @@ class DataManager(BaseModel):
             data[d_req.ticker] = df
         return data
 
-    def _download_batch(self, tickers: List[str], template_req: DownloadRequest) -> Dict[str, pd.DataFrame]:
+    def _download_batch(
+        self, tickers: List[str], template_req: DownloadRequest
+    ) -> Dict[str, pd.DataFrame]:
         """Batch download using yfinance for better performance."""
         start = template_req.start_date or Settings.DATA_START_DATE
         end = template_req.end_date or Settings.DATA_END_DATE
@@ -123,7 +129,7 @@ class DataManager(BaseModel):
                 end=end,
                 auto_adjust=True,
                 progress=False,
-                group_by='ticker'
+                group_by="ticker",
             )
 
             result = {}
@@ -135,7 +141,7 @@ class DataManager(BaseModel):
                         df = data[ticker]
 
                     if not df.empty:
-                        df = df[['Open', 'High', 'Low', 'Close', 'Volume']]
+                        df = df[["Open", "High", "Low", "Close", "Volume"]]
                         df.index = df.index.tz_localize(None)
 
                         if template_req.save:
@@ -175,7 +181,7 @@ class DataManager(BaseModel):
             return pd.DataFrame()
 
         try:
-            df = pd.read_csv(filepath, index_col='Date', parse_dates=True)
+            df = pd.read_csv(filepath, index_col="Date", parse_dates=True)
             logger.info(f"Loaded {len(df)} rows for {ticker} from {filepath}")
             return df
         except Exception as e:
@@ -183,10 +189,10 @@ class DataManager(BaseModel):
             return pd.DataFrame()
 
     def get_close_prices(
-            self,
-            tickers: List[str],
-            start_date: Optional[str] = None,
-            end_date: Optional[str] = None
+        self,
+        tickers: List[str],
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
     ) -> pd.DataFrame:
         """Get close prices for multiple stocks as a DataFrame."""
         close_prices = {}
@@ -196,7 +202,9 @@ class DataManager(BaseModel):
             if df.empty:
                 logger.info(f"No local data for {ticker}, downloading...")
                 df = self.download_stock_data(
-                    DownloadRequest(ticker=ticker, start_date=start_date, end_date=end_date)
+                    DownloadRequest(
+                        ticker=ticker, start_date=start_date, end_date=end_date
+                    )
                 )
 
             if not df.empty:
@@ -204,7 +212,7 @@ class DataManager(BaseModel):
                     df = df[df.index >= start_date]
                 if end_date:
                     df = df[df.index <= end_date]
-                close_prices[ticker] = df['Close']
+                close_prices[ticker] = df["Close"]
 
         if not close_prices:
             return pd.DataFrame()
@@ -219,10 +227,10 @@ class DataManager(BaseModel):
             stock = yf.Ticker(ticker)
             info = stock.get_info()
             return StockInfo(
-                name=info.get('longName', ticker),
-                sector=info.get('sector', 'Unknown'),
-                currency=info.get('currency', 'USD'),
-                exchange=info.get('exchange', 'NASDAQ'),
+                name=info.get("longName", ticker),
+                sector=info.get("sector", "Unknown"),
+                currency=info.get("currency", "USD"),
+                exchange=info.get("exchange", "NASDAQ"),
             )
         except Exception as e:
             logger.error(f"Error getting info for {ticker}: {e}")
@@ -252,15 +260,13 @@ class DataManager(BaseModel):
             return True
 
         _, end_date = date_range
-        last_date = datetime.strptime(end_date, '%Y-%m-%d')
+        last_date = datetime.strptime(end_date, "%Y-%m-%d")
         days_old = (datetime.now() - last_date).days
 
         return days_old > max_days_old
 
     def update_stale_data(
-            self,
-            tickers: List[str],
-            max_days_old: int = 1
+        self, tickers: List[str], max_days_old: int = 1
     ) -> Dict[str, pd.DataFrame]:
         """Update data for tickers that are stale."""
         updated = {}
@@ -268,9 +274,7 @@ class DataManager(BaseModel):
         for ticker in tickers:
             if self.is_data_stale(ticker, max_days_old):
                 logger.info(f"Updating stale data for {ticker}")
-                df = self.download_stock_data(
-                    DownloadRequest(ticker=ticker, save=True)
-                )
+                df = self.download_stock_data(DownloadRequest(ticker=ticker, save=True))
                 if not df.empty:
                     updated[ticker] = df
 
@@ -278,10 +282,10 @@ class DataManager(BaseModel):
         return updated
 
     def get_ohlcv(
-            self,
-            ticker: str,
-            start_date: Optional[str] = None,
-            end_date: Optional[str] = None
+        self,
+        ticker: str,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
     ) -> pd.DataFrame:
         """Get OHLCV data for a ticker with optional date filtering."""
         df = self.load_data(ticker)
@@ -315,7 +319,7 @@ class DataManager(BaseModel):
 
         tickers = []
         for file in csv_files:
-            ticker = file.stem.replace('_', '.')
+            ticker = file.stem.replace("_", ".")
             tickers.append(ticker)
 
         return sorted(tickers)
@@ -331,5 +335,5 @@ class DataManager(BaseModel):
             "data_dir": str(data_path),
             "num_files": len(csv_files),
             "total_size_mb": round(total_size / (1024 * 1024), 2),
-            "tickers": self.list_available_tickers()
+            "tickers": self.list_available_tickers(),
         }

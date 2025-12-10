@@ -3,45 +3,40 @@ Trading strategy module implementing systematic trading strategies.
 """
 
 from .base_strategy import BaseStrategy
-from .trend_following import MovingAverageCrossover, EWMAC, MultipleEWMAC
-from .mean_reversion import BollingerBands, RSIMeanReversion, ZScoreMeanReversion
-from .momentum import RateOfChange, RelativeStrength, DualMomentum, MACD
 from .breakout import (
     DonchianBreakout,
-    VolatilityBreakout,
+    RangeBreakout,
     SupportResistanceBreakout,
-    RangeBreakout
+    VolatilityBreakout,
 )
-from .carry import (
-    DividendYieldCarry,
-    ValueStrategy,
-    YieldCurveCarry,
-    SeasonalityCarry
-)
+from .carry import DividendYieldCarry, SeasonalityCarry, ValueStrategy, YieldCurveCarry
+from .mean_reversion import BollingerBands, RSIMeanReversion, ZScoreMeanReversion
+from .momentum import MACD, DualMomentum, RateOfChange, RelativeStrength
+from .trend_following import EWMAC, MovingAverageCrossover, MultipleEWMAC
 
 __all__ = [
-    'BaseStrategy',
+    "BaseStrategy",
     # Trend Following
-    'MovingAverageCrossover',
-    'EWMAC',
-    'MultipleEWMAC',
+    "MovingAverageCrossover",
+    "EWMAC",
+    "MultipleEWMAC",
     # Mean Reversion
-    'BollingerBands',
-    'RSIMeanReversion',
-    'ZScoreMeanReversion',
+    "BollingerBands",
+    "RSIMeanReversion",
+    "ZScoreMeanReversion",
     # Momentum
-    'RateOfChange',
-    'RelativeStrength',
-    'DualMomentum',
-    'MACD',
+    "RateOfChange",
+    "RelativeStrength",
+    "DualMomentum",
+    "MACD",
     # Breakout
-    'DonchianBreakout',
-    'VolatilityBreakout',
-    'SupportResistanceBreakout',
-    'RangeBreakout',
+    "DonchianBreakout",
+    "VolatilityBreakout",
+    "SupportResistanceBreakout",
+    "RangeBreakout",
     # Carry
-    'DividendYieldCarry',
-    'ValueStrategy',
-    'YieldCurveCarry',
-    'SeasonalityCarry',
+    "DividendYieldCarry",
+    "ValueStrategy",
+    "YieldCurveCarry",
+    "SeasonalityCarry",
 ]

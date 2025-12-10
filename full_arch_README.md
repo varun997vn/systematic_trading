@@ -9,13 +9,11 @@ the frontend uses **Next.js** with **MUI** for UI components.
 
 | Layer              | Technology                                         |
 |--------------------|----------------------------------------------------|
-| Backend            | **FastAPI**                                        |
+| Backend            | **FastAPI**, **Polars** for data manipulation      |
 | Frontend Framework | **Next.js** (Multi-page + SSR)                     |
 | UI Components      | **MUI**                                            |
 | API Client         | **Axios** or **Fetch**, optionally **React Query** |
 | Database           | SQLite (Development)                               |
-| Authentication     | **JWT** (HTTP-only cookies or token storage)       |
-| Deployment         | Backend: Heroku/AWS, Frontend: Vercel/Netlify      |
 
 ---
 
@@ -117,6 +115,14 @@ flowchart TD
     Service --> Model --> Database
     Service --> Utils
 ```
+
+#### Overview
+
+Trader class, which loads the data, takes in the strategies (Strategy class) and gives out the buy sell
+signals on the scale of -20 to 20.
+
+-20: very strong sell, -15: strong sell, -10: good sell, -5: weak sell, 0: neutral, 20: very strong buy, 15: strong buy,
+10; good buy, 5: weak buy
 
 **Description:**
 

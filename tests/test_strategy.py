@@ -2,10 +2,11 @@
 Unit tests for trading strategies.
 """
 
-import pytest
-import pandas as pd
 import numpy as np
-from strategy.trend_following import MovingAverageCrossover, EWMAC
+import pandas as pd
+import pytest
+
+from strategy.trend_following import EWMAC, MovingAverageCrossover
 
 
 class TestStrategies:
@@ -14,7 +15,7 @@ class TestStrategies:
     @pytest.fixture
     def sample_data(self):
         """Create sample OHLCV data for testing."""
-        dates = pd.date_range('2020-01-01', periods=200, freq='D')
+        dates = pd.date_range("2020-01-01", periods=200, freq="D")
         np.random.seed(42)
 
         # Create trending price data
@@ -22,13 +23,16 @@ class TestStrategies:
         noise = np.random.randn(200) * 2
         close_prices = trend + noise
 
-        data = pd.DataFrame({
-            'Open': close_prices * 0.99,
-            'High': close_prices * 1.01,
-            'Low': close_prices * 0.98,
-            'Close': close_prices,
-            'Volume': np.random.randint(1000000, 5000000, 200)
-        }, index=dates)
+        data = pd.DataFrame(
+            {
+                "Open": close_prices * 0.99,
+                "High": close_prices * 1.01,
+                "Low": close_prices * 0.98,
+                "Close": close_prices,
+                "Volume": np.random.randint(1000000, 5000000, 200),
+            },
+            index=dates,
+        )
 
         return data
 
@@ -80,7 +84,7 @@ class TestStrategies:
     def test_strategy_with_missing_close(self):
         """Test strategy with missing Close column."""
         strategy = EWMAC()
-        bad_data = pd.DataFrame({'Open': [100, 101, 102]})
+        bad_data = pd.DataFrame({"Open": [100, 101, 102]})
         signals = strategy.generate_signals(bad_data)
 
         assert len(signals) == 0

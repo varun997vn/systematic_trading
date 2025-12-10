@@ -5,11 +5,10 @@ All strategies should inherit from this class and implement the generate_signals
 """
 
 from abc import ABC, abstractmethod
+
 import pandas as pd
-from typing import Optional
 
 from utils.logger import setup_logger
-
 
 logger = setup_logger(__name__)
 
@@ -61,16 +60,14 @@ class BaseStrategy(ABC):
             logger.error("Data is None or empty")
             return False
 
-        if 'Close' not in data.columns:
+        if "Close" not in data.columns:
             logger.error("Data must contain 'Close' column")
             return False
 
         return True
 
     def calculate_forecast_scalar(
-        self,
-        raw_forecast: pd.Series,
-        target_abs_forecast: float = 10.0
+        self, raw_forecast: pd.Series, target_abs_forecast: float = 10.0
     ) -> pd.Series:
         """
         Scale raw forecasts to Carver's standard forecast range.
