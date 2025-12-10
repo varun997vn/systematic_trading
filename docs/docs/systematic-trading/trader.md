@@ -1,5 +1,5 @@
 ---
-id: Trader
+id: trader
 title: Trader
 sidebar_label: Trader
 ---
