@@ -1,11 +1,8 @@
-Here is a **clear, concise, and developer-friendly documentation** for your `Trader` class.
-It keeps all the conceptual knowledge intact while removing noise and avoiding overwhelm.
-
----
-
 # **📘 Trader Class — Documentation**
 
-The `Trader` class provides a complete pipeline for loading market data, applying trading strategies, and generating consolidated trading signals. It acts as the orchestrator between data ingestion (`DataManager`) and multiple plug-in strategies (`Strategy`).
+The `Trader` class provides a complete pipeline for loading market data, applying trading strategies, and generating
+consolidated trading signals. It acts as the orchestrator between data ingestion (`DataManager`) and multiple plug-in
+strategies (`Strategy`).
 
 ---
 
@@ -18,9 +15,9 @@ The `Trader` class provides a complete pipeline for loading market data, applyin
 * Generate buy/sell signals (range: **-20 to +20**)
 * Aggregate multiple strategies using:
 
-  * `"aggregate"` → average of all signals
-  * `"max"` → strongest absolute signal
-  * `"consensus"` → majority vote with strength
+    * `"aggregate"` → average of all signals
+    * `"max"` → strongest absolute signal
+    * `"consensus"` → majority vote with strength
 * Provide utilities to inspect, save, and summarize signals
 
 ---
@@ -29,7 +26,7 @@ The `Trader` class provides a complete pipeline for loading market data, applyin
 
 ```python
 Trader(strategies: List[Strategy] = None,
-       data_manager: DataManager = None)
+data_manager: DataManager = None)
 ```
 
 **Args**
@@ -99,7 +96,7 @@ Runs all strategies and produces:
 **Supported modes**
 
 | Mode          | Description                           |
-| ------------- | ------------------------------------- |
+|---------------|---------------------------------------|
 | `"aggregate"` | Average of all strategy signals       |
 | `"max"`       | The strongest absolute signal         |
 | `"consensus"` | Majority direction × average strength |
@@ -159,7 +156,8 @@ The `Trader` class is designed as a **modular, extensible trading engine** that 
 * Signal generation
 * Reporting
 
-You can plug in new strategies, swap data sources, and choose different aggregation modes without changing the core workflow.
+You can plug in new strategies, swap data sources, and choose different aggregation modes without changing the core
+workflow.
 
 ---
 

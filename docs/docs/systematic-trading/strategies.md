@@ -1,8 +1,3 @@
-Below is **clean, concise documentation** for both files while keeping the original technical meaning intact and
-avoiding unnecessary detail.
-
----
-
 # 📘 Project Documentation
 
 ## Overview
