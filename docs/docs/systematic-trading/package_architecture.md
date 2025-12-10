@@ -3,6 +3,7 @@ id: package-architecture          # unique ID for this doc
 title: Package Architecture       # this becomes the page title
 sidebar_label: Package Architecture
 ---
+
 # Application Architecture
 
 This is a full-stack multi-page web application for **automated trading**. The backend is built with **FastAPI**, and
@@ -55,7 +56,7 @@ the frontend uses **Next.js** with **MUI** for UI components.
 │
 ├── /frontend
 │   ├── package.json
-│   ├── /pages              # Next.js pages
+│   ├── /app              # Next.js pages
 │   ├── /components         # Reusable UI components
 │   ├── /styles             # Global CSS / themes
 │   ├── /hooks              # Custom React hooks
@@ -102,6 +103,34 @@ flowchart TD
     Component --> UI
     Hook --> Utils
 ```
+
+```bash
+app/
+├── layout.tsx (with MUI AppBar, Drawer navigation)
+├── page.tsx (redirect to /dashboard)
+├── dashboard/
+│   └── page.tsx
+├── chart/
+│   └── page.tsx ⭐
+├── data/
+│   └── page.tsx
+├── strategies/
+│   ├── page.tsx
+│   ├── [id]/
+│   │   └── page.tsx (strategy details)
+│   └── new/
+│       └── page.tsx (create strategy)
+├── signals/
+│   └── page.tsx
+├── trades/
+│   ├── page.tsx
+│   └── [id]/
+│       └── page.tsx (trade details)
+├── positions/
+│   └── page.tsx
+└── settings/
+    └── page.tsx
+````
 
 **Description:**
 

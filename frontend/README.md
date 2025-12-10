@@ -56,18 +56,16 @@ The frontend will be available at http://localhost:3000
 ## Project Structure
 
 ```
-trading-frontend/
-├── app/
-│   ├── page.tsx              # Main dashboard page
-│   └── layout.tsx            # Root layout
-├── components/
-│   ├── PortfolioSummary.tsx  # Portfolio overview component
-│   ├── SignalMonitor.tsx     # Trading signal checker
-│   └── TickerSearch.tsx      # Data download component
-├── lib/
-│   └── api.ts                # API client for FastAPI backend
-├── .env.local                # Environment variables
-└── package.json              # Dependencies
+app/
+├── dashboard (landing page)
+├── charts (primary visualization)
+├── trading/
+│   ├── positions
+│   ├── trades
+│   └── signals
+├── strategies
+├── data
+└── settings
 ```
 
 ## Features
