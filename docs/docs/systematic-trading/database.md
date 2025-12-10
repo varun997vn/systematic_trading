@@ -1,3 +1,8 @@
+---
+id: database          # unique ID for this doc
+title: Database      # this becomes the page title
+sidebar_label: Database
+---
 # Trading Database Setup
 
 Clean SQLAlchemy database for systematic trading - **5 tables, zero bloat**.
