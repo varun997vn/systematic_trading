@@ -16,17 +16,16 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from st.data import DataManager
-from strategy.trend_following import EWMAC, MovingAverageCrossover
-from risk_management.position_sizer import PositionSizer
 from backtesting.backtest_engine import BacktestEngine
 from backtesting.performance import PerformanceAnalyzer
+from risk_management.position_sizer import PositionSizer
 from st.config.settings import Settings
+from st.data import DataManager
+from strategy.trend_following import EWMAC, MovingAverageCrossover
 from utils.logger import setup_logger
 
-
 # Set up logging
-logger = setup_logger(__name__, log_file='systematic_trading.log')
+logger = setup_logger(__name__, log_file="systematic_trading.log")
 
 
 def main():
@@ -42,7 +41,7 @@ def main():
     Settings.validate()
 
     # Define US tech stocks to test
-    us_stocks = ['GOOG', 'MSFT', 'TSLA']
+    us_stocks = ["GOOG", "MSFT", "TSLA"]
     logger.info(f"\nTesting with US stocks: {us_stocks}")
 
     # =========================================================================
@@ -58,7 +57,7 @@ def main():
         tickers=us_stocks,
         start_date=Settings.DATA_START_DATE,
         end_date=Settings.DATA_END_DATE,
-        save=True
+        save=True,
     )
 
     if not stock_data:
@@ -79,7 +78,7 @@ def main():
     logger.info("Running single-stock backtest...")
 
     # Select GOOG for detailed analysis
-    ticker = 'GOOG'
+    ticker = "GOOG"
     data = stock_data[ticker]
 
     # Create EWMAC strategy (Carver's preferred method)
@@ -87,22 +86,19 @@ def main():
 
     # Create position sizer with volatility targeting
     position_sizer = PositionSizer(
-        capital=Settings.INITIAL_CAPITAL,
-        volatility_target=Settings.VOLATILITY_TARGET
+        capital=Settings.INITIAL_CAPITAL, volatility_target=Settings.VOLATILITY_TARGET
     )
 
     # Create backtest engine
     backtest_engine = BacktestEngine(
         initial_capital=Settings.INITIAL_CAPITAL,
         transaction_cost=Settings.TRANSACTION_COST,
-        slippage=Settings.SLIPPAGE
+        slippage=Settings.SLIPPAGE,
     )
 
     # Run backtest
     results = backtest_engine.run(
-        strategy=strategy,
-        data=data,
-        position_sizer=position_sizer
+        strategy=strategy, data=data, position_sizer=position_sizer
     )
 
     # =========================================================================
@@ -116,8 +112,8 @@ def main():
 
     # Generate plots
     print("\nGenerating performance charts...")
-    analyzer.plot_equity_curve(show=False, save_path=Path('equity_curve.png'))
-    analyzer.plot_positions(show=False, save_path=Path('positions.png'))
+    analyzer.plot_equity_curve(show=False, save_path=Path("equity_curve.png"))
+    analyzer.plot_positions(show=False, save_path=Path("positions.png"))
     print("✓ Charts saved: equity_curve.png, positions.png")
 
     # =========================================================================
@@ -136,18 +132,22 @@ def main():
 
     for strat in strategies_to_test:
         result = backtest_engine.run(strat, data, position_sizer)
-        comparison_results.append({
-            'strategy': strat.name,
-            'total_return': result['total_return'],
-            'annualized_return': result['annualized_return'],
-            'sharpe_ratio': result['sharpe_ratio'],
-            'max_trades': result['total_trades'],
-        })
+        comparison_results.append(
+            {
+                "strategy": strat.name,
+                "total_return": result["total_return"],
+                "annualized_return": result["annualized_return"],
+                "sharpe_ratio": result["sharpe_ratio"],
+                "max_trades": result["total_trades"],
+            }
+        )
 
     # Print comparison table
     print("\nStrategy Comparison:")
     print("-" * 80)
-    print(f"{'Strategy':<20} {'Total Return':>15} {'Annual Return':>15} {'Sharpe':>10} {'Trades':>10}")
+    print(
+        f"{'Strategy':<20} {'Total Return':>15} {'Annual Return':>15} {'Sharpe':>10} {'Trades':>10}"
+    )
     print("-" * 80)
 
     for res in comparison_results:
@@ -171,9 +171,7 @@ def main():
     portfolio_strategy = EWMAC(fast_span=16, slow_span=64, name="EWMAC_Portfolio")
 
     portfolio_results = backtest_engine.run_multiple_assets(
-        strategy=portfolio_strategy,
-        data_dict=stock_data,
-        position_sizer=position_sizer
+        strategy=portfolio_strategy, data_dict=stock_data, position_sizer=position_sizer
     )
 
     print("\nPortfolio Performance:")

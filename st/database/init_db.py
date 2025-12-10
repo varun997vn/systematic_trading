@@ -2,7 +2,8 @@
 Database initialization script
 Run this to create all tables
 """
-from .database import engine, Base
+
+from .database import Base, engine
 
 
 def create_tables():

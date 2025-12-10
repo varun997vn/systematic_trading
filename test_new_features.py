@@ -4,8 +4,9 @@ Quick test script to verify all new features work correctly.
 
 import sys
 from pathlib import Path
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -19,20 +20,32 @@ print("\n[TEST 1] Importing strategies...")
 try:
     from strategy import (
         # Trend Following
-        EWMAC, MultipleEWMAC, MovingAverageCrossover,
+        EWMAC,
+        MACD,
         # Mean Reversion
-        BollingerBands, RSIMeanReversion, ZScoreMeanReversion,
-        # Momentum
-        RateOfChange, RelativeStrength, DualMomentum, MACD,
-        # Breakout
-        DonchianBreakout, VolatilityBreakout,
-        SupportResistanceBreakout, RangeBreakout,
+        BollingerBands,
         # Carry
-        DividendYieldCarry, ValueStrategy,
-        YieldCurveCarry, SeasonalityCarry
+        DividendYieldCarry,
+        # Breakout
+        DonchianBreakout,
+        DualMomentum,
+        MovingAverageCrossover,
+        MultipleEWMAC,
+        RangeBreakout,
+        # Momentum
+        RateOfChange,
+        RelativeStrength,
+        RSIMeanReversion,
+        SeasonalityCarry,
+        SupportResistanceBreakout,
+        ValueStrategy,
+        VolatilityBreakout,
+        YieldCurveCarry,
+        ZScoreMeanReversion,
     )
+
     print("✓ All strategies imported successfully")
-    print(f"  - Total strategies available: 18")
+    print("  - Total strategies available: 18")
 except ImportError as e:
     print(f"✗ Strategy import failed: {e}")
     sys.exit(1)
@@ -40,8 +53,9 @@ except ImportError as e:
 # Test 2: Import risk management modules
 print("\n[TEST 2] Importing risk management...")
 try:
-    from risk_management.portfolio_optimizer import PortfolioOptimizer
     from risk_management.drawdown_manager import DrawdownManager
+    from risk_management.portfolio_optimizer import PortfolioOptimizer
+
     print("✓ Risk management modules imported successfully")
 except ImportError as e:
     print(f"✗ Risk management import failed: {e}")
@@ -50,9 +64,10 @@ except ImportError as e:
 # Test 3: Import execution modules
 print("\n[TEST 3] Importing execution engine...")
 try:
-    from execution.mock_broker import MockBroker
     from execution.execution_engine import ExecutionEngine
-    from execution.order import Order, OrderType, OrderStatus
+    from execution.mock_broker import MockBroker
+    from execution.order import Order, OrderStatus, OrderType
+
     print("✓ Execution modules imported successfully")
 except ImportError as e:
     print(f"✗ Execution import failed: {e}")
@@ -60,15 +75,18 @@ except ImportError as e:
 
 # Test 4: Create sample data
 print("\n[TEST 4] Creating sample data...")
-dates = pd.date_range('2023-01-01', '2023-12-31', freq='D')
+dates = pd.date_range("2023-01-01", "2023-12-31", freq="D")
 np.random.seed(42)
 prices = 100 + np.cumsum(np.random.randn(len(dates)) * 2)
-sample_data = pd.DataFrame({
-    'Close': prices,
-    'High': prices + np.random.rand(len(dates)) * 2,
-    'Low': prices - np.random.rand(len(dates)) * 2,
-    'Volume': np.random.randint(1000000, 10000000, len(dates))
-}, index=dates)
+sample_data = pd.DataFrame(
+    {
+        "Close": prices,
+        "High": prices + np.random.rand(len(dates)) * 2,
+        "Low": prices - np.random.rand(len(dates)) * 2,
+        "Volume": np.random.randint(1000000, 10000000, len(dates)),
+    },
+    index=dates,
+)
 print(f"✓ Created sample data: {len(sample_data)} days")
 
 # Test 5: Test trend following strategies
@@ -88,7 +106,9 @@ try:
     bb = BollingerBands(period=20, num_std=2.0)
     signals = bb.generate_signals(sample_data)
     assert len(signals) == len(sample_data), "Signal length mismatch"
-    print(f"✓ Bollinger Bands: Generated {len(signals)} signals, mean={signals.mean():.2f}")
+    print(
+        f"✓ Bollinger Bands: Generated {len(signals)} signals, mean={signals.mean():.2f}"
+    )
 
     rsi = RSIMeanReversion(period=14)
     signals = rsi.generate_signals(sample_data)
@@ -118,7 +138,9 @@ try:
 
     vol_breakout = VolatilityBreakout(lookback=20, threshold=1.5)
     signals = vol_breakout.generate_signals(sample_data)
-    print(f"✓ Volatility Breakout: Generated {len(signals)} signals, mean={signals.mean():.2f}")
+    print(
+        f"✓ Volatility Breakout: Generated {len(signals)} signals, mean={signals.mean():.2f}"
+    )
 except Exception as e:
     print(f"✗ Breakout failed: {e}")
 
@@ -127,9 +149,9 @@ print("\n[TEST 9] Testing portfolio optimizer...")
 try:
     # Create sample returns
     returns_data = {
-        'Strategy_A': pd.Series(np.random.randn(100) * 0.01),
-        'Strategy_B': pd.Series(np.random.randn(100) * 0.01),
-        'Strategy_C': pd.Series(np.random.randn(100) * 0.01),
+        "Strategy_A": pd.Series(np.random.randn(100) * 0.01),
+        "Strategy_B": pd.Series(np.random.randn(100) * 0.01),
+        "Strategy_C": pd.Series(np.random.randn(100) * 0.01),
     }
     returns_df = pd.DataFrame(returns_data)
 
@@ -142,11 +164,11 @@ try:
     print(f"✓ Equal weight: {weights}")
 
     # Test risk parity
-    result = optimizer.optimize_portfolio(returns_df, method='risk_parity')
+    result = optimizer.optimize_portfolio(returns_df, method="risk_parity")
     print(f"✓ Risk parity: Sharpe={result['sharpe_ratio']:.2f}")
 
     # Test minimum variance
-    result = optimizer.optimize_portfolio(returns_df, method='min_variance')
+    result = optimizer.optimize_portfolio(returns_df, method="min_variance")
     print(f"✓ Min variance: Volatility={result['volatility']:.2%}")
 
 except Exception as e:
@@ -158,13 +180,13 @@ try:
     # Create sample equity curve
     equity = pd.Series(
         100000 + np.cumsum(np.random.randn(100) * 1000),
-        index=pd.date_range('2023-01-01', periods=100)
+        index=pd.date_range("2023-01-01", periods=100),
     )
 
     dd_manager = DrawdownManager(
         max_drawdown_threshold=0.15,
         stop_trading_threshold=0.30,
-        scale_down_threshold=0.10
+        scale_down_threshold=0.10,
     )
 
     # Calculate drawdown
@@ -187,27 +209,27 @@ except Exception as e:
 print("\n[TEST 11] Testing mock broker...")
 try:
     broker = MockBroker(
-        initial_capital=100000,
-        commission_rate=0.001,
-        slippage_rate=0.0005
+        initial_capital=100000, commission_rate=0.001, slippage_rate=0.0005
     )
 
     # Submit order
-    order = broker.submit_order(symbol='TEST', quantity=10, order_type=OrderType.MARKET)
+    order = broker.submit_order(symbol="TEST", quantity=10, order_type=OrderType.MARKET)
     print(f"✓ Order submitted: {order.order_id}")
 
     # Execute order
     success = broker.execute_order(order, current_price=150.0)
     assert success, "Order execution failed"
-    print(f"✓ Order executed: {order.filled_quantity} shares @ ${order.filled_price:.2f}")
+    print(
+        f"✓ Order executed: {order.filled_quantity} shares @ ${order.filled_price:.2f}"
+    )
 
     # Check position
-    position = broker.get_position('TEST')
+    position = broker.get_position("TEST")
     assert position == 10, "Position mismatch"
     print(f"✓ Position: {position} shares")
 
     # Get account summary
-    summary = broker.get_account_summary({'TEST': 150.0})
+    summary = broker.get_account_summary({"TEST": 150.0})
     print(f"✓ Account value: ${summary['total_value']:,.2f}")
 
 except Exception as e:
@@ -220,15 +242,12 @@ try:
 
     broker = MockBroker(initial_capital=100000)
     position_sizer = PositionSizer(capital=100000)
-    execution_engine = ExecutionEngine(
-        broker=broker,
-        position_sizer=position_sizer
-    )
+    execution_engine = ExecutionEngine(broker=broker, position_sizer=position_sizer)
 
     # Create simple signals
-    signals = {'TEST': 10.0}  # Positive signal
-    prices = {'TEST': 150.0}
-    volatilities = {'TEST': 0.25}
+    signals = {"TEST": 10.0}  # Positive signal
+    prices = {"TEST": 150.0}
+    volatilities = {"TEST": 0.25}
 
     # Execute signals
     executed_orders = execution_engine.execute_signals(signals, prices, volatilities)
@@ -242,12 +261,12 @@ print("\n" + "=" * 80)
 print("✅ ALL TESTS PASSED!")
 print("=" * 80)
 print("\n📊 System Summary:")
-print(f"  - 18 trading strategies available")
-print(f"  - 5 portfolio optimization methods")
-print(f"  - Complete execution simulation")
-print(f"  - Realistic cost modeling")
-print(f"  - Drawdown management")
-print(f"  - Risk controls and compliance")
+print("  - 18 trading strategies available")
+print("  - 5 portfolio optimization methods")
+print("  - Complete execution simulation")
+print("  - Realistic cost modeling")
+print("  - Drawdown management")
+print("  - Risk controls and compliance")
 print("\n🚀 System ready for use!")
 print("\nNext steps:")
 print("  1. Run: jupyter notebook notebooks/")

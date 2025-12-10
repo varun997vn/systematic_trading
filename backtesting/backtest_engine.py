@@ -8,15 +8,15 @@ Implements realistic simulation accounting for:
 - Capital constraints
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, Dict
+from typing import Dict, Optional
 
-from strategy.base_strategy import BaseStrategy
+import numpy as np
+import pandas as pd
+
 from risk_management.position_sizer import PositionSizer
 from st.config.settings import Settings
+from strategy.base_strategy import BaseStrategy
 from utils.logger import setup_logger
-
 
 logger = setup_logger(__name__)
 
@@ -85,7 +85,7 @@ class BacktestEngine:
 
         # Calculate positions
         positions = position_sizer.calculate_position_from_signal(
-            prices=data['Close'],
+            prices=data["Close"],
             signal=signals,
         )
 
@@ -117,7 +117,7 @@ class BacktestEngine:
         Returns:
             Dictionary with performance metrics
         """
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate position changes (trades)
         position_diff = positions.diff()
@@ -156,30 +156,37 @@ class BacktestEngine:
         years = trading_days / Settings.BUSINESS_DAYS_PER_YEAR
 
         annualized_return = (1 + total_return) ** (1 / years) - 1 if years > 0 else 0
-        annualized_vol = strategy_returns_pct.std() * np.sqrt(Settings.BUSINESS_DAYS_PER_YEAR)
+        annualized_vol = strategy_returns_pct.std() * np.sqrt(
+            Settings.BUSINESS_DAYS_PER_YEAR
+        )
 
         # Sharpe ratio
-        excess_returns = strategy_returns_pct - (Settings.RISK_FREE_RATE / Settings.BUSINESS_DAYS_PER_YEAR)
+        excess_returns = strategy_returns_pct - (
+            Settings.RISK_FREE_RATE / Settings.BUSINESS_DAYS_PER_YEAR
+        )
         sharpe_ratio = (
-            excess_returns.mean() / strategy_returns_pct.std() * np.sqrt(Settings.BUSINESS_DAYS_PER_YEAR)
-            if strategy_returns_pct.std() > 0 else 0
+            excess_returns.mean()
+            / strategy_returns_pct.std()
+            * np.sqrt(Settings.BUSINESS_DAYS_PER_YEAR)
+            if strategy_returns_pct.std() > 0
+            else 0
         )
 
         # Prepare results
         results = {
-            'equity_curve': equity_curve,
-            'returns': strategy_returns_pct,
-            'positions': positions,
-            'signals': signals,
-            'total_return': total_return,
-            'annualized_return': annualized_return,
-            'annualized_volatility': annualized_vol,
-            'sharpe_ratio': sharpe_ratio,
-            'total_trades': trades,
-            'total_costs': total_costs,
-            'final_equity': equity_curve.iloc[-1],
-            'start_date': equity_curve.index[0],
-            'end_date': equity_curve.index[-1],
+            "equity_curve": equity_curve,
+            "returns": strategy_returns_pct,
+            "positions": positions,
+            "signals": signals,
+            "total_return": total_return,
+            "annualized_return": annualized_return,
+            "annualized_volatility": annualized_vol,
+            "sharpe_ratio": sharpe_ratio,
+            "total_trades": trades,
+            "total_costs": total_costs,
+            "final_equity": equity_curve.iloc[-1],
+            "start_date": equity_curve.index[0],
+            "end_date": equity_curve.index[-1],
         }
 
         return results
@@ -213,11 +220,13 @@ class BacktestEngine:
             individual_results[ticker] = result
 
         # Combine into portfolio
-        portfolio_equity = pd.DataFrame({
-            ticker: result['equity_curve']
-            for ticker, result in individual_results.items()
-            if 'equity_curve' in result
-        })
+        portfolio_equity = pd.DataFrame(
+            {
+                ticker: result["equity_curve"]
+                for ticker, result in individual_results.items()
+                if "equity_curve" in result
+            }
+        )
 
         # Sum equity curves (equal weighting)
         # In production, Carver uses more sophisticated weighting
@@ -225,27 +234,28 @@ class BacktestEngine:
 
         # Calculate portfolio metrics
         portfolio_returns = combined_equity.pct_change()
-        total_return = (combined_equity.iloc[-1] / (self.initial_capital * len(data_dict))) - 1
+        total_return = (
+            combined_equity.iloc[-1] / (self.initial_capital * len(data_dict))
+        ) - 1
 
         years = len(combined_equity) / Settings.BUSINESS_DAYS_PER_YEAR
         annualized_return = (1 + total_return) ** (1 / years) - 1 if years > 0 else 0
-        annualized_vol = portfolio_returns.std() * np.sqrt(Settings.BUSINESS_DAYS_PER_YEAR)
-
-        sharpe = (
-            annualized_return / annualized_vol
-            if annualized_vol > 0 else 0
+        annualized_vol = portfolio_returns.std() * np.sqrt(
+            Settings.BUSINESS_DAYS_PER_YEAR
         )
 
+        sharpe = annualized_return / annualized_vol if annualized_vol > 0 else 0
+
         results = {
-            'individual_results': individual_results,
-            'portfolio_equity': combined_equity,
-            'portfolio_returns': portfolio_returns,
-            'total_return': total_return,
-            'annualized_return': annualized_return,
-            'annualized_volatility': annualized_vol,
-            'sharpe_ratio': sharpe,
+            "individual_results": individual_results,
+            "portfolio_equity": combined_equity,
+            "portfolio_returns": portfolio_returns,
+            "total_return": total_return,
+            "annualized_return": annualized_return,
+            "annualized_volatility": annualized_vol,
+            "sharpe_ratio": sharpe,
         }
 
-        logger.info(f"Multi-asset backtest completed")
+        logger.info("Multi-asset backtest completed")
 
         return results

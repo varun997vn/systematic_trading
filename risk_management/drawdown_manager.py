@@ -4,12 +4,12 @@ Drawdown management and risk controls for systematic trading.
 Implements various drawdown monitoring and protection mechanisms.
 """
 
-import pandas as pd
-import numpy as np
 from typing import Dict
 
-from utils.logger import setup_logger
+import numpy as np
+import pandas as pd
 
+from utils.logger import setup_logger
 
 logger = setup_logger(__name__)
 
@@ -26,7 +26,7 @@ class DrawdownManager:
         self,
         max_drawdown_threshold: float = 0.20,  # 20%
         stop_trading_threshold: float = 0.30,  # 30%
-        scale_down_threshold: float = 0.15,    # 15%
+        scale_down_threshold: float = 0.15,  # 15%
     ):
         """
         Initialize drawdown manager.
@@ -47,10 +47,7 @@ class DrawdownManager:
             f"scale={scale_down_threshold:.1%}"
         )
 
-    def calculate_drawdown(
-        self,
-        equity_curve: pd.Series
-    ) -> pd.Series:
+    def calculate_drawdown(self, equity_curve: pd.Series) -> pd.Series:
         """
         Calculate drawdown series from equity curve.
 
@@ -68,10 +65,7 @@ class DrawdownManager:
 
         return drawdown
 
-    def calculate_max_drawdown(
-        self,
-        equity_curve: pd.Series
-    ) -> float:
+    def calculate_max_drawdown(self, equity_curve: pd.Series) -> float:
         """
         Calculate maximum drawdown.
 
@@ -88,10 +82,7 @@ class DrawdownManager:
 
         return max_dd
 
-    def calculate_drawdown_duration(
-        self,
-        equity_curve: pd.Series
-    ) -> Dict:
+    def calculate_drawdown_duration(self, equity_curve: pd.Series) -> Dict:
         """
         Calculate drawdown duration statistics.
 
@@ -115,7 +106,9 @@ class DrawdownManager:
             if isinstance(equity_curve.index, pd.DatetimeIndex):
                 current_duration = (equity_curve.index[-1] - last_peak_idx).days
             else:
-                current_duration = current_idx - equity_curve.index.get_loc(last_peak_idx)
+                current_duration = current_idx - equity_curve.index.get_loc(
+                    last_peak_idx
+                )
         else:
             current_duration = 0
 
@@ -134,17 +127,19 @@ class DrawdownManager:
                 if isinstance(equity_curve.index, pd.DatetimeIndex):
                     duration = (end_idx - start_idx).days
                 else:
-                    duration = equity_curve.index.get_loc(end_idx) - equity_curve.index.get_loc(start_idx)
+                    duration = equity_curve.index.get_loc(
+                        end_idx
+                    ) - equity_curve.index.get_loc(start_idx)
                 durations.append(duration)
 
         avg_duration = np.mean(durations) if durations else 0
         max_duration = max(durations) if durations else 0
 
         results = {
-            'current_drawdown_duration': current_duration,
-            'average_drawdown_duration': avg_duration,
-            'max_drawdown_duration': max_duration,
-            'number_of_drawdowns': len(durations),
+            "current_drawdown_duration": current_duration,
+            "average_drawdown_duration": avg_duration,
+            "max_drawdown_duration": max_duration,
+            "number_of_drawdowns": len(durations),
         }
 
         logger.debug(
@@ -154,10 +149,7 @@ class DrawdownManager:
 
         return results
 
-    def check_risk_limits(
-        self,
-        equity_curve: pd.Series
-    ) -> Dict:
+    def check_risk_limits(self, equity_curve: pd.Series) -> Dict:
         """
         Check if current drawdown exceeds risk limits.
 
@@ -172,21 +164,21 @@ class DrawdownManager:
         current_drawdown = (current_equity - peak_equity) / peak_equity
 
         # Determine status and actions
-        status = 'normal'
-        action = 'none'
+        status = "normal"
+        action = "none"
         scale_factor = 1.0
 
         if current_drawdown < -self.stop_trading_threshold:
-            status = 'critical'
-            action = 'stop_trading'
+            status = "critical"
+            action = "stop_trading"
             scale_factor = 0.0
             logger.warning(
                 f"CRITICAL: Drawdown {current_drawdown:.2%} exceeds stop threshold "
                 f"{self.stop_trading_threshold:.2%}"
             )
         elif current_drawdown < -self.scale_down_threshold:
-            status = 'warning'
-            action = 'scale_down'
+            status = "warning"
+            action = "scale_down"
             # Scale positions proportionally to drawdown severity
             excess_dd = abs(current_drawdown) - self.scale_down_threshold
             max_scale_down = self.stop_trading_threshold - self.scale_down_threshold
@@ -196,26 +188,24 @@ class DrawdownManager:
                 f"{self.scale_down_threshold:.2%}. Scaling to {scale_factor:.1%}"
             )
         elif current_drawdown < -self.max_drawdown_threshold:
-            status = 'caution'
-            action = 'monitor'
+            status = "caution"
+            action = "monitor"
             logger.info(
                 f"CAUTION: Drawdown {current_drawdown:.2%} exceeds warning threshold "
                 f"{self.max_drawdown_threshold:.2%}"
             )
 
         return {
-            'current_drawdown': current_drawdown,
-            'status': status,
-            'action': action,
-            'position_scale_factor': scale_factor,
-            'peak_equity': peak_equity,
-            'current_equity': current_equity,
+            "current_drawdown": current_drawdown,
+            "status": status,
+            "action": action,
+            "position_scale_factor": scale_factor,
+            "peak_equity": peak_equity,
+            "current_equity": current_equity,
         }
 
     def calculate_calmar_ratio(
-        self,
-        equity_curve: pd.Series,
-        periods_per_year: int = 252
+        self, equity_curve: pd.Series, periods_per_year: int = 252
     ) -> float:
         """
         Calculate Calmar ratio (return / max drawdown).
@@ -247,10 +237,7 @@ class DrawdownManager:
 
         return calmar
 
-    def calculate_ulcer_index(
-        self,
-        equity_curve: pd.Series
-    ) -> float:
+    def calculate_ulcer_index(self, equity_curve: pd.Series) -> float:
         """
         Calculate Ulcer Index (measure of downside volatility).
 
@@ -265,17 +252,14 @@ class DrawdownManager:
         drawdown = self.calculate_drawdown(equity_curve)
 
         # Square the drawdowns and calculate RMS
-        squared_dd = drawdown ** 2
+        squared_dd = drawdown**2
         ulcer_index = np.sqrt(squared_dd.mean())
 
         logger.debug(f"Ulcer Index: {ulcer_index:.4f}")
 
         return ulcer_index
 
-    def get_drawdown_summary(
-        self,
-        equity_curve: pd.Series
-    ) -> Dict:
+    def get_drawdown_summary(self, equity_curve: pd.Series) -> Dict:
         """
         Get comprehensive drawdown summary.
 
@@ -293,10 +277,10 @@ class DrawdownManager:
         ulcer = self.calculate_ulcer_index(equity_curve)
 
         summary = {
-            'max_drawdown': max_dd,
-            'current_drawdown': drawdown_series.iloc[-1],
-            'calmar_ratio': calmar,
-            'ulcer_index': ulcer,
+            "max_drawdown": max_dd,
+            "current_drawdown": drawdown_series.iloc[-1],
+            "calmar_ratio": calmar,
+            "ulcer_index": ulcer,
             **duration_stats,
             **risk_status,
         }

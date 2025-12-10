@@ -5,13 +5,20 @@ Reorganized with proper class hierarchy for Portfolio and Universe.
 
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 from pydantic import BaseModel, Field
 
 from st.config.settings import Settings
-from st.data import DataManager, DownloadRequest, StockInfo, Portfolio, Universe, DataCache
+from st.data import (
+    DataCache,
+    DataManager,
+    DownloadRequest,
+    Portfolio,
+    StockInfo,
+    Universe,
+)
 from utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -20,6 +27,7 @@ logger = setup_logger(__name__)
 # ==========================================
 # Main Trader Class
 # ==========================================
+
 
 class Trader(BaseModel):
     """
@@ -64,10 +72,7 @@ class Trader(BaseModel):
 
     @classmethod
     def with_portfolio(
-            cls,
-            positions: Dict[str, Tuple[float, float]],
-            cash: float = 100000.0,
-            **kwargs
+        cls, positions: Dict[str, Tuple[float, float]], cash: float = 100000.0, **kwargs
     ) -> "Trader":
         """
         Create trader with existing portfolio.
@@ -129,10 +134,10 @@ class Trader(BaseModel):
         self.portfolio.add_position(ticker, quantity, price, update_cash=True)
 
     def sell(
-            self,
-            ticker: str,
-            quantity: Optional[float] = None,
-            price: Optional[float] = None
+        self,
+        ticker: str,
+        quantity: Optional[float] = None,
+        price: Optional[float] = None,
     ) -> Optional[float]:
         """
         Sell shares of a stock.
@@ -179,11 +184,11 @@ class Trader(BaseModel):
     # ==========================================
 
     def get_data(
-            self,
-            ticker: str,
-            start_date: Optional[str] = None,
-            end_date: Optional[str] = None,
-            use_cache: bool = True
+        self,
+        ticker: str,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        use_cache: bool = True,
     ) -> pd.DataFrame:
         """
         Get historical data for a ticker with caching support.
@@ -207,7 +212,7 @@ class Trader(BaseModel):
                 ticker=ticker,
                 start_date=start_date or self.start_date,
                 end_date=end_date or self.end_date,
-                save=True
+                save=True,
             )
             df = self.data_manager.download_stock_data(req)
 
@@ -252,8 +257,8 @@ class Trader(BaseModel):
         prices = {}
         for ticker in tickers:
             df = self.get_data(ticker)
-            if not df.empty and 'Close' in df.columns:
-                prices[ticker] = df['Close']
+            if not df.empty and "Close" in df.columns:
+                prices[ticker] = df["Close"]
 
         if not prices:
             return pd.DataFrame()
@@ -263,9 +268,9 @@ class Trader(BaseModel):
     def get_latest_price(self, ticker: str) -> Optional[float]:
         """Get the most recent price for a ticker."""
         df = self.get_data(ticker)
-        if df.empty or 'Close' not in df.columns:
+        if df.empty or "Close" not in df.columns:
             return None
-        return float(df['Close'].iloc[-1])
+        return float(df["Close"].iloc[-1])
 
     def get_latest_prices(self, tickers: List[str]) -> Dict[str, float]:
         """Get latest prices for multiple tickers."""
@@ -280,7 +285,9 @@ class Trader(BaseModel):
     # Stock Information
     # ==========================================
 
-    def get_stock_info(self, ticker: str, use_cache: bool = True) -> Optional[StockInfo]:
+    def get_stock_info(
+        self, ticker: str, use_cache: bool = True
+    ) -> Optional[StockInfo]:
         """Get stock information with caching."""
         ticker = ticker.upper()
 
@@ -309,11 +316,11 @@ class Trader(BaseModel):
 
         for ticker, info in info_dict.items():
             metadata[ticker] = {
-                'sector': info.sector,
-                'industry': info.industry,
-                'market_cap': info.market_cap,
-                'price': info.current_price,
-                'volume': info.average_volume
+                "sector": info.sector,
+                "industry": info.industry,
+                "market_cap": info.market_cap,
+                "price": info.current_price,
+                "volume": info.average_volume,
             }
 
         self.universe.update_metadata(metadata)
@@ -340,14 +347,16 @@ class Trader(BaseModel):
             "start_date": str(df.index[0]),
             "end_date": str(df.index[-1]),
             "missing_values": df.isnull().sum().to_dict(),
-            "zero_volume_days": int((df['Volume'] == 0).sum()),
-            "price_anomalies": 0
+            "zero_volume_days": int((df["Volume"] == 0).sum()),
+            "price_anomalies": 0,
         }
 
         # Check for price anomalies (e.g., huge gaps)
-        if 'Close' in df.columns:
-            returns = df['Close'].pct_change()
-            quality["price_anomalies"] = int((abs(returns) > 0.5).sum())  # >50% daily change
+        if "Close" in df.columns:
+            returns = df["Close"].pct_change()
+            quality["price_anomalies"] = int(
+                (abs(returns) > 0.5).sum()
+            )  # >50% daily change
 
         return quality
 
@@ -370,9 +379,7 @@ class Trader(BaseModel):
     # ==========================================
 
     def calculate_returns(
-            self,
-            tickers: Optional[List[str]] = None,
-            period: str = '1D'
+        self, tickers: Optional[List[str]] = None, period: str = "1D"
     ) -> pd.DataFrame:
         """
         Calculate returns for tickers.
@@ -386,8 +393,7 @@ class Trader(BaseModel):
         return returns
 
     def calculate_correlation_matrix(
-            self,
-            tickers: Optional[List[str]] = None
+        self, tickers: Optional[List[str]] = None
     ) -> pd.DataFrame:
         """Calculate correlation matrix of returns."""
         returns = self.calculate_returns(tickers)
@@ -408,11 +414,11 @@ class Trader(BaseModel):
             "start": str(df.index[0]),
             "end": str(df.index[-1]),
             "rows": len(df),
-            "close_mean": float(df['Close'].mean()),
-            "close_std": float(df['Close'].std()),
-            "volume_mean": float(df['Volume'].mean()),
-            "high": float(df['High'].max()),
-            "low": float(df['Low'].min()),
+            "close_mean": float(df["Close"].mean()),
+            "close_std": float(df["Close"].std()),
+            "volume_mean": float(df["Volume"].mean()),
+            "high": float(df["High"].max()),
+            "low": float(df["Low"].min()),
         }
 
     # ==========================================
@@ -428,7 +434,7 @@ class Trader(BaseModel):
             return ""
 
         # Combine all close prices
-        combined = pd.DataFrame({ticker: df['Close'] for ticker, df in data.items()})
+        combined = pd.DataFrame({ticker: df["Close"] for ticker, df in data.items()})
 
         if filename is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -477,21 +483,23 @@ class Trader(BaseModel):
 
         # Add portfolio summary
         summary = self.get_portfolio_summary()
-        report_lines.extend([
-            f"  Total Value: ${summary['total_value']:,.2f}",
-            f"  Cash: ${summary['cash']:,.2f} ({summary['cash_weight']:.1f}%)",
-            f"  Positions Value: ${summary['positions_value']:,.2f}",
-            f"  Positions: {summary['num_positions']}",
-            f"  Total Return: {self.portfolio.total_return:.2f}%",
-            f"  Unrealized P&L: ${summary['total_unrealized_pnl']:,.2f}",
-            ""
-        ])
+        report_lines.extend(
+            [
+                f"  Total Value: ${summary['total_value']:,.2f}",
+                f"  Cash: ${summary['cash']:,.2f} ({summary['cash_weight']:.1f}%)",
+                f"  Positions Value: ${summary['positions_value']:,.2f}",
+                f"  Positions: {summary['num_positions']}",
+                f"  Total Return: {self.portfolio.total_return:.2f}%",
+                f"  Unrealized P&L: ${summary['total_unrealized_pnl']:,.2f}",
+                "",
+            ]
+        )
 
         # Add position details
-        if summary['positions']:
+        if summary["positions"]:
             report_lines.append("POSITIONS:")
             report_lines.append("-" * 60)
-            for ticker, pos in summary['positions'].items():
+            for ticker, pos in summary["positions"].items():
                 report_lines.append(
                     f"  {ticker}: {pos['quantity']:.0f} shares @ ${pos['avg_entry']:.2f} "
                     f"| Current: ${pos['current_price']:.2f} "
@@ -500,13 +508,15 @@ class Trader(BaseModel):
                 )
 
         # Add data quality section
-        report_lines.extend([
-            "",
-            "DATA CACHE:",
-            "-" * 60,
-            f"  Cached tickers: {len(self.data_cache.cache)}",
-            f"  Cache TTL: {self.data_cache.cache_ttl_minutes} minutes",
-        ])
+        report_lines.extend(
+            [
+                "",
+                "DATA CACHE:",
+                "-" * 60,
+                f"  Cached tickers: {len(self.data_cache.cache)}",
+                f"  Cache TTL: {self.data_cache.cache_ttl_minutes} minutes",
+            ]
+        )
 
         return "\n".join(report_lines)
 

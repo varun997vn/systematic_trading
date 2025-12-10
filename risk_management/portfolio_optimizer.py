@@ -8,14 +8,14 @@ Implements various portfolio construction techniques including:
 - Maximum Sharpe ratio
 """
 
-import pandas as pd
-import numpy as np
 from typing import Dict, Optional
+
+import numpy as np
+import pandas as pd
 from scipy.optimize import minimize
 
 from st.config.settings import Settings
 from utils.logger import setup_logger
-
 
 logger = setup_logger(__name__)
 
@@ -28,10 +28,7 @@ class PortfolioOptimizer:
     of diversification and risk management.
     """
 
-    def __init__(
-        self,
-        risk_free_rate: float = None
-    ):
+    def __init__(self, risk_free_rate: float = None):
         """
         Initialize portfolio optimizer.
 
@@ -57,9 +54,7 @@ class PortfolioOptimizer:
         return weights
 
     def risk_parity(
-        self,
-        returns: pd.DataFrame,
-        target_risk: Optional[np.ndarray] = None
+        self, returns: pd.DataFrame, target_risk: Optional[np.ndarray] = None
     ) -> np.ndarray:
         """
         Calculate risk parity allocation.
@@ -98,9 +93,7 @@ class PortfolioOptimizer:
             return np.sum((risk_contrib_pct - target_risk) ** 2)
 
         # Constraints: weights sum to 1, all weights >= 0
-        constraints = [
-            {'type': 'eq', 'fun': lambda w: np.sum(w) - 1}
-        ]
+        constraints = [{"type": "eq", "fun": lambda w: np.sum(w) - 1}]
         bounds = tuple((0, 1) for _ in range(n_assets))
 
         # Initial guess: equal weights
@@ -110,9 +103,9 @@ class PortfolioOptimizer:
         result = minimize(
             risk_parity_objective,
             x0,
-            method='SLSQP',
+            method="SLSQP",
             bounds=bounds,
-            constraints=constraints
+            constraints=constraints,
         )
 
         if result.success:
@@ -122,10 +115,7 @@ class PortfolioOptimizer:
             logger.warning("Risk parity optimization failed, using equal weights")
             return self.equal_weight(n_assets)
 
-    def minimum_variance(
-        self,
-        returns: pd.DataFrame
-    ) -> np.ndarray:
+    def minimum_variance(self, returns: pd.DataFrame) -> np.ndarray:
         """
         Calculate minimum variance portfolio allocation.
 
@@ -145,9 +135,7 @@ class PortfolioOptimizer:
             return np.dot(weights, np.dot(cov_matrix, weights))
 
         # Constraints
-        constraints = [
-            {'type': 'eq', 'fun': lambda w: np.sum(w) - 1}
-        ]
+        constraints = [{"type": "eq", "fun": lambda w: np.sum(w) - 1}]
         bounds = tuple((0, 1) for _ in range(n_assets))
 
         # Initial guess
@@ -157,9 +145,9 @@ class PortfolioOptimizer:
         result = minimize(
             portfolio_variance,
             x0,
-            method='SLSQP',
+            method="SLSQP",
             bounds=bounds,
-            constraints=constraints
+            constraints=constraints,
         )
 
         if result.success:
@@ -169,10 +157,7 @@ class PortfolioOptimizer:
             logger.warning("Min variance optimization failed, using equal weights")
             return self.equal_weight(n_assets)
 
-    def maximum_sharpe(
-        self,
-        returns: pd.DataFrame
-    ) -> np.ndarray:
+    def maximum_sharpe(self, returns: pd.DataFrame) -> np.ndarray:
         """
         Calculate maximum Sharpe ratio portfolio allocation.
 
@@ -200,9 +185,7 @@ class PortfolioOptimizer:
             return -sharpe  # Negative because we minimize
 
         # Constraints
-        constraints = [
-            {'type': 'eq', 'fun': lambda w: np.sum(w) - 1}
-        ]
+        constraints = [{"type": "eq", "fun": lambda w: np.sum(w) - 1}]
         bounds = tuple((0, 1) for _ in range(n_assets))
 
         # Initial guess
@@ -210,11 +193,7 @@ class PortfolioOptimizer:
 
         # Optimize
         result = minimize(
-            negative_sharpe,
-            x0,
-            method='SLSQP',
-            bounds=bounds,
-            constraints=constraints
+            negative_sharpe, x0, method="SLSQP", bounds=bounds, constraints=constraints
         )
 
         if result.success:
@@ -224,10 +203,7 @@ class PortfolioOptimizer:
             logger.warning("Max Sharpe optimization failed, using equal weights")
             return self.equal_weight(n_assets)
 
-    def inverse_volatility(
-        self,
-        returns: pd.DataFrame
-    ) -> np.ndarray:
+    def inverse_volatility(self, returns: pd.DataFrame) -> np.ndarray:
         """
         Calculate inverse volatility weights.
 
@@ -253,9 +229,7 @@ class PortfolioOptimizer:
         return weights
 
     def optimize_portfolio(
-        self,
-        returns: pd.DataFrame,
-        method: str = 'risk_parity'
+        self, returns: pd.DataFrame, method: str = "risk_parity"
     ) -> Dict:
         """
         Optimize portfolio using specified method.
@@ -271,15 +245,15 @@ class PortfolioOptimizer:
         logger.info(f"Optimizing portfolio using {method} method")
 
         # Get weights based on method
-        if method == 'equal':
+        if method == "equal":
             weights = self.equal_weight(len(returns.columns))
-        elif method == 'risk_parity':
+        elif method == "risk_parity":
             weights = self.risk_parity(returns)
-        elif method == 'min_variance':
+        elif method == "min_variance":
             weights = self.minimum_variance(returns)
-        elif method == 'max_sharpe':
+        elif method == "max_sharpe":
             weights = self.maximum_sharpe(returns)
-        elif method == 'inverse_vol':
+        elif method == "inverse_vol":
             weights = self.inverse_volatility(returns)
         else:
             logger.warning(f"Unknown method {method}, using equal weights")
@@ -287,20 +261,20 @@ class PortfolioOptimizer:
 
         # Calculate portfolio statistics
         portfolio_return = np.dot(weights, returns.mean().values)
-        portfolio_std = np.sqrt(
-            np.dot(weights, np.dot(returns.cov().values, weights))
-        )
+        portfolio_std = np.sqrt(np.dot(weights, np.dot(returns.cov().values, weights)))
 
         # Annualize
         annual_return = portfolio_return * 252
         annual_std = portfolio_std * np.sqrt(252)
-        sharpe = (annual_return - self.risk_free_rate) / annual_std if annual_std > 0 else 0
+        sharpe = (
+            (annual_return - self.risk_free_rate) / annual_std if annual_std > 0 else 0
+        )
 
         results = {
-            'weights': dict(zip(returns.columns, weights)),
-            'expected_return': annual_return,
-            'volatility': annual_std,
-            'sharpe_ratio': sharpe,
+            "weights": dict(zip(returns.columns, weights)),
+            "expected_return": annual_return,
+            "volatility": annual_std,
+            "sharpe_ratio": sharpe,
         }
 
         logger.info(f"Portfolio optimized: Sharpe={sharpe:.2f}, Vol={annual_std:.2%}")
@@ -311,7 +285,7 @@ class PortfolioOptimizer:
         self,
         current_weights: Dict[str, float],
         target_weights: Dict[str, float],
-        threshold: float = 0.05
+        threshold: float = 0.05,
     ) -> bool:
         """
         Determine if portfolio needs rebalancing.

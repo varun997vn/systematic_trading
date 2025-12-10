@@ -2,16 +2,14 @@
 Performance analysis and reporting for backtests.
 """
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from typing import Dict, Optional
 from pathlib import Path
+from typing import Dict, Optional
 
-from utils.calculations import calculate_max_drawdown
+import matplotlib.pyplot as plt
+
 from st.config.settings import Settings
+from utils.calculations import calculate_max_drawdown
 from utils.logger import setup_logger
-
 
 logger = setup_logger(__name__)
 
@@ -53,8 +51,8 @@ class PerformanceAnalyzer:
         print(f"Total Costs: ${self.results['total_costs']:,.2f}")
 
         # Drawdown analysis
-        if 'equity_curve' in self.results:
-            dd_stats = calculate_max_drawdown(self.results['equity_curve'])
+        if "equity_curve" in self.results:
+            dd_stats = calculate_max_drawdown(self.results["equity_curve"])
             print(f"\nMaximum Drawdown: {dd_stats['max_drawdown']:.2%}")
             print(f"Peak Date: {dd_stats['peak_date']}")
             print(f"Trough Date: {dd_stats['trough_date']}")
@@ -62,9 +60,7 @@ class PerformanceAnalyzer:
         print("=" * 60 + "\n")
 
     def plot_equity_curve(
-        self,
-        save_path: Optional[Path] = None,
-        show: bool = True
+        self, save_path: Optional[Path] = None, show: bool = True
     ) -> None:
         """
         Plot equity curve.
@@ -73,21 +69,26 @@ class PerformanceAnalyzer:
             save_path: Path to save figure
             show: If True, display the plot
         """
-        if 'equity_curve' not in self.results:
+        if "equity_curve" not in self.results:
             logger.warning("No equity curve in results")
             return
 
-        equity = self.results['equity_curve']
+        equity = self.results["equity_curve"]
 
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
 
         # Equity curve
-        ax1.plot(equity.index, equity.values, label='Strategy Equity', linewidth=2)
-        ax1.axhline(y=Settings.INITIAL_CAPITAL, color='r', linestyle='--',
-                    label='Initial Capital', alpha=0.7)
-        ax1.set_title('Equity Curve', fontsize=14, fontweight='bold')
-        ax1.set_xlabel('Date')
-        ax1.set_ylabel('Equity ($)')
+        ax1.plot(equity.index, equity.values, label="Strategy Equity", linewidth=2)
+        ax1.axhline(
+            y=Settings.INITIAL_CAPITAL,
+            color="r",
+            linestyle="--",
+            label="Initial Capital",
+            alpha=0.7,
+        )
+        ax1.set_title("Equity Curve", fontsize=14, fontweight="bold")
+        ax1.set_xlabel("Date")
+        ax1.set_ylabel("Equity ($)")
         ax1.legend()
         ax1.grid(True, alpha=0.3)
 
@@ -95,18 +96,19 @@ class PerformanceAnalyzer:
         running_max = equity.expanding().max()
         drawdown = (equity - running_max) / running_max
 
-        ax2.fill_between(drawdown.index, drawdown.values, 0,
-                         alpha=0.3, color='red', label='Drawdown')
-        ax2.set_title('Drawdown', fontsize=14, fontweight='bold')
-        ax2.set_xlabel('Date')
-        ax2.set_ylabel('Drawdown (%)')
+        ax2.fill_between(
+            drawdown.index, drawdown.values, 0, alpha=0.3, color="red", label="Drawdown"
+        )
+        ax2.set_title("Drawdown", fontsize=14, fontweight="bold")
+        ax2.set_xlabel("Date")
+        ax2.set_ylabel("Drawdown (%)")
         ax2.legend()
         ax2.grid(True, alpha=0.3)
 
         plt.tight_layout()
 
         if save_path:
-            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
             logger.info(f"Saved equity curve plot to {save_path}")
 
         if show:
@@ -115,9 +117,7 @@ class PerformanceAnalyzer:
             plt.close()
 
     def plot_positions(
-        self,
-        save_path: Optional[Path] = None,
-        show: bool = True
+        self, save_path: Optional[Path] = None, show: bool = True
     ) -> None:
         """
         Plot positions over time.
@@ -126,38 +126,43 @@ class PerformanceAnalyzer:
             save_path: Path to save figure
             show: If True, display the plot
         """
-        if 'positions' not in self.results or 'signals' not in self.results:
+        if "positions" not in self.results or "signals" not in self.results:
             logger.warning("No positions or signals in results")
             return
 
-        positions = self.results['positions']
-        signals = self.results['signals']
+        positions = self.results["positions"]
+        signals = self.results["signals"]
 
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
 
         # Signals
-        ax1.plot(signals.index, signals.values, label='Trading Signal', linewidth=1.5)
-        ax1.axhline(y=0, color='black', linestyle='-', alpha=0.3)
-        ax1.set_title('Trading Signals', fontsize=14, fontweight='bold')
-        ax1.set_xlabel('Date')
-        ax1.set_ylabel('Signal Strength')
+        ax1.plot(signals.index, signals.values, label="Trading Signal", linewidth=1.5)
+        ax1.axhline(y=0, color="black", linestyle="-", alpha=0.3)
+        ax1.set_title("Trading Signals", fontsize=14, fontweight="bold")
+        ax1.set_xlabel("Date")
+        ax1.set_ylabel("Signal Strength")
         ax1.legend()
         ax1.grid(True, alpha=0.3)
 
         # Positions
-        ax2.plot(positions.index, positions.values, label='Position Size',
-                linewidth=1.5, color='green')
-        ax2.axhline(y=0, color='black', linestyle='-', alpha=0.3)
-        ax2.set_title('Position Sizes', fontsize=14, fontweight='bold')
-        ax2.set_xlabel('Date')
-        ax2.set_ylabel('Shares')
+        ax2.plot(
+            positions.index,
+            positions.values,
+            label="Position Size",
+            linewidth=1.5,
+            color="green",
+        )
+        ax2.axhline(y=0, color="black", linestyle="-", alpha=0.3)
+        ax2.set_title("Position Sizes", fontsize=14, fontweight="bold")
+        ax2.set_xlabel("Date")
+        ax2.set_ylabel("Shares")
         ax2.legend()
         ax2.grid(True, alpha=0.3)
 
         plt.tight_layout()
 
         if save_path:
-            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
             logger.info(f"Saved positions plot to {save_path}")
 
         if show:
@@ -178,13 +183,9 @@ class PerformanceAnalyzer:
 
             # Save plots
             self.plot_equity_curve(
-                save_path=output_dir / 'equity_curve.png',
-                show=False
+                save_path=output_dir / "equity_curve.png", show=False
             )
-            self.plot_positions(
-                save_path=output_dir / 'positions.png',
-                show=False
-            )
+            self.plot_positions(save_path=output_dir / "positions.png", show=False)
 
             logger.info(f"Performance report saved to {output_dir}")
 

@@ -6,11 +6,10 @@ For stocks, this can be implemented using dividend yield and fundamental ratios.
 """
 
 import pandas as pd
-import numpy as np
 
-from .base_strategy import BaseStrategy
 from utils.logger import setup_logger
 
+from .base_strategy import BaseStrategy
 
 logger = setup_logger(__name__)
 
@@ -29,7 +28,7 @@ class DividendYieldCarry(BaseStrategy):
     def __init__(
         self,
         yield_lookback: int = 252,  # 1 year
-        name: str = "Dividend_Carry"
+        name: str = "Dividend_Carry",
     ):
         """
         Initialize dividend yield carry strategy.
@@ -56,11 +55,11 @@ class DividendYieldCarry(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Check if dividend data is available
-        if 'Dividends' in data.columns:
-            dividends = data['Dividends']
+        if "Dividends" in data.columns:
+            dividends = data["Dividends"]
             # Calculate rolling dividend yield
             rolling_dividends = dividends.rolling(window=self.yield_lookback).sum()
             dividend_yield = rolling_dividends / prices
@@ -98,11 +97,7 @@ class ValueStrategy(BaseStrategy):
     In production, this would use fundamental data (P/E, P/B ratios).
     """
 
-    def __init__(
-        self,
-        lookback_period: int = 252,
-        name: str = "Value_Strategy"
-    ):
+    def __init__(self, lookback_period: int = 252, name: str = "Value_Strategy"):
         """
         Initialize value strategy.
 
@@ -128,7 +123,7 @@ class ValueStrategy(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate long-term moving average as "fair value" proxy
         fair_value = prices.rolling(window=self.lookback_period).mean()
@@ -166,7 +161,7 @@ class YieldCurveCarry(BaseStrategy):
         self,
         short_period: int = 20,
         long_period: int = 200,
-        name: str = "Yield_Curve_Carry"
+        name: str = "Yield_Curve_Carry",
     ):
         """
         Initialize yield curve carry strategy.
@@ -197,7 +192,7 @@ class YieldCurveCarry(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate short and long-term moving averages
         ma_short = prices.rolling(window=self.short_period).mean()
@@ -231,11 +226,7 @@ class SeasonalityCarry(BaseStrategy):
     - Year-end rallies
     """
 
-    def __init__(
-        self,
-        lookback_years: int = 3,
-        name: str = "Seasonality_Carry"
-    ):
+    def __init__(self, lookback_years: int = 3, name: str = "Seasonality_Carry"):
         """
         Initialize seasonality carry strategy.
 
@@ -261,7 +252,7 @@ class SeasonalityCarry(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
         returns = prices.pct_change()
 
         # Calculate average returns by month

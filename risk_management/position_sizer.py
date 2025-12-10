@@ -14,7 +14,6 @@ from st.config.settings import Settings
 from utils.calculations import calculate_volatility
 from utils.logger import setup_logger
 
-
 logger = setup_logger(__name__)
 
 
@@ -112,9 +111,7 @@ class PositionSizer:
         # Calculate returns and volatility
         returns = prices.pct_change()
         volatility = calculate_volatility(
-            returns,
-            window=volatility_window,
-            annualize=True
+            returns, window=volatility_window, annualize=True
         )
 
         # Initialize position series
@@ -128,7 +125,8 @@ class PositionSizer:
                 positions.iloc[i] = self.calculate_instrument_weight(
                     price=prices.iloc[i],
                     volatility=volatility.iloc[i],
-                    forecast=signal.iloc[i] * 10,  # Scale signal to Carver's forecast range
+                    forecast=signal.iloc[i]
+                    * 10,  # Scale signal to Carver's forecast range
                 )
 
         return positions

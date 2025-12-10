@@ -5,4 +5,4 @@ Manages all configuration parameters from environment variables and defaults.
 
 from .settings import Settings
 
-__all__ = ['Settings']
+__all__ = ["Settings"]

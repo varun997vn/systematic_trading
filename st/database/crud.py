@@ -1,24 +1,23 @@
 """
 CRUD Operations - Single User System
 """
-from sqlalchemy.orm import Session
-from sqlalchemy import desc
-from typing import List, Optional, Dict, Any
+
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
-from .models import Config, Strategy, Trade, MarketData, Position
+from sqlalchemy import desc
+from sqlalchemy.orm import Session
 
+from .models import Config, MarketData, Position, Strategy, Trade
 
 # ==================== Config CRUD ====================
+
 
 def get_config(db: Session) -> Config:
     """Get configuration (creates if doesn't exist)"""
     config = db.query(Config).first()
     if not config:
-        config = Config(
-            initial_capital=10000.0,
-            cash_balance=10000.0
-        )
+        config = Config(initial_capital=10000.0, cash_balance=10000.0)
         db.add(config)
         db.commit()
         db.refresh(config)
@@ -26,11 +25,7 @@ def get_config(db: Session) -> Config:
 
 
 def update_broker_config(
-        db: Session,
-        broker_name: str,
-        api_key: str,
-        api_secret: str,
-        is_paper: bool = True
+    db: Session, broker_name: str, api_key: str, api_secret: str, is_paper: bool = True
 ) -> Config:
     """Update broker credentials"""
     config = get_config(db)
@@ -54,19 +49,20 @@ def update_cash_balance(db: Session, cash_balance: float) -> Config:
 
 # ==================== Strategy CRUD ====================
 
+
 def create_strategy(
-        db: Session,
-        name: str,
-        strategy_type: str,
-        parameters: Dict[str, Any] = None,
-        status: str = "inactive"
+    db: Session,
+    name: str,
+    strategy_type: str,
+    parameters: Dict[str, Any] = None,
+    status: str = "inactive",
 ) -> Strategy:
     """Create a new trading strategy"""
     db_strategy = Strategy(
         name=name,
         strategy_type=strategy_type,
         parameters=parameters or {},
-        status=status
+        status=status,
     )
     db.add(db_strategy)
     db.commit()
@@ -92,7 +88,9 @@ def get_all_strategies(db: Session, active_only: bool = False) -> List[Strategy]
     return query.all()
 
 
-def update_strategy_status(db: Session, strategy_id: int, status: str) -> Optional[Strategy]:
+def update_strategy_status(
+    db: Session, strategy_id: int, status: str
+) -> Optional[Strategy]:
     """Update strategy status"""
     strategy = get_strategy(db, strategy_id)
     if strategy:
@@ -103,11 +101,11 @@ def update_strategy_status(db: Session, strategy_id: int, status: str) -> Option
 
 
 def update_strategy_performance(
-        db: Session,
-        strategy_id: int,
-        total_trades: int = None,
-        winning_trades: int = None,
-        total_pnl: float = None
+    db: Session,
+    strategy_id: int,
+    total_trades: int = None,
+    winning_trades: int = None,
+    total_pnl: float = None,
 ) -> Optional[Strategy]:
     """Update strategy performance metrics"""
     strategy = get_strategy(db, strategy_id)
@@ -125,16 +123,17 @@ def update_strategy_performance(
 
 # ==================== Trade CRUD ====================
 
+
 def create_trade(
-        db: Session,
-        strategy_id: int,
-        symbol: str,
-        side: str,
-        quantity: float,
-        signal_price: float = None,
-        signal_indicators: Dict = None,
-        order_type: str = "market",
-        notes: str = None
+    db: Session,
+    strategy_id: int,
+    symbol: str,
+    side: str,
+    quantity: float,
+    signal_price: float = None,
+    signal_indicators: Dict = None,
+    order_type: str = "market",
+    notes: str = None,
 ) -> Trade:
     """Create a new trade"""
     db_trade = Trade(
@@ -145,7 +144,7 @@ def create_trade(
         signal_price=signal_price,
         signal_indicators=signal_indicators,
         order_type=order_type,
-        notes=notes
+        notes=notes,
     )
     db.add(db_trade)
     db.commit()
@@ -154,11 +153,11 @@ def create_trade(
 
 
 def update_trade_entry(
-        db: Session,
-        trade_id: int,
-        entry_price: float,
-        entry_time: datetime = None,
-        broker_order_id: str = None
+    db: Session,
+    trade_id: int,
+    entry_price: float,
+    entry_time: datetime = None,
+    broker_order_id: str = None,
 ) -> Optional[Trade]:
     """Update trade with entry execution details"""
     trade = db.query(Trade).filter(Trade.id == trade_id).first()
@@ -174,10 +173,7 @@ def update_trade_entry(
 
 
 def close_trade(
-        db: Session,
-        trade_id: int,
-        exit_price: float,
-        exit_time: datetime = None
+    db: Session, trade_id: int, exit_price: float, exit_time: datetime = None
 ) -> Optional[Trade]:
     """Close a trade and calculate P&L"""
     trade = db.query(Trade).filter(Trade.id == trade_id).first()
@@ -207,10 +203,7 @@ def get_open_trades(db: Session, strategy_id: int = None) -> List[Trade]:
 
 
 def get_trade_history(
-        db: Session,
-        strategy_id: int = None,
-        symbol: str = None,
-        limit: int = 100
+    db: Session, strategy_id: int = None, symbol: str = None, limit: int = 100
 ) -> List[Trade]:
     """Get trade history"""
     query = db.query(Trade)
@@ -223,16 +216,14 @@ def get_trade_history(
 
 # ==================== Position CRUD ====================
 
+
 def get_position(db: Session, symbol: str) -> Optional[Position]:
     """Get position for a symbol"""
     return db.query(Position).filter(Position.symbol == symbol).first()
 
 
 def update_position(
-        db: Session,
-        symbol: str,
-        quantity_change: float,
-        price: float
+    db: Session, symbol: str, quantity_change: float, price: float
 ) -> Position:
     """Update position after a trade"""
     position = get_position(db, symbol)
@@ -257,7 +248,9 @@ def update_position(
 
     # Calculate unrealized P&L
     if position.quantity != 0 and position.average_price:
-        position.unrealized_pnl = (position.current_price - position.average_price) * position.quantity
+        position.unrealized_pnl = (
+            position.current_price - position.average_price
+        ) * position.quantity
     else:
         position.unrealized_pnl = 0
 
@@ -271,13 +264,17 @@ def get_all_positions(db: Session) -> List[Position]:
     return db.query(Position).filter(Position.quantity != 0).all()
 
 
-def update_position_price(db: Session, symbol: str, current_price: float) -> Optional[Position]:
+def update_position_price(
+    db: Session, symbol: str, current_price: float
+) -> Optional[Position]:
     """Update current price and recalculate P&L"""
     position = get_position(db, symbol)
     if position:
         position.current_price = current_price
         if position.quantity != 0 and position.average_price:
-            position.unrealized_pnl = (current_price - position.average_price) * position.quantity
+            position.unrealized_pnl = (
+                current_price - position.average_price
+            ) * position.quantity
         db.commit()
         db.refresh(position)
     return position
@@ -285,16 +282,17 @@ def update_position_price(db: Session, symbol: str, current_price: float) -> Opt
 
 # ==================== Market Data CRUD ====================
 
+
 def save_market_data(
-        db: Session,
-        symbol: str,
-        timestamp: datetime,
-        open: float,
-        high: float,
-        low: float,
-        close: float,
-        volume: float,
-        timeframe: str = "1d"
+    db: Session,
+    symbol: str,
+    timestamp: datetime,
+    open: float,
+    high: float,
+    low: float,
+    close: float,
+    volume: float,
+    timeframe: str = "1d",
 ) -> MarketData:
     """Save market data"""
     db_data = MarketData(
@@ -305,7 +303,7 @@ def save_market_data(
         low=low,
         close=close,
         volume=volume,
-        timeframe=timeframe
+        timeframe=timeframe,
     )
     db.add(db_data)
     db.commit()
@@ -314,12 +312,12 @@ def save_market_data(
 
 
 def get_market_data(
-        db: Session,
-        symbol: str,
-        start_date: datetime = None,
-        end_date: datetime = None,
-        timeframe: str = "1d",
-        limit: int = 100
+    db: Session,
+    symbol: str,
+    start_date: datetime = None,
+    end_date: datetime = None,
+    timeframe: str = "1d",
+    limit: int = 100,
 ) -> List[MarketData]:
     """Get market data for a symbol"""
     query = db.query(MarketData).filter(MarketData.symbol == symbol)
@@ -334,17 +332,22 @@ def get_market_data(
     return query.order_by(desc(MarketData.timestamp)).limit(limit).all()
 
 
-def get_latest_price(db: Session, symbol: str, timeframe: str = "1d") -> Optional[float]:
+def get_latest_price(
+    db: Session, symbol: str, timeframe: str = "1d"
+) -> Optional[float]:
     """Get the latest price for a symbol"""
-    data = db.query(MarketData).filter(
-        MarketData.symbol == symbol,
-        MarketData.timeframe == timeframe
-    ).order_by(desc(MarketData.timestamp)).first()
+    data = (
+        db.query(MarketData)
+        .filter(MarketData.symbol == symbol, MarketData.timeframe == timeframe)
+        .order_by(desc(MarketData.timestamp))
+        .first()
+    )
 
     return data.close if data else None
 
 
 # ==================== Portfolio Summary ====================
+
 
 def get_portfolio_summary(db: Session) -> Dict[str, Any]:
     """Get complete portfolio summary"""
@@ -371,6 +374,8 @@ def get_portfolio_summary(db: Session) -> Dict[str, Any]:
         "total_pnl": total_pnl,
         "realized_pnl": total_realized_pnl,
         "unrealized_pnl": total_unrealized_pnl,
-        "return_pct": (total_pnl / config.initial_capital * 100) if config.initial_capital else 0,
-        "positions": len(positions)
+        "return_pct": (total_pnl / config.initial_capital * 100)
+        if config.initial_capital
+        else 0,
+        "positions": len(positions),
     }

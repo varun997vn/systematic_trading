@@ -6,12 +6,11 @@ using multiple timeframes and exponential moving averages.
 """
 
 import pandas as pd
-import numpy as np
 
-from .base_strategy import BaseStrategy
 from st.config.settings import Settings
 from utils.logger import setup_logger
 
+from .base_strategy import BaseStrategy
 
 logger = setup_logger(__name__)
 
@@ -31,7 +30,7 @@ class MovingAverageCrossover(BaseStrategy):
         self,
         fast_period: int = None,
         slow_period: int = None,
-        name: str = "MA_Crossover"
+        name: str = "MA_Crossover",
     ):
         """
         Initialize MA crossover strategy.
@@ -45,9 +44,7 @@ class MovingAverageCrossover(BaseStrategy):
         self.fast_period = fast_period or Settings.MA_FAST
         self.slow_period = slow_period or Settings.MA_SLOW
 
-        logger.info(
-            f"MA Crossover: fast={self.fast_period}, slow={self.slow_period}"
-        )
+        logger.info(f"MA Crossover: fast={self.fast_period}, slow={self.slow_period}")
 
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
         """
@@ -63,8 +60,8 @@ class MovingAverageCrossover(BaseStrategy):
             return pd.Series(index=data.index, dtype=float)
 
         # Calculate moving averages
-        ma_fast = data['Close'].rolling(window=self.fast_period).mean()
-        ma_slow = data['Close'].rolling(window=self.slow_period).mean()
+        ma_fast = data["Close"].rolling(window=self.fast_period).mean()
+        ma_slow = data["Close"].rolling(window=self.slow_period).mean()
 
         # Generate raw signals
         # 1 when fast > slow (uptrend), -1 when fast < slow (downtrend)
@@ -93,10 +90,7 @@ class EWMAC(BaseStrategy):
     """
 
     def __init__(
-        self,
-        fast_span: int = None,
-        slow_span: int = None,
-        name: str = "EWMAC"
+        self, fast_span: int = None, slow_span: int = None, name: str = "EWMAC"
     ):
         """
         Initialize EWMAC strategy.
@@ -110,9 +104,7 @@ class EWMAC(BaseStrategy):
         self.fast_span = fast_span or Settings.MA_FAST
         self.slow_span = slow_span or Settings.MA_SLOW
 
-        logger.info(
-            f"EWMAC initialized: fast={self.fast_span}, slow={self.slow_span}"
-        )
+        logger.info(f"EWMAC initialized: fast={self.fast_span}, slow={self.slow_span}")
 
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
         """
@@ -130,7 +122,7 @@ class EWMAC(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate exponential moving averages
         ema_fast = prices.ewm(span=self.fast_span, adjust=False).mean()
@@ -164,11 +156,7 @@ class MultipleEWMAC(BaseStrategy):
     combination of EWMAC rules.
     """
 
-    def __init__(
-        self,
-        rule_configs: list = None,
-        name: str = "Multiple_EWMAC"
-    ):
+    def __init__(self, rule_configs: list = None, name: str = "Multiple_EWMAC"):
         """
         Initialize multiple EWMAC strategy.
 
@@ -181,7 +169,7 @@ class MultipleEWMAC(BaseStrategy):
         # Default: Carver's typical combinations
         if rule_configs is None:
             rule_configs = [
-                (16, 64),   # Fast rule
+                (16, 64),  # Fast rule
                 (32, 128),  # Medium rule
                 (64, 256),  # Slow rule
             ]

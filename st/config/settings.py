@@ -6,7 +6,7 @@ Based on Robert Carver's principles for US equity markets.
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import List
+
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -24,8 +24,8 @@ class Settings:
     """
 
     # Project paths
-    BASE_DIR = Path(__file__).parent.parent
-    DATA_DIR = BASE_DIR / "data" / "historical"
+    BASE_DIR = Path(__file__).parent.parent.parent
+    DATA_DIR = BASE_DIR / "data"
     LOGS_DIR = BASE_DIR / "logs"
 
     # Data configuration
@@ -35,7 +35,9 @@ class Settings:
     # Risk management parameters (Carver's approach)
     INITIAL_CAPITAL = float(os.getenv("INITIAL_CAPITAL", "100000"))
     MAX_POSITION_SIZE = float(os.getenv("MAX_POSITION_SIZE", "0.10"))  # 10% max
-    VOLATILITY_TARGET = float(os.getenv("VOLATILITY_TARGET", "0.20"))  # 20% annual vol target
+    VOLATILITY_TARGET = float(
+        os.getenv("VOLATILITY_TARGET", "0.20")
+    )  # 20% annual vol target
     RISK_FREE_RATE = float(os.getenv("RISK_FREE_RATE", "0.03"))  # 3%
 
     # Strategy parameters
@@ -70,7 +72,9 @@ class Settings:
     @classmethod
     def validate(cls) -> bool:
         """Validate configuration parameters."""
-        assert 0 < cls.MAX_POSITION_SIZE <= 1, "MAX_POSITION_SIZE must be between 0 and 1"
+        assert (
+            0 < cls.MAX_POSITION_SIZE <= 1
+        ), "MAX_POSITION_SIZE must be between 0 and 1"
         assert cls.VOLATILITY_TARGET > 0, "VOLATILITY_TARGET must be positive"
         assert cls.INITIAL_CAPITAL > 0, "INITIAL_CAPITAL must be positive"
         assert cls.MA_FAST < cls.MA_SLOW, "MA_FAST must be less than MA_SLOW"

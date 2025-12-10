@@ -1,13 +1,24 @@
 """
 SQLAlchemy Models for Trading Application - Single User Version
 """
+
+import enum
+
 from sqlalchemy import (
-    Column, Integer, String, Float, DateTime, Boolean,
-    ForeignKey, Text, Enum, JSON, Index
+    JSON,
+    Boolean,
+    Column,
+    DateTime,
+    Enum,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-import enum
 
 from .database import Base
 
@@ -39,8 +50,10 @@ class StrategyStatus(str, enum.Enum):
 
 # ==================== Configuration ====================
 
+
 class Config(Base):
     """Single configuration table for app settings and broker credentials"""
+
     __tablename__ = "config"
 
     id = Column(Integer, primary_key=True)
@@ -55,17 +68,22 @@ class Config(Base):
     initial_capital = Column(Float, default=10000.0)
     cash_balance = Column(Float, default=10000.0)
 
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
 
 
 # ==================== Trading Strategies ====================
+
 
 class Strategy(Base):
     __tablename__ = "strategies"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False, unique=True)
-    strategy_type = Column(String(100), nullable=False)  # mean_reversion, momentum, etc.
+    strategy_type = Column(
+        String(100), nullable=False
+    )  # mean_reversion, momentum, etc.
     status = Column(Enum(StrategyStatus), default=StrategyStatus.INACTIVE)
 
     # Strategy parameters and risk management stored as JSON
@@ -79,10 +97,13 @@ class Strategy(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relationships
-    trades = relationship("Trade", back_populates="strategy", cascade="all, delete-orphan")
+    trades = relationship(
+        "Trade", back_populates="strategy", cascade="all, delete-orphan"
+    )
 
 
 # ==================== Market Data ====================
+
 
 class MarketData(Base):
     __tablename__ = "market_data"
@@ -100,12 +121,11 @@ class MarketData(Base):
 
     timeframe = Column(String(10), default="1d")  # 1m, 5m, 1h, 1d
 
-    __table_args__ = (
-        Index('idx_symbol_timestamp', 'symbol', 'timestamp'),
-    )
+    __table_args__ = (Index("idx_symbol_timestamp", "symbol", "timestamp"),)
 
 
 # ==================== Trades ====================
+
 
 class Trade(Base):
     __tablename__ = "trades"
@@ -148,6 +168,7 @@ class Trade(Base):
 
 # ==================== Portfolio Positions ====================
 
+
 class Position(Base):
     __tablename__ = "positions"
 
@@ -163,4 +184,6 @@ class Position(Base):
     unrealized_pnl = Column(Float, default=0.0)
     total_pnl = Column(Float, default=0.0)
 
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    updated_at = Column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
