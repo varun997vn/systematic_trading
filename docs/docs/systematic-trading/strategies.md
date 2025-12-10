@@ -1,4 +1,10 @@
-# 📘 Project Documentation
+---
+id: strategies          # unique ID for this doc
+title: Strategies       # this becomes the page title
+sidebar_label: Strategies
+---
+
+# Strategies
 
 ## Overview
 
@@ -11,6 +17,16 @@ It consists of:
 The overall pattern:
 Each strategy takes a `DataFrame` of market data → computes features → produces a signal → returns a cleaned/validated
 output.
+
+### Strategies Available
+
+| Strategy Name           | Description                                                                                                                                     |
+|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| **SimpleMeanReversion** | Compares the latest price to its rolling mean. Price above average → negative signal; below average → positive. Normalized to the signal scale. |
+| **MomentumStrategy**    | Uses recent price changes or returns to detect trends. Strong positive returns → positive signal; negative returns → negative.                  |
+| **VolatilityBreakout**  | Based on price range expansion. Large breakouts relative to average volatility produce stronger signals.                                        |
+| **RSIReversion**        | Uses RSI (Relative Strength Index). Overbought (high RSI) → negative signal; oversold (low RSI) → positive.                                     |
+| **VWAPStrategy**        | Compares price to VWAP (Volume-Weighted Average Price). Price below VWAP → positive signal; above VWAP → negative.                              |
 
 ---
 
@@ -77,34 +93,6 @@ df = self.prepare(df)
 signal = <computed value>
 return self.validate_signal(signal)
 ```
-
-### **Strategies (High-Level)**
-
-#### **1. SimpleMeanReversion**
-
-* Compares the latest price to its rolling mean.
-* If price is above average → negative signal; below average → positive.
-* Normalized to the signal scale.
-
-#### **2. MomentumStrategy**
-
-* Uses recent price changes or returns to detect upward/downward trends.
-* Strong positive returns → positive signal; negative returns → negative.
-
-#### **3. VolatilityBreakout**
-
-* Based on price range expansion.
-* Large breakouts relative to average volatility → stronger signals.
-
-#### **4. RSIReversion**
-
-* Uses RSI (Relative Strength Index).
-* Overbought (high RSI) → negative signal; oversold (low RSI) → positive.
-
-#### **5. VWAPStrategy**
-
-* Compares price to VWAP (Volume-Weighted Average Price).
-* If price is below VWAP → positive signal; above VWAP → negative.
 
 ---
 

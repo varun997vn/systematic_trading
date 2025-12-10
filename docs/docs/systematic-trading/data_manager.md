@@ -1,4 +1,10 @@
-# **Data Manager – Concise Documentation**
+---
+id: data-manager          # unique ID for this doc
+title: Data Manager       # this becomes the page title
+sidebar_label: Data Manager
+---
+
+# **Data Manager**
 
 ## **Overview**
 
@@ -9,66 +15,25 @@ how it is fetched or stored.
 
 ---
 
-# **Core Responsibilities**
+## Core Responsibilities
 
-### **1. Download market data**
-
-* Price history (daily, intraday)
-* Fundamentals
-* Options chain data
-* Additional vendor-specific datasets
-
-### **2. Manage local storage**
-
-* Organizes data by ticker + dataset type
-* Saves to disk (likely JSON/CSV/parquet depending on implementation)
-* Loads cached data when available
-* Handles safe file operations + error logging
-
-### **3. Automatically update stale data**
-
-* Detects outdated files
-* Pulls only required incremental data
-* Rebuilds datasets when corruption or missing segments are detected
-
-### **4. Provide a clean public API for clients**
-
-Common methods (based on code patterns):
-
-* `get_price_history(ticker, ...)`
-* `get_fundamentals(ticker)`
-* `get_options_chain(ticker)`
-* `list_available_tickers()`
-* `refresh_all()` or dataset-specific update functions
-* `export_metadata()` returning info about the stored data
-
----
+| Responsibility                  | Description                                                                                                                                |
+|---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| Download market data            | Price history (daily, intraday), fundamentals, options chain data, additional vendor-specific datasets                                     |
+| Manage local storage            | Organizes data by ticker + dataset type, saves to disk (JSON/CSV/parquet), loads cached data, handles safe file operations + error logging |
+| Automatically update stale data | Detects outdated files, pulls incremental data only, rebuilds datasets when corruption or missing segments are detected                    |
+| Provide a clean public API      | Methods like `get_price_history`, `get_fundamentals`, `get_options_chain`, `list_available_tickers`, `refresh_all`, `export_metadata`      |
 
 # **Important Features**
 
-### **Caching Layer**
+| Feature                  | Description                                                                                                               |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------|
+| Caching Layer            | Reduces API usage and ensures fast repeated access                                                                        |
+| Data Validation          | Checks file integrity before returning results, falls back to re-download if needed                                       |
+| Logging + Error Handling | Uniform logging for all download and load operations, graceful failures with meaningful error messages                    |
+| Extensibility            | Designed so new data providers and dataset types can be added easily, likely via plugin-style or structured class methods |
 
-* Reduces API usage
-* Ensures fast repeated access
-
-### **Data Validation**
-
-* Checks file integrity before returning results
-* Falls back to re-download when needed
-
-### **Logging + Error Handling**
-
-* Uniform logging for all download and load operations
-* Graceful failures with meaningful error messages
-
-### **Extensibility**
-
-* Designed so new data providers and dataset types can be added easily
-* Likely uses plugin-style or well-structured class methods
-
----
-
-# **Main Class**
+## **Main Class**
 
 ### **`DataManager`**
 
