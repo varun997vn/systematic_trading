@@ -160,7 +160,7 @@ This codebase implements Carver's principles for **US stock markets** (NASDAQ/NY
 
 It includes:
 
-1. **Data Management** ([data/data_manager.py](data/data_manager.py))
+1. **Data Management** ([data/data_manager.py](st/data/data_manager.py))
    - Downloads historical stock prices from Yahoo Finance
    - Stores data locally for analysis
 
@@ -589,7 +589,7 @@ Day 510: Price stabilizes
 
 Let's look at actual data from the repository:
 
-### In [data/data_manager.py](data/data_manager.py:60)
+### In [data/data_manager.py](st/data/data_manager.py:60)
 
 ```python
 def download_stock_data(self, ticker: str, ...) -> pd.DataFrame:
@@ -610,7 +610,7 @@ Date
 
 ### What We Do With It
 
-1. **Store it** in CSV files ([data/historical/](data/historical/))
+1. **Store it** in CSV files ([data/historical/](st/data/historical/))
 2. **Calculate signals** from Close prices (Chapter 4)
 3. **Measure volatility** from price changes (Chapter 5)
 4. **Backtest strategies** using historical data (Chapter 10)
@@ -1818,7 +1818,7 @@ Let's see exactly how EWMAC works in the code:
 
 ```python
 # In main.py
-from data.data_manager import DataManager
+from st.data import DataManager
 
 dm = DataManager()
 data = dm.download_stock_data('GOOG',
@@ -2482,6 +2482,7 @@ Let's see the full volatility calculation and usage:
 import pandas as pd
 import numpy as np
 
+
 def calculate_volatility(prices, window=30):
     # Daily returns
     returns = prices.pct_change()
@@ -2494,8 +2495,9 @@ def calculate_volatility(prices, window=30):
 
     return annual_vol
 
+
 # Usage
-data = pd.read_csv('data/historical/GOOG.csv')
+data = pd.read_csv('st/data/historical/GOOG.csv')
 vol = calculate_volatility(data['Close'])
 
 print(vol.tail())

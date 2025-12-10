@@ -171,9 +171,11 @@ The book uses the main repository's data infrastructure:
 
 ```python
 import sys
+
 sys.path.insert(0, '..')  # Add parent directory to path
 
-from data.data_manager import DataManager
+from st.data import DataManager
+
 dm = DataManager()
 data = dm.download_stock_data('GOOG')
 ```

@@ -4,15 +4,16 @@ Mock broker for simulating realistic trade execution.
 Implements realistic trading costs, slippage, and market impact.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional
 from datetime import datetime
+from typing import Dict, List, Optional
 
-from .order import Order, OrderType, OrderStatus
-from config.settings import Settings
+import numpy as np
+import pandas as pd
+
+from st.config.settings import Settings
 from utils.logger import setup_logger
 
+from .order import Order, OrderStatus, OrderType
 
 logger = setup_logger(__name__)
 
@@ -94,11 +95,7 @@ class MockBroker:
         return self.cash + position_value
 
     def calculate_slippage(
-        self,
-        symbol: str,
-        quantity: float,
-        price: float,
-        volume: Optional[float] = None
+        self, symbol: str, quantity: float, price: float, volume: Optional[float] = None
     ) -> float:
         """
         Calculate realistic slippage based on order size and market conditions.
@@ -128,11 +125,7 @@ class MockBroker:
 
         return slippage
 
-    def calculate_commission(
-        self,
-        quantity: float,
-        price: float
-    ) -> float:
+    def calculate_commission(self, quantity: float, price: float) -> float:
         """
         Calculate commission for trade.
 
@@ -174,7 +167,7 @@ class MockBroker:
             order_type=order_type,
             limit_price=limit_price,
             stop_price=stop_price,
-            status=OrderStatus.SUBMITTED
+            status=OrderStatus.SUBMITTED,
         )
 
         self.orders.append(order)
@@ -184,10 +177,7 @@ class MockBroker:
         return order
 
     def execute_order(
-        self,
-        order: Order,
-        current_price: float,
-        volume: Optional[float] = None
+        self, order: Order, current_price: float, volume: Optional[float] = None
     ) -> bool:
         """
         Execute an order at current market conditions.
@@ -232,9 +222,9 @@ class MockBroker:
 
         # Apply slippage (worse price for trader)
         if order.is_buy:
-            fill_price *= (1 + slippage_fraction)
+            fill_price *= 1 + slippage_fraction
         else:
-            fill_price *= (1 - slippage_fraction)
+            fill_price *= 1 - slippage_fraction
 
         # Calculate commission
         commission = self.calculate_commission(abs(order.quantity), fill_price)
@@ -259,26 +249,28 @@ class MockBroker:
             fill_quantity=fill_quantity,
             fill_price=fill_price,
             commission=commission,
-            slippage=slippage_fraction * fill_price * abs(fill_quantity)
+            slippage=slippage_fraction * fill_price * abs(fill_quantity),
         )
 
         # Update positions and cash
-        self.positions[order.symbol] = self.positions.get(order.symbol, 0.0) + fill_quantity
+        self.positions[order.symbol] = (
+            self.positions.get(order.symbol, 0.0) + fill_quantity
+        )
 
         if order.is_buy:
-            self.cash -= (abs(fill_quantity) * fill_price + commission)
+            self.cash -= abs(fill_quantity) * fill_price + commission
         else:
-            self.cash += (abs(fill_quantity) * fill_price - commission)
+            self.cash += abs(fill_quantity) * fill_price - commission
 
         # Record trade
         trade = {
-            'timestamp': datetime.now(),
-            'symbol': order.symbol,
-            'quantity': fill_quantity,
-            'price': fill_price,
-            'commission': commission,
-            'slippage': order.slippage,
-            'order_id': order.order_id,
+            "timestamp": datetime.now(),
+            "symbol": order.symbol,
+            "quantity": fill_quantity,
+            "price": fill_price,
+            "commission": commission,
+            "slippage": order.slippage,
+            "order_id": order.order_id,
         }
         self.trade_history.append(trade)
 
@@ -318,20 +310,19 @@ class MockBroker:
             Dictionary with account information
         """
         position_value = sum(
-            qty * prices.get(symbol, 0)
-            for symbol, qty in self.positions.items()
+            qty * prices.get(symbol, 0) for symbol, qty in self.positions.items()
         )
 
         total_value = self.cash + position_value
 
         return {
-            'cash': self.cash,
-            'position_value': position_value,
-            'total_value': total_value,
-            'positions': self.positions.copy(),
-            'active_orders': len(self.orders),
-            'filled_orders': len(self.filled_orders),
-            'total_trades': len(self.trade_history),
+            "cash": self.cash,
+            "position_value": position_value,
+            "total_value": total_value,
+            "positions": self.positions.copy(),
+            "active_orders": len(self.orders),
+            "filled_orders": len(self.filled_orders),
+            "total_trades": len(self.trade_history),
         }
 
     def get_trade_statistics(self) -> Dict:
@@ -346,24 +337,24 @@ class MockBroker:
 
         trades_df = pd.DataFrame(self.trade_history)
 
-        total_commission = trades_df['commission'].sum()
-        total_slippage = trades_df['slippage'].sum()
+        total_commission = trades_df["commission"].sum()
+        total_slippage = trades_df["slippage"].sum()
         total_costs = total_commission + total_slippage
 
-        avg_commission = trades_df['commission'].mean()
-        avg_slippage = trades_df['slippage'].mean()
+        avg_commission = trades_df["commission"].mean()
+        avg_slippage = trades_df["slippage"].mean()
 
-        trade_value = (trades_df['quantity'].abs() * trades_df['price']).sum()
+        trade_value = (trades_df["quantity"].abs() * trades_df["price"]).sum()
         cost_percentage = total_costs / trade_value if trade_value > 0 else 0
 
         return {
-            'total_trades': len(self.trade_history),
-            'total_commission': total_commission,
-            'total_slippage': total_slippage,
-            'total_costs': total_costs,
-            'avg_commission_per_trade': avg_commission,
-            'avg_slippage_per_trade': avg_slippage,
-            'cost_as_percentage': cost_percentage,
+            "total_trades": len(self.trade_history),
+            "total_commission": total_commission,
+            "total_slippage": total_slippage,
+            "total_costs": total_costs,
+            "avg_commission_per_trade": avg_commission,
+            "avg_slippage_per_trade": avg_slippage,
+            "cost_as_percentage": cost_percentage,
         }
 
     def reset(self):

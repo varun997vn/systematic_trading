@@ -76,8 +76,9 @@ You'll see:
 ```
 
 ### Run Specific Strategy
+
 ```python
-from data.data_manager import DataManager
+from st.data import DataManager
 from strategy import EWMAC
 from backtesting.backtest_engine import BacktestEngine
 from risk_management.position_sizer import PositionSizer

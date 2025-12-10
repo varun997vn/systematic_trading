@@ -6,13 +6,10 @@ moving away from it. These strategies work well in ranging markets.
 """
 
 import pandas as pd
-import numpy as np
-from typing import Optional
 
-from .base_strategy import BaseStrategy
-from config.settings import Settings
 from utils.logger import setup_logger
 
+from .base_strategy import BaseStrategy
 
 logger = setup_logger(__name__)
 
@@ -27,10 +24,7 @@ class BollingerBands(BaseStrategy):
     """
 
     def __init__(
-        self,
-        period: int = 20,
-        num_std: float = 2.0,
-        name: str = "Bollinger_Bands"
+        self, period: int = 20, num_std: float = 2.0, name: str = "Bollinger_Bands"
     ):
         """
         Initialize Bollinger Bands strategy.
@@ -44,9 +38,7 @@ class BollingerBands(BaseStrategy):
         self.period = period
         self.num_std = num_std
 
-        logger.info(
-            f"Bollinger Bands: period={self.period}, std={self.num_std}"
-        )
+        logger.info(f"Bollinger Bands: period={self.period}, std={self.num_std}")
 
     def generate_signals(self, data: pd.DataFrame) -> pd.Series:
         """
@@ -61,7 +53,7 @@ class BollingerBands(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate Bollinger Bands
         middle_band = prices.rolling(window=self.period).mean()
@@ -101,7 +93,7 @@ class RSIMeanReversion(BaseStrategy):
         period: int = 14,
         overbought: float = 70.0,
         oversold: float = 30.0,
-        name: str = "RSI_Mean_Reversion"
+        name: str = "RSI_Mean_Reversion",
     ):
         """
         Initialize RSI mean reversion strategy.
@@ -162,7 +154,7 @@ class RSIMeanReversion(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate RSI
         rsi = self.calculate_rsi(prices)
@@ -176,10 +168,14 @@ class RSIMeanReversion(BaseStrategy):
         signals = pd.Series(0.0, index=data.index)
 
         # Below oversold: strong buy signal
-        signals[rsi < self.oversold] = (self.oversold - rsi[rsi < self.oversold]) / self.oversold
+        signals[rsi < self.oversold] = (
+            self.oversold - rsi[rsi < self.oversold]
+        ) / self.oversold
 
         # Above overbought: strong sell signal
-        signals[rsi > self.overbought] = (self.overbought - rsi[rsi > self.overbought]) / (100 - self.overbought)
+        signals[rsi > self.overbought] = (
+            self.overbought - rsi[rsi > self.overbought]
+        ) / (100 - self.overbought)
 
         # Clip and scale
         signals = signals.clip(-1, 1) * 10
@@ -205,7 +201,7 @@ class ZScoreMeanReversion(BaseStrategy):
         lookback: int = 20,
         entry_threshold: float = 2.0,
         exit_threshold: float = 0.5,
-        name: str = "ZScore_Mean_Reversion"
+        name: str = "ZScore_Mean_Reversion",
     ):
         """
         Initialize Z-Score mean reversion strategy.
@@ -239,7 +235,7 @@ class ZScoreMeanReversion(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate rolling mean and std
         rolling_mean = prices.rolling(window=self.lookback).mean()

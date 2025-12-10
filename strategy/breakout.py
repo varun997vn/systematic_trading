@@ -6,13 +6,10 @@ support/resistance levels or trading ranges.
 """
 
 import pandas as pd
-import numpy as np
-from typing import Optional
 
-from .base_strategy import BaseStrategy
-from config.settings import Settings
 from utils.logger import setup_logger
 
+from .base_strategy import BaseStrategy
 
 logger = setup_logger(__name__)
 
@@ -32,7 +29,7 @@ class DonchianBreakout(BaseStrategy):
         self,
         entry_period: int = 20,
         exit_period: int = 10,
-        name: str = "Donchian_Breakout"
+        name: str = "Donchian_Breakout",
     ):
         """
         Initialize Donchian breakout strategy.
@@ -64,14 +61,14 @@ class DonchianBreakout(BaseStrategy):
             return pd.Series(index=data.index, dtype=float)
 
         # Use High/Low if available, otherwise use Close
-        if 'High' in data.columns and 'Low' in data.columns:
-            high = data['High']
-            low = data['Low']
+        if "High" in data.columns and "Low" in data.columns:
+            high = data["High"]
+            low = data["Low"]
         else:
-            high = data['Close']
-            low = data['Close']
+            high = data["Close"]
+            low = data["Close"]
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate Donchian channels
         upper_channel = high.rolling(window=self.entry_period).max()
@@ -118,7 +115,7 @@ class VolatilityBreakout(BaseStrategy):
         self,
         lookback: int = 20,
         threshold: float = 1.5,
-        name: str = "Volatility_Breakout"
+        name: str = "Volatility_Breakout",
     ):
         """
         Initialize volatility breakout strategy.
@@ -149,7 +146,7 @@ class VolatilityBreakout(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate rolling mean and volatility
         rolling_mean = prices.rolling(window=self.lookback).mean()
@@ -189,7 +186,7 @@ class SupportResistanceBreakout(BaseStrategy):
         self,
         pivot_lookback: int = 20,
         breakout_threshold: float = 0.02,
-        name: str = "SR_Breakout"
+        name: str = "SR_Breakout",
     ):
         """
         Initialize support/resistance breakout strategy.
@@ -222,14 +219,14 @@ class SupportResistanceBreakout(BaseStrategy):
             return pd.Series(index=data.index, dtype=float)
 
         # Use High/Low if available
-        if 'High' in data.columns and 'Low' in data.columns:
-            high = data['High']
-            low = data['Low']
+        if "High" in data.columns and "Low" in data.columns:
+            high = data["High"]
+            low = data["Low"]
         else:
-            high = data['Close']
-            low = data['Close']
+            high = data["Close"]
+            low = data["Close"]
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate pivot points (simplified version)
         pivot = (high + low + prices) / 3
@@ -247,10 +244,14 @@ class SupportResistanceBreakout(BaseStrategy):
         signals = pd.Series(0.0, index=data.index)
 
         # Bullish breakout above resistance
-        signals[prices > resistance] = (dist_to_resistance[prices > resistance] / self.breakout_threshold).clip(0, 2)
+        signals[prices > resistance] = (
+            dist_to_resistance[prices > resistance] / self.breakout_threshold
+        ).clip(0, 2)
 
         # Bearish breakout below support
-        signals[prices < support] = (dist_to_support[prices < support] / self.breakout_threshold).clip(-2, 0)
+        signals[prices < support] = (
+            dist_to_support[prices < support] / self.breakout_threshold
+        ).clip(-2, 0)
 
         # Scale to forecast range
         signals = signals * 5
@@ -273,7 +274,7 @@ class RangeBreakout(BaseStrategy):
         self,
         range_period: int = 20,
         volatility_factor: float = 1.5,
-        name: str = "Range_Breakout"
+        name: str = "Range_Breakout",
     ):
         """
         Initialize range breakout strategy.
@@ -305,7 +306,7 @@ class RangeBreakout(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate range boundaries
         range_high = prices.rolling(window=self.range_period).max()
@@ -324,7 +325,11 @@ class RangeBreakout(BaseStrategy):
         range_position = (prices - range_mid) / (range_high - range_low)
 
         # Generate signals: position * volatility confirmation
-        signals = range_position * vol_expansion.clip(0, self.volatility_factor) / self.volatility_factor
+        signals = (
+            range_position
+            * vol_expansion.clip(0, self.volatility_factor)
+            / self.volatility_factor
+        )
 
         # Scale to forecast range
         signals = signals.clip(-1, 1) * 10

@@ -135,7 +135,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Local imports last
-from config.settings import Settings
+from st.config.settings import Settings
 from utils.logger import setup_logger
 from strategy.base_strategy import BaseStrategy
 ```
@@ -446,8 +446,9 @@ results = engine.run(strategy, data)
 
 ```python
 # data/alternative_source.py
-from data.data_manager import DataManager
+from st.data import DataManager
 import pandas as pd
+
 
 class AlphaVantageDataManager(DataManager):
     """Data manager for Alpha Vantage API."""
@@ -468,9 +469,9 @@ class AlphaVantageDataManager(DataManager):
 # utils/calculations.py
 
 def calculate_sortino_ratio(
-    returns: pd.Series,
-    target_return: float = 0.0,
-    annualize: bool = True
+        returns: pd.Series,
+        target_return: float = 0.0,
+        annualize: bool = True
 ) -> float:
     """
     Calculate Sortino ratio (downside deviation version of Sharpe).
@@ -483,7 +484,7 @@ def calculate_sortino_ratio(
     Returns:
         Sortino ratio
     """
-    from config.settings import Settings
+    from st.config.settings import Settings
 
     excess_returns = returns - target_return
     downside_returns = excess_returns[excess_returns < 0]
@@ -503,9 +504,11 @@ def calculate_sortino_ratio(
 
     return sortino
 
+
 # Then use in PerformanceAnalyzer
 # backtesting/performance.py
 from utils.calculations import calculate_sortino_ratio
+
 
 class PerformanceAnalyzer:
     def calculate_sortino(self) -> float:
@@ -622,11 +625,13 @@ def calculate_sharpe_ratio(
 
 ```python
 # Good: Use Settings class
-from config.settings import Settings
+from st.config.settings import Settings
+
 
 def my_function():
     capital = Settings.INITIAL_CAPITAL
     vol_target = Settings.VOLATILITY_TARGET
+
 
 # Bad: Hardcoded values
 def my_function():

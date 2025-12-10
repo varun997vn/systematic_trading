@@ -20,7 +20,7 @@ pytest
 ### Download Data
 
 ```python
-from data.data_manager import DataManager
+from st.data import DataManager
 
 dm = DataManager()
 

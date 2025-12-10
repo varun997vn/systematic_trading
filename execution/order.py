@@ -4,14 +4,15 @@ Order management for trading execution.
 Defines order types, status, and order objects.
 """
 
-from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 from typing import Optional
 
 
 class OrderType(Enum):
     """Order types supported by the execution engine."""
+
     MARKET = "MARKET"
     LIMIT = "LIMIT"
     STOP = "STOP"
@@ -20,6 +21,7 @@ class OrderType(Enum):
 
 class OrderStatus(Enum):
     """Order status lifecycle."""
+
     PENDING = "PENDING"
     SUBMITTED = "SUBMITTED"
     PARTIAL_FILL = "PARTIAL_FILL"
@@ -47,6 +49,7 @@ class Order:
         commission: Commission paid
         slippage: Slippage experienced
     """
+
     symbol: str
     quantity: float
     order_type: OrderType = OrderType.MARKET
@@ -85,7 +88,11 @@ class Order:
     @property
     def is_active(self) -> bool:
         """Check if order is still active."""
-        return self.status in [OrderStatus.PENDING, OrderStatus.SUBMITTED, OrderStatus.PARTIAL_FILL]
+        return self.status in [
+            OrderStatus.PENDING,
+            OrderStatus.SUBMITTED,
+            OrderStatus.PARTIAL_FILL,
+        ]
 
     @property
     def remaining_quantity(self) -> float:
@@ -97,7 +104,7 @@ class Order:
         fill_quantity: float,
         fill_price: float,
         commission: float = 0.0,
-        slippage: float = 0.0
+        slippage: float = 0.0,
     ):
         """
         Update order with fill information.
@@ -115,8 +122,10 @@ class Order:
         if self.filled_price is None:
             self.filled_price = fill_price
         else:
-            total_value = (self.filled_price * (self.filled_quantity - fill_quantity) +
-                          fill_price * fill_quantity)
+            total_value = (
+                self.filled_price * (self.filled_quantity - fill_quantity)
+                + fill_price * fill_quantity
+            )
             self.filled_price = total_value / self.filled_quantity
 
         # Update costs

@@ -3,16 +3,16 @@ Financial calculations and metrics for systematic trading.
 Based on Robert Carver's methods.
 """
 
-import numpy as np
-import pandas as pd
 from typing import Union
 
-from config.settings import Settings
+import numpy as np
+import pandas as pd
+
+from st.config.settings import Settings
 
 
 def calculate_returns(
-    prices: Union[pd.Series, pd.DataFrame],
-    method: str = 'log'
+    prices: Union[pd.Series, pd.DataFrame], method: str = "log"
 ) -> Union[pd.Series, pd.DataFrame]:
     """
     Calculate returns from price series.
@@ -27,9 +27,9 @@ def calculate_returns(
     Returns:
         Returns series or DataFrame
     """
-    if method == 'log':
+    if method == "log":
         return np.log(prices / prices.shift(1))
-    elif method == 'simple':
+    elif method == "simple":
         return prices.pct_change()
     else:
         raise ValueError(f"Unknown method: {method}. Use 'log' or 'simple'")
@@ -122,13 +122,13 @@ def calculate_max_drawdown(equity_curve: pd.Series) -> dict:
     peak_idx = equity_curve[:trough_idx].idxmax()
 
     # Calculate duration
-    duration = (trough_idx - peak_idx).days if hasattr(trough_idx, 'days') else 0
+    duration = (trough_idx - peak_idx).days if hasattr(trough_idx, "days") else 0
 
     return {
-        'max_drawdown': max_dd,
-        'peak_date': peak_idx,
-        'trough_date': trough_idx,
-        'duration_days': duration,
+        "max_drawdown": max_dd,
+        "peak_date": peak_idx,
+        "trough_date": trough_idx,
+        "duration_days": duration,
     }
 
 

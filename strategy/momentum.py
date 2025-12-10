@@ -5,14 +5,13 @@ Momentum strategies profit from the continuation of existing trends.
 They buy assets that have performed well and sell assets that have performed poorly.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, List
+from typing import List
 
-from .base_strategy import BaseStrategy
-from config.settings import Settings
+import pandas as pd
+
 from utils.logger import setup_logger
 
+from .base_strategy import BaseStrategy
 
 logger = setup_logger(__name__)
 
@@ -25,11 +24,7 @@ class RateOfChange(BaseStrategy):
     Positive ROC suggests upward momentum, negative ROC suggests downward momentum.
     """
 
-    def __init__(
-        self,
-        period: int = 12,
-        name: str = "ROC_Momentum"
-    ):
+    def __init__(self, period: int = 12, name: str = "ROC_Momentum"):
         """
         Initialize ROC momentum strategy.
 
@@ -55,7 +50,7 @@ class RateOfChange(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate ROC: (current_price / price_n_periods_ago - 1) * 100
         roc = ((prices / prices.shift(self.period)) - 1) * 100
@@ -86,7 +81,7 @@ class RelativeStrength(BaseStrategy):
         self,
         short_period: int = 20,
         long_period: int = 60,
-        name: str = "Relative_Strength"
+        name: str = "Relative_Strength",
     ):
         """
         Initialize Relative Strength strategy.
@@ -117,7 +112,7 @@ class RelativeStrength(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate returns over different periods
         short_return = prices.pct_change(self.short_period)
@@ -150,11 +145,7 @@ class DualMomentum(BaseStrategy):
     This implementation focuses on absolute momentum with multiple timeframes.
     """
 
-    def __init__(
-        self,
-        periods: List[int] = None,
-        name: str = "Dual_Momentum"
-    ):
+    def __init__(self, periods: List[int] = None, name: str = "Dual_Momentum"):
         """
         Initialize Dual Momentum strategy.
 
@@ -180,7 +171,7 @@ class DualMomentum(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate momentum for each period
         momentum_signals = []
@@ -225,7 +216,7 @@ class MACD(BaseStrategy):
         fast_period: int = 12,
         slow_period: int = 26,
         signal_period: int = 9,
-        name: str = "MACD"
+        name: str = "MACD",
     ):
         """
         Initialize MACD strategy.
@@ -259,7 +250,7 @@ class MACD(BaseStrategy):
         if not self.validate_data(data):
             return pd.Series(index=data.index, dtype=float)
 
-        prices = data['Close']
+        prices = data["Close"]
 
         # Calculate MACD
         ema_fast = prices.ewm(span=self.fast_period, adjust=False).mean()

@@ -158,7 +158,7 @@ Maximum Drawdown: -XX.XX%
 ### 1. Download Stock Data
 
 ```python
-from data.data_manager import DataManager
+from st.data import DataManager
 
 # Initialize data manager
 dm = DataManager()

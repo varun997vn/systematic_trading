@@ -2,14 +2,15 @@
 Unit tests for utility calculations.
 """
 
-import pytest
-import pandas as pd
 import numpy as np
+import pandas as pd
+import pytest
+
 from utils.calculations import (
-    calculate_returns,
-    calculate_volatility,
-    calculate_sharpe_ratio,
     calculate_max_drawdown,
+    calculate_returns,
+    calculate_sharpe_ratio,
+    calculate_volatility,
 )
 
 
@@ -19,16 +20,15 @@ class TestCalculations:
     @pytest.fixture
     def sample_prices(self):
         """Create sample price data for testing."""
-        dates = pd.date_range('2020-01-01', periods=100, freq='D')
+        dates = pd.date_range("2020-01-01", periods=100, freq="D")
         prices = pd.Series(
-            100 * (1 + np.random.randn(100).cumsum() * 0.01),
-            index=dates
+            100 * (1 + np.random.randn(100).cumsum() * 0.01), index=dates
         )
         return prices
 
     def test_calculate_returns_log(self, sample_prices):
         """Test log returns calculation."""
-        returns = calculate_returns(sample_prices, method='log')
+        returns = calculate_returns(sample_prices, method="log")
 
         assert isinstance(returns, pd.Series)
         assert len(returns) == len(sample_prices)
@@ -37,7 +37,7 @@ class TestCalculations:
 
     def test_calculate_returns_simple(self, sample_prices):
         """Test simple returns calculation."""
-        returns = calculate_returns(sample_prices, method='simple')
+        returns = calculate_returns(sample_prices, method="simple")
 
         assert isinstance(returns, pd.Series)
         assert len(returns) == len(sample_prices)
@@ -66,12 +66,12 @@ class TestCalculations:
 
         dd_stats = calculate_max_drawdown(equity)
 
-        assert 'max_drawdown' in dd_stats
-        assert 'peak_date' in dd_stats
-        assert 'trough_date' in dd_stats
-        assert dd_stats['max_drawdown'] <= 0  # Drawdown should be negative or zero
+        assert "max_drawdown" in dd_stats
+        assert "peak_date" in dd_stats
+        assert "trough_date" in dd_stats
+        assert dd_stats["max_drawdown"] <= 0  # Drawdown should be negative or zero
 
     def test_invalid_returns_method(self, sample_prices):
         """Test that invalid method raises error."""
         with pytest.raises(ValueError):
-            calculate_returns(sample_prices, method='invalid')
+            calculate_returns(sample_prices, method="invalid")

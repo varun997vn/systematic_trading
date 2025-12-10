@@ -4,10 +4,9 @@ Logging configuration for the systematic trading system.
 
 import logging
 import sys
-from pathlib import Path
 from typing import Optional
 
-from config.settings import Settings
+from st.config.settings import Settings
 
 
 def setup_logger(
@@ -35,8 +34,8 @@ def setup_logger(
 
     # Create formatter
     formatter = logging.Formatter(
-        '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
 
     # Console handler
