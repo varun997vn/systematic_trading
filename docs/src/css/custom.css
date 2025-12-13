@@ -1,223 +1,221 @@
 /**
  * Systematic Trading Custom Theme
- * Professional, data-focused design for algorithmic trading documentation
+ * Tailwind v3 with Docusaurus integration
  */
 
+@tailwind utilities;
+
+/* Docusaurus CSS Variable Overrides */
 :root {
-  /* Primary Brand Colors - Professional Blue/Teal */
-  --ifm-color-primary: #0ea5e9;
-  --ifm-color-primary-dark: #0284c7;
-  --ifm-color-primary-darker: #0369a1;
-  --ifm-color-primary-darkest: #075985;
-  --ifm-color-primary-light: #38bdf8;
-  --ifm-color-primary-lighter: #7dd3fc;
-  --ifm-color-primary-lightest: #bae6fd;
+    /* Primary Brand Colors */
+    --ifm-color-primary: #0ea5e9;
+    --ifm-color-primary-dark: #0284c7;
+    --ifm-color-primary-darker: #0369a1;
+    --ifm-color-primary-darkest: #075985;
+    --ifm-color-primary-light: #38bdf8;
+    --ifm-color-primary-lighter: #7dd3fc;
+    --ifm-color-primary-lightest: #bae6fd;
 
-  /* Accent Colors for Data Visualization */
-  --trading-green: #10b981;
-  --trading-red: #ef4444;
-  --trading-amber: #f59e0b;
-  --trading-purple: #8b5cf6;
+    /* Accent Colors for Data Visualization */
+    --trading-green: #10b981;
+    --trading-red: #ef4444;
+    --trading-amber: #f59e0b;
+    --trading-purple: #8b5cf6;
 
-  /* Background Colors */
-  --ifm-background-color: #ffffff;
-  --ifm-background-surface-color: #f8fafc;
+    /* Background Colors */
+    --ifm-background-color: #ffffff;
+    --ifm-background-surface-color: #f8fafc;
 
-  /* Code Blocks */
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+    /* Code Blocks */
+    --ifm-code-font-size: 95%;
+    --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 
-  /* Typography */
-  --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --ifm-font-family-monospace: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    /* Typography */
+    --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --ifm-font-family-monospace: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
 
-  /* Spacing */
-  --ifm-spacing-horizontal: 1.5rem;
-  --ifm-navbar-height: 64px;
+    /* Spacing */
+    --ifm-spacing-horizontal: 1.5rem;
+    --ifm-navbar-height: 64px;
 
-  /* Border Radius */
-  --ifm-global-radius: 0.5rem;
-  --ifm-code-border-radius: 0.375rem;
+    /* Border Radius */
+    --ifm-global-radius: 0.5rem;
+    --ifm-code-border-radius: 0.375rem;
 }
 
 /* Dark Mode Theme */
 [data-theme='dark'] {
-  --ifm-color-primary: #38bdf8;
-  --ifm-color-primary-dark: #0ea5e9;
-  --ifm-color-primary-darker: #0284c7;
-  --ifm-color-primary-darkest: #0369a1;
-  --ifm-color-primary-light: #7dd3fc;
-  --ifm-color-primary-lighter: #bae6fd;
-  --ifm-color-primary-lightest: #e0f2fe;
+    --ifm-color-primary: #38bdf8;
+    --ifm-color-primary-dark: #0ea5e9;
+    --ifm-color-primary-darker: #0284c7;
+    --ifm-color-primary-darkest: #0369a1;
+    --ifm-color-primary-light: #7dd3fc;
+    --ifm-color-primary-lighter: #bae6fd;
+    --ifm-color-primary-lightest: #e0f2fe;
 
-  --ifm-background-color: #0f172a;
-  --ifm-background-surface-color: #1e293b;
+    --ifm-background-color: #0f172a;
+    --ifm-background-surface-color: #1e293b;
 
-  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
+    --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.1);
 
-  /* Dark mode specific colors */
-  --ifm-navbar-background-color: #1e293b;
-  --ifm-footer-background-color: #0f172a;
+    --ifm-navbar-background-color: #1e293b;
+    --ifm-footer-background-color: #0f172a;
 }
 
-/* Navigation Bar Styling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Navigation Bar */
 .navbar {
-  border-bottom: 1px solid var(--ifm-toc-border-color);
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    border-bottom: 1px solid var(--ifm-toc-border-color);
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
 }
 
 .navbar__title {
-  font-weight: 700;
-  letter-spacing: -0.025em;
+    font-weight: 700;
+    letter-spacing: -0.025em;
 }
 
 /* GitHub Icon in Header */
 .header-github-link::before {
-  content: '';
-  width: 24px;
-  height: 24px;
-  display: flex;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E")
-    no-repeat;
+    content: '';
+    width: 24px;
+    height: 24px;
+    display: flex;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23000' d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E") no-repeat;
 }
 
 [data-theme='dark'] .header-github-link::before {
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23fff' d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E")
-    no-repeat;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23fff' d='M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12'/%3E%3C/svg%3E") no-repeat;
 }
 
 .header-github-link:hover {
-  opacity: 0.6;
+    opacity: 0.6;
 }
 
-/* Hero Section Styling */
+/* Hero Section */
 .hero {
-  background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
-  padding: 4rem 0;
+    background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+    padding: 4rem 0;
 }
 
 .hero__title {
-  font-size: 3rem;
-  font-weight: 800;
+    font-size: 3rem;
+    font-weight: 800;
 }
 
-/* Admonitions (Callouts) */
+/* Admonitions */
 .admonition {
-  border-radius: var(--ifm-global-radius);
-  border-left-width: 4px;
+    border-radius: var(--ifm-global-radius);
+    border-left-width: 4px;
 }
 
 /* Code Blocks */
 .prism-code {
-  border-radius: var(--ifm-code-border-radius);
-  font-size: 0.875rem;
-  line-height: 1.5;
+    border-radius: var(--ifm-code-border-radius);
+    font-size: 0.875rem;
+    line-height: 1.5;
 }
 
 /* Tables */
 table {
-  border-radius: var(--ifm-global-radius);
-  overflow: hidden;
+    border-radius: var(--ifm-global-radius);
+    overflow: hidden;
 }
 
 table thead tr {
-  background-color: var(--ifm-color-primary-lightest);
+    background-color: var(--ifm-color-primary-lightest);
 }
 
 [data-theme='dark'] table thead tr {
-  background-color: var(--ifm-color-primary-darkest);
+    background-color: var(--ifm-color-primary-darkest);
 }
 
-/* Trading-Specific Components */
+/* Trading Metric Cards */
 .metric-card {
-  background: var(--ifm-background-surface-color);
-  border: 1px solid var(--ifm-toc-border-color);
-  border-radius: var(--ifm-global-radius);
-  padding: 1.5rem;
-  margin: 1rem 0;
+    background: var(--ifm-background-surface-color);
+    border: 1px solid var(--ifm-toc-border-color);
+    border-radius: var(--ifm-global-radius);
+    padding: 1.5rem;
+    margin: 1rem 0;
 }
 
 .metric-positive {
-  color: var(--trading-green);
-  font-weight: 600;
+    color: var(--trading-green);
+    font-weight: 600;
 }
 
 .metric-negative {
-  color: var(--trading-red);
-  font-weight: 600;
+    color: var(--trading-red);
+    font-weight: 600;
 }
 
 .metric-neutral {
-  color: var(--trading-amber);
-  font-weight: 600;
+    color: var(--trading-amber);
+    font-weight: 600;
 }
 
-/* Sidebar Styling */
+/* Sidebar */
 .menu__link {
-  border-radius: 0.375rem;
+    border-radius: 0.375rem;
 }
 
 .menu__link--active {
-  background-color: var(--ifm-color-primary-lightest);
-  font-weight: 600;
+    background-color: var(--ifm-color-primary-lightest);
+    font-weight: 600;
 }
 
 [data-theme='dark'] .menu__link--active {
-  background-color: var(--ifm-color-primary-darkest);
+    background-color: var(--ifm-color-primary-darkest);
 }
 
 /* Footer */
 .footer {
-  border-top: 1px solid var(--ifm-toc-border-color);
+    border-top: 1px solid var(--ifm-toc-border-color);
 }
 
-/* Smooth Scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Custom Badge Styles */
+/* Custom Badges */
 .badge-strategy {
-  background-color: var(--trading-purple);
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
+    background-color: var(--trading-purple);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
 }
 
 .badge-live {
-  background-color: var(--trading-green);
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    background-color: var(--trading-green);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .badge-backtest {
-  background-color: var(--trading-amber);
-  color: white;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
+    background-color: var(--trading-amber);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
 }
 
 @keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: .7;
-  }
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .7;
+    }
 }
 
 /* Responsive Design */
 @media (max-width: 996px) {
-  .hero__title {
-    font-size: 2rem;
-  }
+    .hero__title {
+        font-size: 2rem;
+    }
 }

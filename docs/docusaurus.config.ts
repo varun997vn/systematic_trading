@@ -25,6 +25,20 @@ const config: Config = {
     locales: ['en'],
   },
 
+  // ✅ Tailwind CSS v4 integration
+  plugins: [
+    async function tailwindPlugin() {
+      return {
+        name: 'docusaurus-tailwindcss',
+        configurePostCss(postcssOptions) {
+          postcssOptions.plugins.push(require('tailwindcss'));
+          postcssOptions.plugins.push(require('autoprefixer'));
+          return postcssOptions;
+        },
+      };
+    },
+  ],
+
   presets: [
     [
       'classic',
@@ -78,57 +92,10 @@ const config: Config = {
           position: 'left',
           label: 'Documentation',
         },
-        // {
-        //   type: 'dropdown',
-        //   label: 'Components',
-        //   position: 'left',
-        //   items: [
-        //     {
-        //       label: 'Backend Architecture',
-        //       to: '/docs/backend',
-        //     },
-        //     {
-        //       label: 'Strategy Engine',
-        //       to: '/docs/strategy-engine',
-        //     },
-        //     {
-        //       label: 'Data Pipeline',
-        //       to: '/docs/data-pipeline',
-        //     },
-        //     {
-        //       label: 'Risk Management',
-        //       to: '/docs/risk-management',
-        //     },
-        //   ],
-        // },
-        // {
-        //   to: '/blog',
-        //   label: 'Insights',
-        //   position: 'left'
-        // },
-        // {
-        //   type: 'dropdown',
-        //   label: 'API',
-        //   position: 'left',
-        //   items: [
-        //     {
-        //       label: 'REST API',
-        //       to: '/docs/api/rest',
-        //     },
-        //     {
-        //       label: 'WebSocket',
-        //       to: '/docs/api/websocket',
-        //     },
-        //     {
-        //       label: 'Python SDK',
-        //       to: '/docs/api/python-sdk',
-        //     },
-        //   ],
-        // },
         {
           to: '/architecture',
           label: 'Architecture',
-          position: 'left'
+          position: 'left',
         },
         {
           href: 'https://github.com/varun997vn/systematic_trading',
@@ -145,39 +112,18 @@ const config: Config = {
         {
           title: 'Documentation',
           items: [
-            {
-              label: 'Getting Started',
-              to: '/docs/intro',
-            },
-            {
-              label: 'Backend Architecture',
-              to: '/docs/backend',
-            },
-            {
-              label: 'Strategy Development',
-              to: '/docs/strategies',
-            },
-            {
-              label: 'API Reference',
-              to: '/docs/api',
-            },
+            { label: 'Getting Started', to: '/docs/intro' },
+            { label: 'Backend Architecture', to: '/docs/backend' },
+            { label: 'Strategy Development', to: '/docs/strategies' },
+            { label: 'API Reference', to: '/docs/api' },
           ],
         },
         {
           title: 'Resources',
           items: [
-            {
-              label: 'Trading Insights',
-              to: '/blog',
-            },
-            {
-              label: 'Backtesting Guide',
-              to: '/docs/backtesting',
-            },
-            {
-              label: 'Performance Metrics',
-              to: '/docs/metrics',
-            },
+            { label: 'Trading Insights', to: '/blog' },
+            { label: 'Backtesting Guide', to: '/docs/backtesting' },
+            { label: 'Performance Metrics', to: '/docs/metrics' },
           ],
         },
         {
@@ -187,10 +133,7 @@ const config: Config = {
               label: 'GitHub Discussions',
               href: 'https://github.com/your-org/systematic-trading/discussions',
             },
-            {
-              label: 'Discord',
-              href: 'https://discord.gg/your-invite',
-            },
+            { label: 'Discord', href: 'https://discord.gg/your-invite' },
             {
               label: 'Stack Overflow',
               href: 'https://stackoverflow.com/questions/tagged/systematic-trading',
@@ -200,22 +143,13 @@ const config: Config = {
         {
           title: 'More',
           items: [
-            {
-              label: 'GitHub',
-              href: 'https://github.com/your-org/systematic-trading',
-            },
-            {
-              label: 'Changelog',
-              to: '/changelog',
-            },
-            {
-              label: 'License',
-              to: '/license',
-            },
+            { label: 'GitHub', href: 'https://github.com/your-org/systematic-trading' },
+            { label: 'Changelog', to: '/changelog' },
+            { label: 'License', to: '/license' },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} Systematic Trading. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Systematic Trading.`,
     },
 
     prism: {
@@ -223,15 +157,6 @@ const config: Config = {
       darkTheme: prismThemes.vsDark,
       additionalLanguages: ['python', 'java', 'bash', 'json', 'yaml'],
     },
-
-    // Algolia search (uncomment and configure when ready)
-    // algolia: {
-    //   appId: 'YOUR_APP_ID',
-    //   apiKey: 'YOUR_SEARCH_API_KEY',
-    //   indexName: 'systematic-trading',
-    //   contextualSearch: true,
-    // },
-
   } satisfies Preset.ThemeConfig,
 };
 
