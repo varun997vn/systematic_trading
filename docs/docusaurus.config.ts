@@ -126,6 +126,11 @@ const config: Config = {
         //   ],
         // },
         {
+          to: '/architecture',
+          label: 'Architecture',
+          position: 'left'
+        },
+        {
           href: 'https://github.com/varun997vn/systematic_trading',
           position: 'right',
           className: 'header-github-link',
