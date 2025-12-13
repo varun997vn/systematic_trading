@@ -73,7 +73,7 @@ const config: Config = {
 
     colorMode: {
       defaultMode: 'dark',
-      disableSwitch: false,
+      disableSwitch: true,
       respectPrefersColorScheme: true,
     },
 
@@ -92,11 +92,11 @@ const config: Config = {
           position: 'left',
           label: 'Documentation',
         },
-        {
-          to: '/architecture',
-          label: 'Architecture',
-          position: 'left',
-        },
+        // {
+        //   to: '/architecture',
+        //   label: 'Architecture',
+        //   position: 'left',
+        // },
         {
           href: 'https://github.com/varun997vn/systematic_trading',
           position: 'right',
