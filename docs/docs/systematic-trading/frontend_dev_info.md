@@ -18,6 +18,11 @@ sidebar_label: Frontend Dev Info
 - **Zod** (schema validation)
 - **Plotly.js** (charts)
 
+## Documentation Guide
+
+- Docusaurus
+- TailwindCSS v3 + PostCSS
+
 ---
 
 # Application Pages

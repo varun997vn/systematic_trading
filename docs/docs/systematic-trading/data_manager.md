@@ -8,83 +8,161 @@ sidebar_label: Data Manager
 
 ## **Overview**
 
-`data_manager.py` provides a unified interface for downloading, caching, updating, and retrieving market data (prices,
-fundamentals, options, etc.).
-It abstracts storage, versioning, API calls, and caching so higher-level code can request data without worrying about
-how it is fetched or stored.
+`data_manager.py` provides a unified interface for downloading, validating, and retrieving OHLCV market data for
+systematic trading based on Robert Carver's methodology. It uses Yahoo Finance as the data source and implements robust
+validation and return calculation functionality.
 
 ---
 
 ## Core Responsibilities
 
-| Responsibility                  | Description                                                                                                                                |
-|---------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| Download market data            | Price history (daily, intraday), fundamentals, options chain data, additional vendor-specific datasets                                     |
-| Manage local storage            | Organizes data by ticker + dataset type, saves to disk (JSON/CSV/parquet), loads cached data, handles safe file operations + error logging |
-| Automatically update stale data | Detects outdated files, pulls incremental data only, rebuilds datasets when corruption or missing segments are detected                    |
-| Provide a clean public API      | Methods like `get_price_history`, `get_fundamentals`, `get_options_chain`, `list_available_tickers`, `refresh_all`, `export_metadata`      |
+| Component            | Description                                                                                                   |
+|----------------------|---------------------------------------------------------------------------------------------------------------|
+| **PriceData**        | Pydantic model wrapping OHLCV DataFrame with validation and convenient properties for close prices and volume |
+| **DataLoader**       | Downloads data from Yahoo Finance (single/batch), loads from CSV cache, manages local file storage            |
+| **DataValidator**    | Validates data completeness (minimum rows, missing values, price sanity checks, OHLC consistency)             |
+| **ReturnCalculator** | Computes log returns, percentage returns, and multi-period returns for systematic trading analysis            |
+| **DataManager**      | Main interface coordinating all components, provides unified API for data retrieval with auto-download        |
 
 # **Important Features**
 
-| Feature                  | Description                                                                                                               |
-|--------------------------|---------------------------------------------------------------------------------------------------------------------------|
-| Caching Layer            | Reduces API usage and ensures fast repeated access                                                                        |
-| Data Validation          | Checks file integrity before returning results, falls back to re-download if needed                                       |
-| Logging + Error Handling | Uniform logging for all download and load operations, graceful failures with meaningful error messages                    |
-| Extensibility            | Designed so new data providers and dataset types can be added easily, likely via plugin-style or structured class methods |
+| Feature             | Description                                                                                |
+|---------------------|--------------------------------------------------------------------------------------------|
+| CSV Caching         | Automatically saves downloaded data to CSV files, loads from cache when available          |
+| Data Validation     | Comprehensive checks: minimum rows, missing values, zero/negative prices, OHLC consistency |
+| Batch Downloads     | Efficiently download multiple tickers in a single Yahoo Finance API call                   |
+| Return Calculations | Built-in support for log returns, percentage returns, and multi-period returns             |
+| Auto-adjustment     | Uses Yahoo Finance's auto-adjusted prices for accurate historical analysis                 |
+| Logging             | Structured logging throughout for monitoring downloads, validations, and errors            |
+| Date Filtering      | Apply custom date ranges to loaded data while preserving cached files                      |
+| Pydantic Validation | Type-safe data structures with automatic validation of OHLCV columns                       |
 
-## **Main Class**
+## **Main Classes**
 
 ### **`DataManager`**
 
-The central class that orchestrates:
+The central class providing a high-level interface for:
 
-* Path management
-* Download logic
-* Update rules
-* Return of final cleaned datasets
+* Loading data from CSV cache or auto-downloading from Yahoo Finance
+* Applying date range filters
+* Running validation checks
+* Computing returns (log or percentage)
+* Retrieving close prices for multiple tickers as DataFrame
 
-Internally handles:
+**Key Methods:**
 
-* Session management (API clients)
-* Conversion functions
-* Storage utilities
+* `get_data(ticker, start_date, end_date, validate)` - Get validated OHLCV data
+* `get_returns(ticker, return_type, start_date, end_date)` - Get computed returns
+* `get_close_prices(tickers, start_date, end_date)` - Get multi-ticker close price DataFrame
+
+### **`PriceData`**
+
+Pydantic model wrapping OHLCV data with:
+
+* Automatic validation of required columns (Open, High, Low, Close, Volume)
+* Convenient properties: `.close`, `.volume`
+* Type-safe structure using Pydantic
+
+### **`DataLoader`**
+
+Handles all data I/O:
+
+* `load_csv(ticker)` - Load from local CSV cache
+* `download(ticker, start_date, end_date)` - Download single ticker from Yahoo Finance
+* `download_batch(tickers, start_date, end_date)` - Download multiple tickers efficiently
+
+### **`DataValidator`**
+
+Ensures data quality:
+
+* `check(price_data, min_rows)` - Comprehensive validation suite
+* `get_missing_dates(price_data)` - Identify gaps in trading days
+
+### **`ReturnCalculator`**
+
+Computes returns for analysis:
+
+* `log_returns(price_data)` - Natural log returns
+* `percentage_returns(price_data)` - Simple percentage returns
+* `multi_period_returns(price_data, periods, return_type)` - Multi-period returns
 
 ---
 
-# **Typical Usage Pattern**
+## **Typical Usage Pattern**
 
 ```python
-from st.data import DataManager
+from st.data.data_manager import DataManager, ReturnCalculator
 
-dm = DataManager(base_path="data/")
+# Initialize DataManager
+dm = DataManager(data_dir="data/")
 
-prices = dm.get_price_history("AAPL", period="5y")
-funds = dm.get_fundamentals("AAPL")
-opt = dm.get_options_chain("AAPL")
+# Get OHLCV data (auto-downloads if not cached)
+price_data = dm.get_data("AAPL", start_date="2020-01-01", end_date="2024-12-31")
 
-dm.refresh_all()  # optional: refresh entire local dataset
+# Access close prices and volume
+close_prices = price_data.close
+volume = price_data.volume
+
+# Get returns
+log_returns = dm.get_returns("AAPL", return_type="log")
+pct_returns = dm.get_returns("AAPL", return_type="percentage")
+
+# Get close prices for multiple tickers
+tickers = ["AAPL", "MSFT", "GOOGL"]
+close_df = dm.get_close_prices(tickers, start_date="2020-01-01")
+
+# Compute multi-period returns
+returns_5d = ReturnCalculator.multi_period_returns(price_data, periods=5, return_type="log")
+
+# Batch download
+loader = DataLoader()
+data_dict = loader.download_batch(["AAPL", "MSFT", "GOOGL"], start_date="2020-01-01")
 ```
 
 ---
 
-# **Returned Metadata**
+## **Data Validation**
 
-A helper method (e.g., `export_metadata()`) summarizes:
+The `DataValidator` performs comprehensive checks:
 
-* available tickers
-* last updated timestamps
-* cached dataset types
-  Useful for dashboards and diagnostics.
+* **Minimum rows**: Ensures sufficient data points (default 100 rows)
+* **Missing values**: Detects null/NaN values in any column
+* **Price sanity**: Checks for zero or negative prices
+* **OHLC consistency**: Verifies High >= Low relationship
+* **Date gaps**: Identifies missing business days using `get_missing_dates()`
 
----
-
-# **What This Module Enables**
-
-✔ Faster research workflows
-✔ Fewer repeated API calls
-✔ Reliable, consistent dataset organization
-✔ A single place to manage all market-data logic
+Failed validation triggers warnings in logs but can be bypassed by setting `validate=False`.
 
 ---
 
+## **What This Module Enables**
+
+✓ Systematic trading data workflows based on Robert Carver's methodology  
+✓ Automatic CSV caching to minimize API calls  
+✓ Robust data validation for reliable backtesting  
+✓ Built-in return calculations (log, percentage, multi-period)  
+✓ Batch downloads for portfolio-level analysis  
+✓ Type-safe data structures with Pydantic validation  
+✓ Forward-fill handling for missing data in multi-ticker DataFrames
+
+---
+
+## **Technology Stack**
+
+* **Data Source**: Yahoo Finance (`yfinance`)
+* **Data Model**: Pydantic for type-safe structures
+* **Data Processing**: Pandas DataFrames (OHLCV with DatetimeIndex)
+* **Storage**: CSV files organized by ticker
+* **Logging**: Structured logging via custom logger
+
+---
+
+## **Configuration**
+
+Uses `Settings` from `st.config.settings` for:
+
+* `DATA_DIR`: Base directory for CSV storage
+* `DATA_START_DATE`: Default start date for downloads
+* `DATA_END_DATE`: Default end date for downloads
+
+---

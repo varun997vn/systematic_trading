@@ -1,6 +1,6 @@
 """
-Centralized configuration management for the systematic trading system.
-Based on Robert Carver's principles for US equity markets.
+Configuration settings for systematic trading system.
+Based on Robert Carver's "Systematic Trading" principles.
 """
 
 import os
@@ -9,73 +9,55 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
 
 class Settings:
-    """
-    Configuration settings for the systematic trading system.
+    """Core configuration for systematic trading."""
 
-    Follows Carver's principles:
-    - Volatility targeting for position sizing
-    - Transaction cost awareness
-    - Risk management parameters
-    """
-
-    # Project paths
+    # --- Paths --- #
     BASE_DIR = Path(__file__).parent.parent.parent
-    DATA_DIR = BASE_DIR / "data"
-    LOGS_DIR = BASE_DIR / "logs"
+    OUTPUT_DIR = BASE_DIR / "outputs"
+    DATA_DIR = OUTPUT_DIR / "data"
+    LOGS_DIR = OUTPUT_DIR / "logs"
 
     # Data configuration
-    DATA_START_DATE = os.getenv("DATA_START_DATE", "2018-01-01")
+    DATA_START_DATE = os.getenv("DATA_START_DATE", "2000-01-01")
     DATA_END_DATE = os.getenv("DATA_END_DATE", datetime.now().strftime("%Y-%m-%d"))
 
-    # Risk management parameters (Carver's approach)
-    INITIAL_CAPITAL = float(os.getenv("INITIAL_CAPITAL", "100000"))
+    # --- Risk Parameters (Carver) --- #
+    VOLATILITY_TARGET = float(os.getenv("VOLATILITY_TARGET", "0.20"))  # 20% annual
     MAX_POSITION_SIZE = float(os.getenv("MAX_POSITION_SIZE", "0.10"))  # 10% max
-    VOLATILITY_TARGET = float(
-        os.getenv("VOLATILITY_TARGET", "0.20")
-    )  # 20% annual vol target
-    RISK_FREE_RATE = float(os.getenv("RISK_FREE_RATE", "0.03"))  # 3%
+    MAX_LEVERAGE = float(os.getenv("MAX_LEVERAGE", "2.0"))  # 2x max leverage
+    INITIAL_CAPITAL = float(os.getenv("INITIAL_CAPITAL", "100000"))
 
-    # Strategy parameters
-    MA_FAST = int(os.getenv("MA_FAST", "16"))  # Carver's recommendation
-    MA_SLOW = int(os.getenv("MA_SLOW", "64"))
-
-    # Trading costs (US market-specific)
+    # --- Trading Costs --- #
     TRANSACTION_COST = float(os.getenv("TRANSACTION_COST", "0.001"))  # 0.1%
     SLIPPAGE = float(os.getenv("SLIPPAGE", "0.0005"))  # 0.05%
 
-    # Logging
+    # --- System Parameters --- #
+    BUSINESS_DAYS_PER_YEAR = 256  # Carver's convention
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-
-    # US stocks to trade
-    US_STOCKS = os.getenv("US_STOCKS", "GOOG,MSFT,TSLA").split(",")
-
-    # Annualization factor (Carver uses 256 for trading days)
-    BUSINESS_DAYS_PER_YEAR = 256
+    LOG_FILE = os.getenv("LOG_FILE", "logs.log")
 
     @classmethod
-    def get_data_path(cls, filename: str) -> Path:
-        """Get full path for a data file."""
-        cls.DATA_DIR.mkdir(parents=True, exist_ok=True)
-        return cls.DATA_DIR / filename
+    def get_log_path(cls, log_file: str = None) -> Path:
+        """
+        Get the full path for a log file.
 
-    @classmethod
-    def get_log_path(cls, filename: str) -> Path:
-        """Get full path for a log file."""
+        Args:
+            log_file: Log file name (defaults to LOG_FILE)
+
+        Returns:
+            Full path to the log file
+        """
         cls.LOGS_DIR.mkdir(parents=True, exist_ok=True)
-        return cls.LOGS_DIR / filename
+        return cls.LOGS_DIR / (log_file or cls.LOG_FILE)
 
     @classmethod
     def validate(cls) -> bool:
-        """Validate configuration parameters."""
-        assert (
-            0 < cls.MAX_POSITION_SIZE <= 1
-        ), "MAX_POSITION_SIZE must be between 0 and 1"
+        """Validate configuration."""
+        assert 0 < cls.MAX_POSITION_SIZE <= 1, "MAX_POSITION_SIZE must be (0, 1]"
         assert cls.VOLATILITY_TARGET > 0, "VOLATILITY_TARGET must be positive"
         assert cls.INITIAL_CAPITAL > 0, "INITIAL_CAPITAL must be positive"
-        assert cls.MA_FAST < cls.MA_SLOW, "MA_FAST must be less than MA_SLOW"
         return True

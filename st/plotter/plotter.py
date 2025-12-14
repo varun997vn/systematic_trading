@@ -48,42 +48,42 @@ class BasePlotter(ABC):
 
     @abstractmethod
     def plot_price_history(
-        self, data: pd.DataFrame, title: str = "Price History", **kwargs
+            self, data: pd.DataFrame, title: str = "Price History", **kwargs
     ) -> Any:
         """Plot price history."""
         pass
 
     @abstractmethod
     def plot_portfolio_value(
-        self, history: pd.DataFrame, title: str = "Portfolio Value", **kwargs
+            self, history: pd.DataFrame, title: str = "Portfolio Value", **kwargs
     ) -> Any:
         """Plot portfolio value over time."""
         pass
 
     @abstractmethod
     def plot_portfolio_composition(
-        self, weights: Dict[str, float], title: str = "Portfolio Composition", **kwargs
+            self, weights: Dict[str, float], title: str = "Portfolio Composition", **kwargs
     ) -> Any:
         """Plot portfolio composition as pie chart."""
         pass
 
     @abstractmethod
     def plot_returns(
-        self, returns: pd.Series, title: str = "Returns Distribution", **kwargs
+            self, returns: pd.Series, title: str = "Returns Distribution", **kwargs
     ) -> Any:
         """Plot returns distribution."""
         pass
 
     @abstractmethod
     def plot_drawdown(
-        self, equity_curve: pd.Series, title: str = "Drawdown", **kwargs
+            self, equity_curve: pd.Series, title: str = "Drawdown", **kwargs
     ) -> Any:
         """Plot drawdown over time."""
         pass
 
     @abstractmethod
     def plot_multiple_series(
-        self, data: Dict[str, pd.Series], title: str = "Multiple Series", **kwargs
+            self, data: Dict[str, pd.Series], title: str = "Multiple Series", **kwargs
     ) -> Any:
         """Plot multiple time series."""
         pass
@@ -103,7 +103,7 @@ class MatplotlibPlotter(BasePlotter):
     """Matplotlib plotting backend."""
 
     def __init__(
-        self, theme: PlotTheme = PlotTheme.DEFAULT, figsize: Tuple[int, int] = (12, 6)
+            self, theme: PlotTheme = PlotTheme.DEFAULT, figsize: Tuple[int, int] = (12, 6)
     ):
         try:
             import matplotlib.dates as mdates
@@ -138,11 +138,11 @@ class MatplotlibPlotter(BasePlotter):
             self.plt.style.use("default")
 
     def plot_price_history(
-        self,
-        data: pd.DataFrame,
-        title: str = "Price History",
-        columns: Optional[List[str]] = None,
-        **kwargs,
+            self,
+            data: pd.DataFrame,
+            title: str = "Price History",
+            columns: Optional[List[str]] = None,
+            **kwargs,
     ) -> Any:
         """Plot price history with optional volume."""
         fig, axes = self.plt.subplots(
@@ -182,7 +182,7 @@ class MatplotlibPlotter(BasePlotter):
         return fig
 
     def plot_portfolio_value(
-        self, history: pd.DataFrame, title: str = "Portfolio Value", **kwargs
+            self, history: pd.DataFrame, title: str = "Portfolio Value", **kwargs
     ) -> Any:
         """Plot portfolio value over time."""
         fig, ax = self.plt.subplots(figsize=kwargs.get("figsize", self.figsize))
@@ -229,7 +229,7 @@ class MatplotlibPlotter(BasePlotter):
         return fig
 
     def plot_portfolio_composition(
-        self, weights: Dict[str, float], title: str = "Portfolio Composition", **kwargs
+            self, weights: Dict[str, float], title: str = "Portfolio Composition", **kwargs
     ) -> Any:
         """Plot portfolio composition as pie chart."""
         fig, ax = self.plt.subplots(figsize=kwargs.get("figsize", (8, 8)))
@@ -267,7 +267,7 @@ class MatplotlibPlotter(BasePlotter):
         return fig
 
     def plot_returns(
-        self, returns: pd.Series, title: str = "Returns Distribution", **kwargs
+            self, returns: pd.Series, title: str = "Returns Distribution", **kwargs
     ) -> Any:
         """Plot returns distribution."""
         fig, axes = self.plt.subplots(1, 2, figsize=kwargs.get("figsize", (14, 5)))
@@ -304,7 +304,7 @@ class MatplotlibPlotter(BasePlotter):
         return fig
 
     def plot_drawdown(
-        self, equity_curve: pd.Series, title: str = "Drawdown", **kwargs
+            self, equity_curve: pd.Series, title: str = "Drawdown", **kwargs
     ) -> Any:
         """Plot drawdown over time."""
         # Calculate drawdown
@@ -337,7 +337,7 @@ class MatplotlibPlotter(BasePlotter):
         return fig
 
     def plot_multiple_series(
-        self, data: Dict[str, pd.Series], title: str = "Multiple Series", **kwargs
+            self, data: Dict[str, pd.Series], title: str = "Multiple Series", **kwargs
     ) -> Any:
         """Plot multiple time series."""
         fig, ax = self.plt.subplots(figsize=kwargs.get("figsize", self.figsize))
@@ -400,11 +400,11 @@ class PlotlyPlotter(BasePlotter):
         return theme_map.get(theme, "plotly")
 
     def plot_price_history(
-        self,
-        data: pd.DataFrame,
-        title: str = "Price History",
-        columns: Optional[List[str]] = None,
-        **kwargs,
+            self,
+            data: pd.DataFrame,
+            title: str = "Price History",
+            columns: Optional[List[str]] = None,
+            **kwargs,
     ) -> Any:
         """Plot price history with optional volume."""
         if columns is None:
@@ -474,7 +474,7 @@ class PlotlyPlotter(BasePlotter):
         return fig
 
     def plot_portfolio_value(
-        self, history: pd.DataFrame, title: str = "Portfolio Value", **kwargs
+            self, history: pd.DataFrame, title: str = "Portfolio Value", **kwargs
     ) -> Any:
         """Plot portfolio value over time."""
         fig = self.go.Figure()
@@ -526,7 +526,7 @@ class PlotlyPlotter(BasePlotter):
         return fig
 
     def plot_portfolio_composition(
-        self, weights: Dict[str, float], title: str = "Portfolio Composition", **kwargs
+            self, weights: Dict[str, float], title: str = "Portfolio Composition", **kwargs
     ) -> Any:
         """Plot portfolio composition as pie chart."""
         # Filter out very small weights
@@ -562,7 +562,7 @@ class PlotlyPlotter(BasePlotter):
         return fig
 
     def plot_returns(
-        self, returns: pd.Series, title: str = "Returns Distribution", **kwargs
+            self, returns: pd.Series, title: str = "Returns Distribution", **kwargs
     ) -> Any:
         """Plot returns distribution."""
         fig = self.make_subplots(
@@ -627,7 +627,7 @@ class PlotlyPlotter(BasePlotter):
         return fig
 
     def plot_drawdown(
-        self, equity_curve: pd.Series, title: str = "Drawdown", **kwargs
+            self, equity_curve: pd.Series, title: str = "Drawdown", **kwargs
     ) -> Any:
         """Plot drawdown over time."""
         # Calculate drawdown
@@ -686,7 +686,7 @@ class PlotlyPlotter(BasePlotter):
         return fig
 
     def plot_multiple_series(
-        self, data: Dict[str, pd.Series], title: str = "Multiple Series", **kwargs
+            self, data: Dict[str, pd.Series], title: str = "Multiple Series", **kwargs
     ) -> Any:
         """Plot multiple time series."""
         fig = self.go.Figure()
@@ -792,10 +792,10 @@ class Plotter(BaseModel):
     # ==========================================
 
     def plot_price_history(
-        self,
-        data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
-        title: str = "Price History",
-        **kwargs,
+            self,
+            data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
+            title: str = "Price History",
+            **kwargs,
     ) -> Any:
         """
         Plot price history for single or multiple tickers.
@@ -823,7 +823,7 @@ class Plotter(BaseModel):
             return self._plotter.plot_price_history(data, title=title, **kwargs)
 
     def plot_portfolio_value(
-        self, history: pd.DataFrame, title: str = "Portfolio Value Over Time", **kwargs
+            self, history: pd.DataFrame, title: str = "Portfolio Value Over Time", **kwargs
     ) -> Any:
         """
         Plot portfolio value over time.
@@ -835,10 +835,10 @@ class Plotter(BaseModel):
         return self._plotter.plot_portfolio_value(history, title=title, **kwargs)
 
     def plot_portfolio_composition(
-        self,
-        portfolio,  # Portfolio object
-        title: str = "Portfolio Composition",
-        **kwargs,
+            self,
+            portfolio,  # Portfolio object
+            title: str = "Portfolio Composition",
+            **kwargs,
     ) -> Any:
         """
         Plot portfolio composition.
@@ -856,7 +856,7 @@ class Plotter(BaseModel):
         return self._plotter.plot_portfolio_composition(weights, title=title, **kwargs)
 
     def plot_returns(
-        self, returns: pd.Series, title: str = "Returns Analysis", **kwargs
+            self, returns: pd.Series, title: str = "Returns Analysis", **kwargs
     ) -> Any:
         """
         Plot returns distribution and time series.
@@ -868,7 +868,7 @@ class Plotter(BaseModel):
         return self._plotter.plot_returns(returns, title=title, **kwargs)
 
     def plot_drawdown(
-        self, equity_curve: pd.Series, title: str = "Drawdown Analysis", **kwargs
+            self, equity_curve: pd.Series, title: str = "Drawdown Analysis", **kwargs
     ) -> Any:
         """
         Plot equity curve and drawdown.
@@ -880,7 +880,7 @@ class Plotter(BaseModel):
         return self._plotter.plot_drawdown(equity_curve, title=title, **kwargs)
 
     def plot_multiple_series(
-        self, data: Dict[str, pd.Series], title: str = "Comparison", **kwargs
+            self, data: Dict[str, pd.Series], title: str = "Comparison", **kwargs
     ) -> Any:
         """
         Plot multiple time series.
@@ -896,7 +896,7 @@ class Plotter(BaseModel):
     # ==========================================
 
     def plot_correlation_matrix(
-        self, returns: pd.DataFrame, title: str = "Correlation Matrix", **kwargs
+            self, returns: pd.DataFrame, title: str = "Correlation Matrix", **kwargs
     ) -> Any:
         """Plot correlation matrix of returns."""
         corr = returns.corr()
@@ -928,7 +928,7 @@ class Plotter(BaseModel):
             return fig
 
     def plot_performance_summary(
-        self, metrics: Dict[str, float], title: str = "Performance Metrics", **kwargs
+            self, metrics: Dict[str, float], title: str = "Performance Metrics", **kwargs
     ) -> Any:
         """Plot performance metrics as a bar chart."""
         if self.backend == PlotBackend.PLOTLY:
@@ -961,12 +961,12 @@ class Plotter(BaseModel):
             return fig
 
     def plot_universe_analysis(
-        self,
-        universe,  # Universe object
-        data_manager,  # DataManager object
-        metric: str = "price",
-        title: Optional[str] = None,
-        **kwargs,
+            self,
+            universe,  # Universe object
+            data_manager,  # DataManager object
+            metric: str = "price",
+            title: Optional[str] = None,
+            **kwargs,
     ) -> Any:
         """
         Plot analysis of universe tickers.

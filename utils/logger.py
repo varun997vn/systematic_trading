@@ -11,7 +11,7 @@ from st.config.settings import Settings
 
 def setup_logger(
     name: str,
-    log_file: Optional[str] = None,
+    log_file: Optional[str] = Settings.get_log_path(),
     level: Optional[str] = None,
 ) -> logging.Logger:
     """
@@ -37,11 +37,6 @@ def setup_logger(
         "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
-
-    # Console handler
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
 
     # File handler (if specified)
     if log_file:
