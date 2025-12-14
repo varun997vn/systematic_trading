@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileCode, Database, TrendingUp, Target, BarChart3, Shield, Package, ArrowRight, Play, CheckCircle2, Circle } from 'lucide-react';
+import { FileCode, Database, TrendingUp, Target, BarChart3, Shield, Package, ArrowRight, Play, CheckCircle2, Circle, Briefcase } from 'lucide-react';
 
 // Module Card Component
 const ModuleCard = ({ module, isSelected, onClick }) => {
@@ -105,7 +105,9 @@ const ModuleDetails = ({ module }) => {
                     <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: 'white', margin: 0 }}>
                         {module.name}
                     </h2>
-                    <p style={{ color: '#94a3b8', fontSize: '0.875rem', margin: '0.25rem 0 0 0' }}>Core Module</p>
+                    <p style={{ color: '#94a3b8', fontSize: '0.875rem', margin: '0.25rem 0 0 0' }}>
+                        {module.import}
+                    </p>
                 </div>
             </div>
 
@@ -115,7 +117,7 @@ const ModuleDetails = ({ module }) => {
 
             <div style={{ marginBottom: '1rem' }}>
                 <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: 'white', marginBottom: '0.75rem' }}>
-                    Key Components
+                    Key Classes
                 </h3>
                 <div style={{
                     display: 'grid',
@@ -195,7 +197,7 @@ const FlowStep = ({ step, index, isActive, isCompleted, color }) => {
                         <Circle style={{ width: '1.25rem', height: '1.25rem', color: '#94a3b8' }} />
                     )}
                 </div>
-                {index < 5 && (
+                {index < 7 && (
                     <div
                         style={{
                             width: '2px',
@@ -243,16 +245,22 @@ const SystematicTradingArchitecture = () => {
     const modules = [
         {
             id: 'data',
-            name: 'Data Management',
+            name: 'Data',
             icon: Database,
             color: '#3b82f6',
             bgColor: 'rgba(59, 130, 246, 0.1)',
-            description: 'Handle price data, returns calculation, and data validation',
-            components: ['PriceData', 'DataLoader', 'DataValidator', 'ReturnCalculator'],
-            details: 'Manages all market data including OHLCV, handles missing data, calculates log returns and percentage returns. This is the foundation of the entire system.',
-            example: `data = DataLoader.load_csv('prices.csv')
-validated = DataValidator.check(data)
-returns = ReturnCalculator.log_returns(validated)`
+            import: 'from st.data import DataManager, PriceData',
+            description: 'OHLCV data ingestion, validation, and return calculation',
+            components: ['DataManager', 'DataLoader', 'PriceData', 'DataValidator', 'ReturnCalculator'],
+            details: 'Handles market data loading from CSV or Yahoo Finance, validates data completeness, and calculates log/percentage returns. Uses Pydantic for data validation and pandas for time series operations.',
+            example: `from st.data import DataManager
+
+dm = DataManager()
+price_data = dm.get_data("AAPL",
+                         start_date="2020-01-01",
+                         validate=True)
+returns = dm.get_returns("AAPL",
+                         return_type="log")`
         },
         {
             id: 'volatility',
@@ -260,41 +268,65 @@ returns = ReturnCalculator.log_returns(validated)`
             icon: BarChart3,
             color: '#eab308',
             bgColor: 'rgba(234, 179, 8, 0.1)',
-            description: 'Estimate and forecast instrument volatility',
-            components: ['VolatilityEstimator', 'EWMAVolatility', 'VolatilityTargeting'],
-            details: 'Calculates exponentially weighted moving average volatility for position sizing and risk management. Uses configurable span for EWMA calculation.',
-            example: `vol_estimator = EWMAVolatility(span=36)
-daily_vol = vol_estimator.calculate(returns)
-annual_vol = daily_vol * sqrt(256)`
+            import: 'from st.volatility import VolatilityManager',
+            description: 'EWMA volatility estimation and targeting for position sizing',
+            components: ['VolatilityManager', 'EWMAVolatility', 'VolatilityTargeter', 'VolatilityConfig'],
+            details: 'Calculates exponentially weighted moving average (EWMA) volatility with configurable span (Carver recommends 32-36). Converts daily volatility to annual using sqrt(256). Provides volatility targeting scalars for position sizing.',
+            example: `from st.volatility import VolatilityManager
+
+vm = VolatilityManager(target_vol=0.20)
+vol_result = vm.estimate_from_prices(
+    prices, ticker="AAPL"
+)
+scalar = vm.get_position_scalar(vol_result)
+# scalar = target_vol / current_vol`
         },
         {
             id: 'forecast',
-            name: 'Forecasting',
+            name: 'Forecast',
             icon: TrendingUp,
             color: '#10b981',
             bgColor: 'rgba(16, 185, 129, 0.1)',
-            description: 'Trading rules that generate forecast signals',
-            components: ['TrendFollowing', 'Carry', 'MeanReversion', 'ForecastScaler'],
-            details: 'Implements various trading rules (EWMAC, carry, etc.) and scales forecasts to standard -20 to +20 range for consistent risk allocation.',
-            example: `ewmac = TrendFollowing.ewmac(fast=16, slow=64)
-forecast = ForecastScaler.scale(ewmac, target=10)
-# Output range: -20 to +20`
+            import: 'from st.forecast import ForecastManager',
+            description: 'Trading rules (EWMAC, carry, mean reversion) and forecast scaling',
+            components: ['ForecastManager', 'EWMAC', 'ForecastScaler', 'ForecastCombiner'],
+            details: 'Implements Carver\'s trading rules, primarily EWMAC (Exponentially Weighted Moving Average Crossover). Scales raw forecasts to standardized -20 to +20 range with target absolute forecast of 10. Combines multiple forecasts using weighted averaging with FDM (Forecast Diversification Multiplier).',
+            example: `from st.forecast import ForecastManager
+
+fm = ForecastManager()
+# Generate EWMAC(16,64) forecast
+raw = fm.ewmac(prices, fast=16, slow=64)
+scaled = fm.scale_forecast(raw, target=10)
+
+# Combine multiple forecasts
+combined = fm.combine_forecasts({
+    'ewmac_16_64': forecast1,
+    'ewmac_32_128': forecast2
+}, weights={'ewmac_16_64': 0.5, ...})`
         },
         {
             id: 'position',
-            name: 'Position Sizing',
+            name: 'Position',
             icon: Target,
             color: '#a855f7',
             bgColor: 'rgba(168, 85, 247, 0.1)',
-            description: 'Calculate optimal position sizes based on volatility and risk',
-            components: ['PositionSizer', 'VolatilityScaling', 'InstrumentWeight'],
-            details: 'Converts forecasts into positions using volatility targeting and risk-adjusted sizing. Ensures consistent risk across instruments.',
-            example: `position = PositionSizer.calculate(
-  forecast=10,
-  volatility=0.15,
-  capital=100000,
-  target_risk=0.20
-)`
+            import: 'from st.position import PositionManager',
+            description: 'Volatility-targeted position sizing and buffering',
+            components: ['PositionManager', 'PositionSizer', 'PositionBuffer', 'Position'],
+            details: 'Converts forecasts to positions using Carver\'s position sizing formula: Position = (Capital × Vol_Target × IDM × Weight × Forecast) / (10 × Instrument_Vol). Applies position buffering (10% buffer width) to reduce turnover from small position changes.',
+            example: `from st.position import PositionManager
+
+pm = PositionManager(
+    volatility_target=0.20,
+    max_leverage=2.0
+)
+position_set = pm.calculate_positions(
+    forecasts=combined_forecasts,
+    volatilities=vol_results,
+    capital=100_000,
+    weights=portfolio_weights
+)
+# Returns Position objects with buffering`
         },
         {
             id: 'portfolio',
@@ -302,67 +334,118 @@ forecast = ForecastScaler.scale(ewmac, target=10)
             icon: Package,
             color: '#ec4899',
             bgColor: 'rgba(236, 72, 153, 0.1)',
-            description: 'Combine forecasts and manage multiple instruments',
-            components: ['ForecastCombiner', 'PortfolioOptimizer', 'DiversificationMultiplier'],
-            details: 'Aggregates multiple trading rules and instruments into a coherent portfolio with proper diversification. Applies diversification multiplier.',
-            example: `combined = ForecastCombiner.weighted_average(
-  forecasts={'ewmac_16_64': 10, 'carry': 5},
-  weights={'ewmac_16_64': 0.6, 'carry': 0.4}
-)`
+            import: 'from st.portfolio import PortfolioManager',
+            description: 'Multi-instrument weights and IDM calculation',
+            components: ['PortfolioManager', 'PortfolioOptimizer', 'PortfolioWeights', 'IDMCalculator'],
+            details: 'Manages portfolio-level weights across multiple instruments using equal weighting, inverse volatility, or risk parity. Calculates IDM (Instrument Diversification Multiplier) to scale positions based on correlation structure. Applies capital allocation per instrument.',
+            example: `from st.portfolio import PortfolioManager
+
+portfolio = PortfolioManager()
+weights = portfolio.calculate_weights(
+    volatilities=vol_dict,
+    method="risk_parity"  # or "equal"
+)
+idm = portfolio.calculate_idm(
+    correlations=corr_matrix
+)
+# Typical IDM: 1.5-2.5 for diversified`
         },
         {
             id: 'risk',
-            name: 'Risk Management',
+            name: 'Risk',
             icon: Shield,
             color: '#ef4444',
             bgColor: 'rgba(239, 68, 68, 0.1)',
-            description: 'Monitor and control portfolio risk',
-            components: ['RiskCalculator', 'CorrelationEstimator', 'CapitalAllocation'],
-            details: 'Tracks portfolio volatility, correlations between instruments, and ensures risk targets are met. Implements position limits and drawdown controls.',
-            example: `risk = RiskCalculator.portfolio_risk(
-  positions=positions,
-  correlations=corr_matrix,
-  volatilities=vols
+            import: 'from st.risk import RiskManager',
+            description: 'Portfolio risk monitoring and leverage controls',
+            components: ['RiskManager', 'RiskCalculator', 'CorrelationEstimator', 'LeverageController'],
+            details: 'Monitors portfolio-level risk metrics including total volatility, leverage, and correlation-adjusted risk. Enforces maximum leverage limits (default 2.0x) and scales positions proportionally if exceeded. Validates volatility ranges and risk parameters.',
+            example: `from st.risk import RiskManager
+
+rm = RiskManager(max_leverage=2.0)
+risk_check = rm.check_portfolio_risk(
+    positions=position_set,
+    volatilities=vol_dict,
+    correlations=corr_matrix
+)
+# Scales positions if leverage > max
+final_positions = rm.apply_risk_limits(
+    position_set
 )`
+        },
+        {
+            id: 'trader',
+            name: 'Trader',
+            icon: Briefcase,
+            color: '#06b6d4',
+            bgColor: 'rgba(6, 182, 212, 0.1)',
+            import: 'from st.trader import Trader',
+            description: 'Complete pipeline orchestration and trade generation',
+            components: ['Trader', 'TradeSet', 'Trade', 'TradingPipeline'],
+            details: 'Orchestrates the complete systematic trading pipeline in generate_trades() method. Coordinates all modules from data loading through trade execution. Stores comprehensive pipeline output for analysis. Handles incremental position updates and trade buffering.',
+            example: `from st.trader import Trader
+
+trader = Trader(
+    tickers=["AAPL", "MSFT", "GOOGL"],
+    capital=100_000
+)
+trade_set = trader.generate_trades(
+    start_date="2020-01-01",
+    ewmac_pairs=[(16,64), (32,128)],
+    portfolio_weights_method="risk_parity"
+)
+# Returns TradeSet with Trade objects`
         }
     ];
 
     const executionFlow = [
         {
             title: '1. Data Ingestion & Validation',
-            description: 'Load historical price data, validate for completeness, and calculate returns',
+            description: 'DataManager loads OHLCV data via DataLoader, validates completeness with DataValidator, calculates log returns',
             color: '#3b82f6',
-            outputs: ['OHLCV Data', 'Log Returns', 'Percentage Returns']
+            outputs: ['PriceData', 'Log Returns', 'Validated Series']
         },
         {
-            title: '2. Volatility Estimation',
-            description: 'Calculate EWMA volatility for each instrument to normalize risk',
+            title: '2. Volatility Estimation (EWMA)',
+            description: 'VolatilityManager calculates EWMA volatility with span=36, annualizes to 256 trading days',
             color: '#eab308',
-            outputs: ['Daily Volatility', 'Annual Volatility', 'Vol Forecast']
+            outputs: ['Daily Vol', 'Annual Vol (×√256)', 'VolatilityResult']
         },
         {
             title: '3. Forecast Generation',
-            description: 'Apply trading rules (trend, carry, mean reversion) to generate signals',
+            description: 'ForecastManager applies EWMAC rules (default 6 pairs: 2/8, 4/16, 8/32, 16/64, 32/128, 64/256)',
             color: '#10b981',
-            outputs: ['Raw Forecasts', 'Scaled Forecasts (-20 to +20)']
+            outputs: ['Raw EWMAC Forecasts', 'Multiple Timeframes']
         },
         {
-            title: '4. Forecast Combination',
-            description: 'Combine multiple forecasts using weighted averaging or optimization',
+            title: '4. Forecast Combination (FDM)',
+            description: 'ForecastCombiner scales to -20/+20 range, applies equal/custom weights, calculates FDM',
+            color: '#10b981',
+            outputs: ['Combined Forecast', 'Scaled -20 to +20', 'FDM Applied']
+        },
+        {
+            title: '5. Portfolio Weights (IDM)',
+            description: 'PortfolioManager calculates instrument weights (equal/inverse vol/risk parity) and IDM from correlations',
             color: '#ec4899',
-            outputs: ['Combined Forecast', 'Diversification Multiplier']
+            outputs: ['Portfolio Weights', 'IDM (1.5-2.5)', 'Capital Allocation']
         },
         {
-            title: '5. Position Sizing',
-            description: 'Convert forecasts to positions using volatility targeting',
+            title: '6. Position Sizing',
+            description: 'PositionManager applies: Position = (Capital × VolTarget × IDM × Weight × Forecast) / (10 × Vol)',
             color: '#a855f7',
-            outputs: ['Target Positions', 'Risk-Adjusted Sizes', 'Capital Allocation']
+            outputs: ['Target Positions', 'Contract Sizes', 'Notional Values']
         },
         {
-            title: '6. Risk Management & Execution',
-            description: 'Apply risk limits, calculate portfolio metrics, and execute trades',
+            title: '7. Risk Management',
+            description: 'RiskManager checks leverage limits (max 2.0x), scales positions if exceeded, validates risk parameters',
             color: '#ef4444',
-            outputs: ['Final Positions', 'Portfolio Risk', 'Trade Orders']
+            outputs: ['Final Positions', 'Leverage Check', 'Risk Metrics']
+        },
+        {
+            title: '8. Trade Generation',
+            description: 'Trader applies position buffering (10% width), generates Trade objects with BUY/SELL actions',
+            color: '#06b6d4',
+            outputs: ['TradeSet', 'Trade Orders', 'Pipeline Summary']
         }
     ];
 
@@ -383,8 +466,11 @@ forecast = ForecastScaler.scale(ewmac, target=10)
                     }}>
                         Systematic Trading Framework
                     </h1>
-                    <p style={{ color: '#cbd5e1', fontSize: '1.125rem', marginBottom: '1.5rem' }}>
+                    <p style={{ color: '#cbd5e1', fontSize: '1.125rem', marginBottom: '0.5rem' }}>
                         Based on Robert Carver's "Systematic Trading"
+                    </p>
+                    <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+                        Built with Polars • Pydantic • YFinance
                     </p>
 
                     {/* View Toggle */}
@@ -422,7 +508,7 @@ forecast = ForecastScaler.scale(ewmac, target=10)
                                 fontWeight: '500'
                             }}
                         >
-                            Execution Flow
+                            Execution Pipeline
                         </button>
                     </div>
                 </div>
@@ -469,7 +555,7 @@ forecast = ForecastScaler.scale(ewmac, target=10)
                             border: '2px solid #334155'
                         }}>
                             <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: 'white', marginBottom: '1.5rem' }}>
-                                Execution Pipeline
+                                Trader.generate_trades() Pipeline
                             </h2>
                             <div style={{ marginBottom: '1.5rem' }}>
                                 {executionFlow.map((step, index) => (
@@ -508,23 +594,23 @@ forecast = ForecastScaler.scale(ewmac, target=10)
                                     Previous
                                 </button>
                                 <button
-                                    onClick={() => setActiveFlow(Math.min(5, activeFlow + 1))}
-                                    disabled={activeFlow === 5}
+                                    onClick={() => setActiveFlow(Math.min(7, activeFlow + 1))}
+                                    disabled={activeFlow === 7}
                                     style={{
                                         padding: '0.5rem 1rem',
                                         backgroundColor: '#3b82f6',
                                         color: 'white',
                                         borderRadius: '0.375rem',
                                         border: 'none',
-                                        cursor: activeFlow === 5 ? 'not-allowed' : 'pointer',
-                                        opacity: activeFlow === 5 ? 0.5 : 1,
+                                        cursor: activeFlow === 7 ? 'not-allowed' : 'pointer',
+                                        opacity: activeFlow === 7 ? 0.5 : 1,
                                         transition: 'all 0.2s'
                                     }}
                                     onMouseEnter={(e) => {
-                                        if (activeFlow !== 5) e.currentTarget.style.backgroundColor = '#2563eb';
+                                        if (activeFlow !== 7) e.currentTarget.style.backgroundColor = '#2563eb';
                                     }}
                                     onMouseLeave={(e) => {
-                                        if (activeFlow !== 5) e.currentTarget.style.backgroundColor = '#3b82f6';
+                                        if (activeFlow !== 7) e.currentTarget.style.backgroundColor = '#3b82f6';
                                     }}
                                 >
                                     Next
@@ -557,18 +643,19 @@ forecast = ForecastScaler.scale(ewmac, target=10)
                             border: '2px solid #334155'
                         }}>
                             <h2 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: 'white', marginBottom: '1.5rem' }}>
-                                Data Flow Diagram
+                                Module Dependencies
                             </h2>
                             <div style={{ marginBottom: '1.5rem' }}>
                                 {[
-                                    { from: 'Market Data', to: 'Data Module', active: activeFlow >= 0 },
-                                    { from: 'Data Module', to: 'Volatility Module', active: activeFlow >= 1 },
-                                    { from: 'Data Module', to: 'Forecast Module', active: activeFlow >= 2 },
-                                    { from: 'Forecast Module', to: 'Portfolio Module', active: activeFlow >= 3 },
-                                    { from: 'Volatility Module', to: 'Position Module', active: activeFlow >= 4 },
-                                    { from: 'Portfolio Module', to: 'Position Module', active: activeFlow >= 4 },
-                                    { from: 'Position Module', to: 'Risk Module', active: activeFlow >= 5 },
-                                    { from: 'Risk Module', to: 'Trade Execution', active: activeFlow >= 5 },
+                                    { from: 'Yahoo Finance', to: 'DataManager', active: activeFlow >= 0 },
+                                    { from: 'DataManager', to: 'VolatilityManager', active: activeFlow >= 1 },
+                                    { from: 'DataManager', to: 'ForecastManager', active: activeFlow >= 2 },
+                                    { from: 'ForecastManager', to: 'ForecastCombiner', active: activeFlow >= 3 },
+                                    { from: 'VolatilityManager', to: 'PortfolioManager', active: activeFlow >= 4 },
+                                    { from: 'ForecastCombiner', to: 'PortfolioManager', active: activeFlow >= 4 },
+                                    { from: 'PortfolioManager', to: 'PositionManager', active: activeFlow >= 5 },
+                                    { from: 'PositionManager', to: 'RiskManager', active: activeFlow >= 6 },
+                                    { from: 'RiskManager', to: 'Trader', active: activeFlow >= 7 },
                                 ].map((edge, idx) => (
                                     <div
                                         key={idx}
@@ -624,7 +711,7 @@ forecast = ForecastScaler.scale(ewmac, target=10)
                                     color: '#94a3b8',
                                     marginBottom: '0.5rem'
                                 }}>
-                                    Current Step Details
+                                    Current Step
                                 </h3>
                                 <p style={{ color: '#cbd5e1', fontSize: '0.875rem', margin: 0 }}>
                                     {executionFlow[activeFlow].description}
@@ -642,10 +729,10 @@ forecast = ForecastScaler.scale(ewmac, target=10)
                     gap: '1rem'
                 }}>
                     {[
-                        { label: 'Total Modules', value: '6' },
-                        { label: 'Components', value: '24' },
-                        { label: 'Pipeline Steps', value: '6' },
-                        { label: 'Integration Points', value: '8' }
+                        { label: 'Core Modules', value: '7' },
+                        { label: 'Key Classes', value: '28' },
+                        { label: 'Pipeline Steps', value: '8' },
+                        { label: 'EWMAC Pairs', value: '6' }
                     ].map((stat, idx) => (
                         <div key={idx} style={{
                             backgroundColor: '#1e293b',
@@ -661,6 +748,28 @@ forecast = ForecastScaler.scale(ewmac, target=10)
                             </div>
                         </div>
                     ))}
+                </div>
+
+                {/* Footer Info */}
+                <div style={{
+                    marginTop: '2rem',
+                    padding: '1.5rem',
+                    backgroundColor: '#1e293b',
+                    borderRadius: '0.5rem',
+                    border: '1px solid #334155'
+                }}>
+                    <h3 style={{ color: 'white', fontSize: '1.125rem', marginBottom: '0.75rem' }}>
+                        Key Carver Principles
+                    </h3>
+                    <ul style={{ color: '#cbd5e1', lineHeight: '1.8', margin: 0, paddingLeft: '1.5rem' }}>
+                        <li><strong>Volatility Targeting:</strong> 20% annual volatility (VOLATILITY_TARGET = 0.20)</li>
+                        <li><strong>EWMA Span:</strong> 36 days for volatility estimation (Carver recommends 32-36)</li>
+                        <li><strong>Trading Days:</strong> 256 per year (BUSINESS_DAYS_PER_YEAR)</li>
+                        <li><strong>Forecast Range:</strong> Scaled -20 to +20, target absolute forecast = 10</li>
+                        <li><strong>FDM/IDM:</strong> Forecast & Instrument Diversification Multipliers (1.5-2.5 typical)</li>
+                        <li><strong>Position Buffering:</strong> 10% buffer width to reduce turnover</li>
+                        <li><strong>Max Leverage:</strong> 2.0x capital (MAX_LEVERAGE = 2.0)</li>
+                    </ul>
                 </div>
             </div>
 

@@ -27,6 +27,7 @@ class Settings:
     # --- Risk Parameters (Carver) --- #
     VOLATILITY_TARGET = float(os.getenv("VOLATILITY_TARGET", "0.20"))  # 20% annual
     MAX_POSITION_SIZE = float(os.getenv("MAX_POSITION_SIZE", "0.10"))  # 10% max
+    MAX_LEVERAGE = float(os.getenv("MAX_LEVERAGE", "2.0"))  # 2x max leverage
     INITIAL_CAPITAL = float(os.getenv("INITIAL_CAPITAL", "100000"))
 
     # --- Trading Costs --- #
