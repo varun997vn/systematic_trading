@@ -813,12 +813,12 @@ class RiskManager:
     def __init__(self, config: Optional[RiskConfig] = None):
         self.config = config or RiskConfig()
         self.correlation_estimator = CorrelationEstimator(
-            lookback=config.correlation_lookback,
-            min_samples=config.min_correlation_samples,
+            lookback=self.config.correlation_lookback,
+            min_samples=self.config.min_correlation_samples,
         )
-        self.calculator = RiskCalculator(config)
-        self.limits = PositionLimits(config)
-        self.monitor = RiskMonitor(config)
+        self.calculator = RiskCalculator(self.config)
+        self.limits = PositionLimits(self.config)
+        self.monitor = RiskMonitor(self.config)
         self.allocator = CapitalAllocator()
 
     def estimate_correlations(

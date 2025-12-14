@@ -161,7 +161,7 @@ class Trader:
             end_date: Optional[str] = None,
             ewmac_pairs: Optional[List[Tuple[int, int]]] = None,
             forecast_weights: Optional[Dict[str, float]] = None,
-            portfolio_weights_method: str = "equal",
+            portfolio_weights_method: str = "inverse_volatility",
             apply_buffering: bool = True,
     ) -> TradeSet:
         """
