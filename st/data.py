@@ -12,6 +12,7 @@ Core responsibilities:
 from pathlib import Path
 from typing import List, Optional
 
+import numpy as np
 import pandas as pd
 import yfinance as yf
 from pydantic import BaseModel, Field
@@ -167,6 +168,8 @@ class DataLoader:
     def _save_csv(self, ticker: str, df: pd.DataFrame) -> None:
         """Save data to CSV."""
         filepath = self._get_filepath(ticker)
+        # Ensure index is named 'Date' before saving
+        df.index.name = "Date"
         df.to_csv(filepath)
         logger.info(f"Saved {ticker} to {filepath}")
 
@@ -216,7 +219,8 @@ class DataValidator:
             return False
 
         # Check high >= low
-        if (df["High"] < df["Low"]).any():
+        bad_high_low = df["High"] < df["Low"]
+        if bad_high_low.any().item():
             logger.warning(f"{price_data.ticker}: High < Low detected")
             return False
 
@@ -246,11 +250,8 @@ class ReturnCalculator:
         Returns: Series of log returns
         """
         close = price_data.close
-        returns = pd.Series(
-            data=close.pct_change().apply(lambda x: pd.np.log(1 + x) if pd.notna(x) else x),
-            index=close.index,
-            name=f"{price_data.ticker}_log_returns",
-        )
+        returns = np.log(close / close.shift(1))
+        returns.name = f"{price_data.ticker}_log_returns"
         return returns
 
     @staticmethod
@@ -282,7 +283,7 @@ class ReturnCalculator:
         close = price_data.close
 
         if return_type == "log":
-            returns = (close / close.shift(periods)).apply(pd.np.log)
+            returns = np.log(close / close.shift(periods))
         else:
             returns = close.pct_change(periods)
 
@@ -404,3 +405,57 @@ class DataManager:
         df = pd.DataFrame(close_prices)
         df = df.ffill()  # Forward fill missing values
         return df
+
+    def get_ticker_correlation(
+            self,
+            tickers: List[str],
+            start_date: Optional[str] = None,
+            end_date: Optional[str] = None,
+            return_type: str = "log",
+            min_periods: int = 100,
+    ) -> pd.DataFrame:
+        """
+        Calculate correlation matrix between tickers based on returns.
+
+        Args:
+            tickers: List of tickers
+            start_date: Start date
+            end_date: End date
+            return_type: 'log' or 'percentage'
+            min_periods: Minimum observations required for correlation
+
+        Returns:
+            DataFrame correlation matrix (tickers as both index and columns)
+        """
+        if len(tickers) < 2:
+            logger.warning("Need at least 2 tickers for correlation")
+            return pd.DataFrame()
+
+        # Get returns for all tickers
+        returns_dict = {}
+        for ticker in tickers:
+            returns = self.get_returns(ticker, return_type, start_date, end_date)
+            if returns is not None and len(returns) >= min_periods:
+                returns_dict[ticker] = returns
+            else:
+                logger.warning(
+                    f"Insufficient data for {ticker} "
+                    f"({len(returns) if returns is not None else 0} < {min_periods})"
+                )
+
+        if len(returns_dict) < 2:
+            logger.error("Insufficient tickers with valid data for correlation")
+            return pd.DataFrame()
+
+        # Create returns DataFrame
+        returns_df = pd.DataFrame(returns_dict)
+
+        # Calculate correlation matrix
+        corr_matrix = returns_df.corr(min_periods=min_periods)
+
+        logger.info(
+            f"Calculated correlation matrix for {len(returns_dict)} tickers "
+            f"({len(returns_df)} observations)"
+        )
+
+        return corr_matrix
