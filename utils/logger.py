@@ -38,11 +38,6 @@ def setup_logger(
         datefmt="%Y-%m-%d %H:%M:%S",
     )
 
-    # Console handler
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
     # File handler (if specified)
     if log_file:
         log_path = Settings.get_log_path(log_file)
