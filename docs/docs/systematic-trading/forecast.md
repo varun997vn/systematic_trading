@@ -625,6 +625,6 @@ config = ForecastConfig(
 
 ## Next Steps
 
-- **[Portfolio Module](portfolio.md)** - Combine forecasts across instruments
-- **[Position Sizing](position-sizing.md)** - Convert forecasts to positions
-- **[Risk Management](risk-management.md)** - Apply portfolio risk controls
+- **[Portfolio Module](portfolio)** - Combine forecasts across instruments
+- **[Position Sizing](position)** - Convert forecasts to positions
+- **[Risk Management](risk)** - Apply portfolio risk controls
