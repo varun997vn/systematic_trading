@@ -11,7 +11,7 @@ from st.config.settings import Settings
 
 def setup_logger(
     name: str,
-    log_file: Optional[str] = None,
+    log_file: Optional[str] = Settings.get_log_path(),
     level: Optional[str] = None,
 ) -> logging.Logger:
     """

@@ -75,7 +75,12 @@ class DataLoader:
             return None
 
         try:
-            df = pd.read_csv(filepath, index_col="Date", parse_dates=True)
+            df = pd.read_csv(
+                filepath,
+                index_col="Date",
+                parse_dates=["Date"]
+            )
+
             logger.info(f"Loaded {len(df)} rows for {ticker}")
             return PriceData(ticker=ticker, data=df)
         except Exception as e:
@@ -112,7 +117,7 @@ class DataLoader:
                 self._save_csv(ticker, df)
 
             logger.info(f"Downloaded {len(df)} rows for {ticker}")
-            return PriceData(ticker=ticker, data=df)
+            return self.load_csv(ticker)
 
         except Exception as e:
             logger.error(f"Error downloading {ticker}: {e}")
@@ -148,12 +153,12 @@ class DataLoader:
 
                     if not df.empty:
                         df = df[["Open", "High", "Low", "Close", "Volume"]]
-                        df.index = df.index.tz_localize(None)
+                        # df.index = df.index.tz_localize(None)
 
                         if save:
                             self._save_csv(ticker, df)
 
-                        result[ticker] = PriceData(ticker=ticker, data=df)
+                        result[ticker] = self.load_csv(ticker)
                         logger.info(f"Downloaded {len(df)} rows for {ticker}")
 
                 except Exception as e:
@@ -168,9 +173,15 @@ class DataLoader:
     def _save_csv(self, ticker: str, df: pd.DataFrame) -> None:
         """Save data to CSV."""
         filepath = self._get_filepath(ticker)
-        # Ensure index is named 'Date' before saving
-        df.index.name = "Date"
-        df.to_csv(filepath)
+
+        # Move index into a column
+        df = df.reset_index()
+
+        # Ensure the column is named 'Date'
+        df.rename(columns={df.columns[0]: "Date"}, inplace=True)
+        df.columns = df.columns.droplevel("Ticker")
+
+        df.to_csv(filepath, index=False)
         logger.info(f"Saved {ticker} to {filepath}")
 
     def _get_filepath(self, ticker: str) -> Path:
@@ -435,17 +446,25 @@ class DataManager:
         returns_dict = {}
         for ticker in tickers:
             returns = self.get_returns(ticker, return_type, start_date, end_date)
-            if returns is not None and len(returns) >= min_periods:
-                returns_dict[ticker] = returns
+            if returns is not None:
+                if len(returns) >= min_periods:
+                    returns_dict[ticker] = returns
+                else:
+                    logger.warning(
+                        f"Insufficient data for {ticker} "
+                        f"({len(returns)} < {min_periods})"
+                    )
             else:
-                logger.warning(
-                    f"Insufficient data for {ticker} "
-                    f"({len(returns) if returns is not None else 0} < {min_periods})"
-                )
+                logger.warning(f"No data available for {ticker}")
 
         if len(returns_dict) < 2:
             logger.error("Insufficient tickers with valid data for correlation")
             return pd.DataFrame()
+
+        # Debug: Check what we have
+        for ticker, returns in returns_dict.items():
+            logger.info(
+                f"Debug - {ticker}: type={type(returns)}, len={len(returns) if hasattr(returns, '__len__') else 'N/A'}")
 
         # Create returns DataFrame
         returns_df = pd.DataFrame(returns_dict)
