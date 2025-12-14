@@ -4,13 +4,13 @@ Clean SQLAlchemy database for systematic trading - **5 tables, zero bloat**.
 
 ## Tables
 
-| Table | Purpose |
-|-------|---------|
-| `config` | Broker credentials & cash balance |
-| `strategies` | Your trading strategies |
-| `trades` | Complete trade records (signal → execution → P&L) |
-| `market_data` | Price data (OHLCV) |
-| `positions` | Current holdings |
+| Table         | Purpose                                           |
+|---------------|---------------------------------------------------|
+| `config`      | Broker credentials & cash balance                 |
+| `strategies`  | Your trading strategies                           |
+| `trades`      | Complete trade records (signal → execution → P&L) |
+| `market_data` | Price data (OHLCV)                                |
+| `positions`   | Current holdings                                  |
 
 ## Setup
 
@@ -67,16 +67,19 @@ summary = get_portfolio_summary(db)
 ## Key CRUD Functions
 
 **Config**
+
 - `get_config(db)` - Get settings
 - `update_broker_config(db, broker, key, secret)` - Set broker
 - `update_cash_balance(db, amount)` - Update cash
 
 **Strategies**
+
 - `create_strategy(db, name, type, parameters)` - New strategy
 - `get_all_strategies(db, active_only=False)` - List strategies
 - `update_strategy_status(db, id, status)` - Activate/deactivate
 
 **Trades**
+
 - `create_trade(db, strategy_id, symbol, side, quantity, ...)` - New trade
 - `update_trade_entry(db, trade_id, entry_price)` - Mark filled
 - `close_trade(db, trade_id, exit_price)` - Close & calculate P&L
@@ -84,11 +87,13 @@ summary = get_portfolio_summary(db)
 - `get_trade_history(db, limit=100)` - Past trades
 
 **Positions**
+
 - `update_position(db, symbol, quantity_change, price)` - Update holding
 - `get_all_positions(db)` - Current positions
 - `get_portfolio_summary(db)` - Complete overview
 
 **Market Data**
+
 - `save_market_data(db, symbol, timestamp, open, high, low, close, volume)` - Store data
 - `get_market_data(db, symbol, timeframe="1d", limit=100)` - Retrieve data
 - `get_latest_price(db, symbol)` - Latest close price
@@ -133,6 +138,7 @@ python init_db.py drop     # Drop all tables
 ## Production Notes
 
 **Switch to PostgreSQL:**
+
 ```bash
 export DATABASE_URL="postgresql://user:pass@localhost/trading"
 ```
@@ -140,6 +146,7 @@ export DATABASE_URL="postgresql://user:pass@localhost/trading"
 **Encrypt API keys before storing** (use `cryptography` library)
 
 **Backup regularly:**
+
 ```bash
 sqlite3 trading_app.db ".backup backup.db"
 ```

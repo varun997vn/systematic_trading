@@ -4,190 +4,213 @@ title: Package Architecture       # this becomes the page title
 sidebar_label: Package Architecture
 ---
 
-# Application Architecture
+# Systematic Trading Framework Guide
 
-This is a full-stack multi-page web application for **automated trading**. The backend is built with **FastAPI**, and
-the frontend uses **Next.js** with **MUI** for UI components.
+**Based on Robert Carver's "Systematic Trading"**
 
----
+## System Overview
 
-## Tech Stack
-
-| Layer              | Technology                                         |
-|--------------------|----------------------------------------------------|
-| Backend            | **FastAPI**, **Polars** for data manipulation      |
-| Frontend Framework | **Next.js** (Multi-page + SSR)                     |
-| UI Components      | **MUI**                                            |
-| API Client         | **Axios** or **Fetch**, optionally **React Query** |
-| Database           | SQLite (Development)                               |
+This framework implements a complete systematic trading pipeline with 6 core modules and 24 components.
 
 ---
 
-## File Structure
+## Core Modules
 
-```bash
-/my-fullstack-app
-│
-├── /backend
-│   ├── main.py             # FastAPI app entry point
-│   ├── requirements.txt    # Python dependencies
-│   ├── /routes             # API route definitions
-│   ├── /models             # Database models (SQLAlchemy)
-│   ├── /schemas            # Pydantic models / request-validation
-│   ├── /services           # Core business logic
-│   │   ├── /strategies     # Trading strategies
-│   │   │   ├── mean_reversion.py
-│   │   │   ├── momentum.py
-│   │   │   └── __init__.py
-│   │   ├── /signals        # Signal generators
-│   │   │   ├── price_action.py
-│   │   │   └── indicators.py
-│   │   ├── /execution      # Order execution & broker integration
-│   │   │   ├── alpaca.py
-│   │   │   └── binance.py
-│   │   └── __init__.py
-│   ├── /utils              # Helper functions (logging, data processing)
-│   │   ├── logger.py
-│   │   ├── data_loader.py
-│   │   └── __init__.py
-│   ├── /scheduler          # Background jobs, cron, async tasks
-│   │   └── tasks.py
-│   └── /tests              # Unit tests
-│
-├── /frontend
-│   ├── package.json
-│   ├── /app              # Next.js pages
-│   ├── /components         # Reusable UI components
-│   ├── /styles             # Global CSS / themes
-│   ├── /hooks              # Custom React hooks
-│   ├── /contexts           # State management
-│   ├── /utils              # Helpers
-│   └── /tests              # Frontend tests
-│
-├── .gitignore
-└── README.md
+### 1. Data Management
+
+**Purpose:** Handle price data, returns calculation, and data validation  
+**Key Components:**
+
+- `PriceData` - OHLCV data structure
+- `DataLoader` - Load market data from files
+- `DataValidator` - Check data completeness
+- `ReturnCalculator` - Compute log/percentage returns
+
+**Usage:**
+
+```python
+data = DataLoader.load_csv('prices.csv')
+validated = DataValidator.check(data)
+returns = ReturnCalculator.log_returns(validated)
 ```
 
 ---
 
-## Architecture Overview
+### 2. Volatility
 
-### 1. System Architecture
+**Purpose:** Estimate and forecast instrument volatility  
+**Key Components:**
 
-```mermaid
-flowchart LR
-    A[Frontend: Next.js] -->|HTTP API| B[Backend: FastAPI]
-    B --> C[Database: PostgreSQL / SQLite]
-    B --> D[Trading Services]
-    D --> D1[Strategies Module]
-    D --> D2[Signal Generators]
-    D --> D3[Execution Module]
-    D --> E[External Trading APIs]
-    B --> F[Background Scheduler / Cron Jobs]
+- `VolatilityEstimator` - Base volatility calculations
+- `EWMAVolatility` - Exponentially weighted moving average
+- `VolatilityTargeting` - Risk normalization
 
+**Usage:**
+
+```python
+vol_estimator = EWMAVolatility(span=36)
+daily_vol = vol_estimator.calculate(returns)
+annual_vol = daily_vol * sqrt(256)
 ```
 
-**Description:**
-
-* Frontend communicates with the backend via REST API or GraphQL (optional).
-* Backend handles database queries, business logic, and connects to trading services or external APIs.
-* Background jobs can manage scheduled trades or market data fetching.
-
 ---
 
-### 2. Frontend Component Flow
+### 3. Forecasting
 
-```mermaid
-flowchart TD
-    Page --> Component --> Hook --> API
-    Component --> UI
-    Hook --> Utils
+**Purpose:** Trading rules that generate forecast signals  
+**Key Components:**
+
+- `TrendFollowing` - EWMAC and trend strategies
+- `Carry` - Carry-based signals
+- `MeanReversion` - Mean reversion strategies
+- `ForecastScaler` - Scale forecasts to -20 to +20
+
+**Usage:**
+
+```python
+ewmac = TrendFollowing.ewmac(fast=16, slow=64)
+forecast = ForecastScaler.scale(ewmac, target=10)
+# Output range: -20 to +20
 ```
 
-```bash
-app/
-├── layout.tsx (with MUI AppBar, Drawer navigation)
-├── page.tsx (redirect to /dashboard)
-├── dashboard/
-│   └── page.tsx
-├── chart/
-│   └── page.tsx ⭐
-├── data/
-│   └── page.tsx
-├── strategies/
-│   ├── page.tsx
-│   ├── [id]/
-│   │   └── page.tsx (strategy details)
-│   └── new/
-│       └── page.tsx (create strategy)
-├── signals/
-│   └── page.tsx
-├── trades/
-│   ├── page.tsx
-│   └── [id]/
-│       └── page.tsx (trade details)
-├── positions/
-│   └── page.tsx
-└── settings/
-    └── page.tsx
-````
-
-**Description:**
-
-* Pages render **components** that fetch data using **hooks**.
-* Hooks call **backend APIs** and use **utils/helpers**.
-* Components are styled using **MUI** and can share state via **contexts**.
-
 ---
 
-### 2. Backend Trading Flow
+### 4. Portfolio
 
-```mermaid
-flowchart TD
-    Request --> Route --> Service
-    Service --> Strategy --> Signal --> Execution --> BrokerAPI
-    Service --> Model --> Database
-    Service --> Utils
+**Purpose:** Combine forecasts and manage multiple instruments  
+**Key Components:**
+
+- `ForecastCombiner` - Aggregate multiple signals
+- `PortfolioOptimizer` - Optimize weights
+- `DiversificationMultiplier` - Account for diversification
+
+**Usage:**
+
+```python
+combined = ForecastCombiner.weighted_average(
+  forecasts={'ewmac_16_64': 10, 'carry': 5},
+  weights={'ewmac_16_64': 0.6, 'carry': 0.4}
+)
 ```
 
-#### Overview
-
-Trader class, which loads the data, takes in the strategies (Strategy class) and gives out the buy sell
-signals on the scale of -20 to 20.
-
--20: very strong sell, -15: strong sell, -10: good sell, -5: weak sell, 0: neutral, 20: very strong buy, 15: strong buy,
-10; good buy, 5: weak buy
-
-**Description:**
-
-* **Strategy Module:** Contains algorithms like mean-reversion, momentum, or custom strategies.
-* **Signal Generators:** Convert market data into actionable signals.
-* **Execution Module:** Sends orders to brokers/exchanges (Alpaca, Binance, etc.).
-* **Scheduler:** Handles periodic data fetching and automated trades.
-
 ---
 
-### 3. Data Flow in Trading
+### 5. Position Sizing
 
-```mermaid
-flowchart TD
-    MarketData --> SignalGenerator --> Strategy --> Execution --> Broker
-    MarketData --> Database
-    Execution --> Database
+**Purpose:** Calculate optimal position sizes based on volatility and risk  
+**Key Components:**
+
+- `PositionSizer` - Core position calculations
+- `VolatilityScaling` - Risk-adjusted sizing
+- `InstrumentWeight` - Capital allocation per instrument
+
+**Usage:**
+
+```python
+position = PositionSizer.calculate(
+  forecast=10,
+  volatility=0.15,
+  capital=100000,
+  target_risk=0.20
+)
 ```
 
-**Description:**
+---
 
-* Market data is collected and optionally stored in the database.
-* Signal generators process the data and feed strategies.
-* Execution module places trades with brokers and logs outcomes.
+### 6. Risk Management
+
+**Purpose:** Monitor and control portfolio risk  
+**Key Components:**
+
+- `RiskCalculator` - Portfolio risk metrics
+- `CorrelationEstimator` - Cross-instrument correlations
+- `CapitalAllocation` - Capital distribution
+
+**Usage:**
+
+```python
+risk = RiskCalculator.portfolio_risk(
+  positions=positions,
+  correlations=corr_matrix,
+  volatilities=vols
+)
+```
 
 ---
 
-This structure is **production-ready**, separates concerns clearly, and makes it easy to extend:
+## Execution Pipeline
 
-* Add new strategies without touching execution code.
-* Add new brokers without touching strategies.
-* Easy to test modules independently.
+### Step 1: Data Ingestion & Validation
+
+Load historical price data, validate for completeness, and calculate returns  
+**Outputs:** OHLCV Data, Log Returns, Percentage Returns
+
+### Step 2: Volatility Estimation
+
+Calculate EWMA volatility for each instrument to normalize risk  
+**Outputs:** Daily Volatility, Annual Volatility, Vol Forecast
+
+### Step 3: Forecast Generation
+
+Apply trading rules (trend, carry, mean reversion) to generate signals  
+**Outputs:** Raw Forecasts, Scaled Forecasts (-20 to +20)
+
+### Step 4: Forecast Combination
+
+Combine multiple forecasts using weighted averaging or optimization  
+**Outputs:** Combined Forecast, Diversification Multiplier
+
+### Step 5: Position Sizing
+
+Convert forecasts to positions using volatility targeting  
+**Outputs:** Target Positions, Risk-Adjusted Sizes, Capital Allocation
+
+### Step 6: Risk Management & Execution
+
+Apply risk limits, calculate portfolio metrics, and execute trades  
+**Outputs:** Final Positions, Portfolio Risk, Trade Orders
 
 ---
+
+## Data Flow Diagram
+
+```
+Market Data → Data Module
+Data Module → Volatility Module
+Data Module → Forecast Module
+Forecast Module → Portfolio Module
+Volatility Module → Position Module
+Portfolio Module → Position Module
+Position Module → Risk Module
+Risk Module → Trade Execution
+```
+
+---
+
+## System Statistics
+
+- **Total Modules:** 6
+- **Components:** 24
+- **Pipeline Steps:** 6
+- **Integration Points:** 8
+
+---
+
+## Key Principles
+
+1. **Standardized Forecasts:** All trading rules scaled to -20 to +20 range
+2. **Volatility Targeting:** Positions sized for consistent risk across instruments
+3. **Diversification:** Combine multiple rules and instruments
+4. **Risk Management:** Continuous monitoring and position limits
+5. **Modularity:** Each component has clear inputs/outputs
+
+---
+
+## Quick Start Workflow
+
+1. Load and validate price data
+2. Calculate instrument volatilities
+3. Generate forecasts from trading rules
+4. Combine forecasts across strategies
+5. Size positions based on volatility targets
+6. Apply risk controls and execute
