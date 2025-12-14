@@ -1,4 +1,3 @@
-from .database import SessionLocal, get_db, create_engine, init_db  # noqa
 from .crud import (  # noqa
     get_config,
     get_position,
@@ -23,3 +22,4 @@ from .crud import (  # noqa
     create_trade,
     close_trade,
 )
+from .database import SessionLocal, get_db, create_engine, init_db  # noqa

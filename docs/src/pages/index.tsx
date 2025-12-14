@@ -5,7 +5,7 @@ import SystematicTradingArchitecture from '@site/src/components/SystematicTradin
 export default function Architecture() {
     return (
         <Layout
-            title="System Architecture"
+            title=""
             description="Interactive overview of the Systematic Trading Framework">
             <SystematicTradingArchitecture />
         </Layout>
