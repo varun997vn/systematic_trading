@@ -5,7 +5,10 @@ import pandas as pd
 from pydantic import BaseModel, Field
 
 from st.config import Settings
+from utils.logger import setup_logger
 from .data import ReturnsDTO
+
+logger = setup_logger(__name__)
 
 
 # ---- Volatility Estimators ---- #
@@ -19,6 +22,9 @@ class VolatilityDTO(BaseModel):
     daily_vol: pd.Series = None
     annul_vol: pd.Series = None
 
+    def __str__(self):
+        return f"{self.__class__.__name__}({self.daily_vol})"
+
 
 class StandardVolatilityDTO(VolatilityDTO):
     window: int = Field(default=36, description="Rolling window size")
@@ -30,6 +36,7 @@ class StandardVolatilityDTO(VolatilityDTO):
     def model_post_init(self, __context: Any):
         self.daily_vol = self.returns.returns.rolling(window=self.window, min_periods=self.min_periods).std()
         self.annul_vol = self.daily_vol * (self.annualization_factor ** 0.5)
+        logger.info(f"Creation Complete: {self}")
 
 
 class EWMAVolatilityDTO(VolatilityDTO):
@@ -57,6 +64,7 @@ class EWMAVolatilityDTO(VolatilityDTO):
 
         # Annualize
         self.annul_vol = self.daily_vol * (self.annualization_factor ** 0.5)
+        logger.info(f"Creation Complete: {self}")
 
 
 class RobustVolatilityDTO(VolatilityDTO):
@@ -77,6 +85,7 @@ class RobustVolatilityDTO(VolatilityDTO):
     def model_post_init(self, __context: Any):
         self.daily_vol = self.returns.returns.rolling(window=self.window).apply(self.rolling_mad, raw=False)
         self.annul_vol = self.daily_vol * (self.annualization_factor ** 0.5)
+        logger.info(f"Creation Complete: {self}")
 
 
 # ---- Volatility Forecasting ---- #
@@ -84,6 +93,9 @@ class RobustVolatilityDTO(VolatilityDTO):
 class VolatilityForecastDTO(BaseModel):
     volatility: VolatilityDTO
     forecast: pd.Series = None
+
+    def __str__(self):
+        return f"{self.__class__.__name__}({self.volatility})"
 
 
 class SimpleVolatilityForecastDTO(VolatilityForecastDTO):
@@ -106,6 +118,7 @@ class SimpleVolatilityForecastDTO(VolatilityForecastDTO):
         # Scale by sqrt(horizon) for multi-day forecasts
         if self.horizon > 1:
             self.forecast = self.forecast * (self.horizon ** 0.5)
+        logger.info(f"Creation Complete: {self}")
 
 
 class EWMAVolatilityForecastDTO(VolatilityForecastDTO):
@@ -119,6 +132,7 @@ class EWMAVolatilityForecastDTO(VolatilityForecastDTO):
         self.forecast = self.volatility.daily_vol.ewm(span=self.span, min_periods=1).mean()
         if self.horizon > 1:
             self.forecast = self.forecast * (self.horizon ** 0.5)
+        logger.info(f"Creation Complete: {self}")
 
 
 # ---- Volatility Targeting ---- #
@@ -135,3 +149,7 @@ class VolatilityTargeter(BaseModel):
         self.scalars = self.target_vol / self.volatility.annul_vol
         self.scalars.fillna(value=0.0, inplace=True)
         self.scalars[np.isinf(self.scalars)] = 0.0
+        logger.info(f"Creation Complete: {self}")
+
+    def __str__(self):
+        return f"{self.__class__.__name__}({self.volatility})"

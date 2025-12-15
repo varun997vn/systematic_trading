@@ -8,6 +8,9 @@ import yfinance as yf
 from pydantic import BaseModel
 
 from st.config.settings import Settings
+from utils.logger import setup_logger
+
+logger = setup_logger(__name__)
 
 
 class PriceDataDTO(BaseModel):
@@ -49,6 +52,10 @@ class PriceDataDTO(BaseModel):
 
         # save the data
         df.to_csv(save_path, index=False)
+        logger.info(f"Creation completed: {self}")
+
+    def __str__(self):
+        return f"PriceData({self.ticker}, {self.start_date}, {self.end_date}, {self.interval})"
 
 
 class ReturnsDTO(BaseModel):
@@ -80,6 +87,10 @@ class ReturnsDTO(BaseModel):
         # Remove NaN values created by the shift/pct_change operation
         # Keep the index aligned with the original data
         self.returns = self.returns.fillna(0) if len(self.returns) > 0 else self.returns
+        logger.info(f"Creation completed: {self}")
+
+    def __str__(self):
+        return f"Returns({self.ticker}, {self.return_type})"
 
 
 class CorrelationDTO(BaseModel):
@@ -132,3 +143,7 @@ class CorrelationDTO(BaseModel):
 
         if self.end_date is None and not returns_df.empty:
             self.end_date = returns_df.index.max()
+        logger.info(f"Creation completed: {self}")
+
+    def __str__(self):
+        return f"Correlation({self.ticker}, {self.start_date}, {self.end_date}, {self.observation_count})"
