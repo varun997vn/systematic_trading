@@ -1,48 +1,49 @@
-from pydantic import BaseModel, Field, field_validator
+from typing import Any
+
+from pydantic import BaseModel, Field
 
 
 # ---- Strategy Configuration DTOs ---- #
 
 
-class EWMACConfig(BaseModel):
+class EWMACStrategyDTO(BaseModel):
     """EWMAC trend-following strategy configuration."""
 
     fast_span: int = Field(ge=2, description="Fast EMA span (e.g., 2, 4, 8, 16, 32, 64)")
     slow_span: int = Field(gt=2, description="Slow EMA span (must be > fast_span)")
 
-    @field_validator("slow_span")
-    @classmethod
-    def validate_spans(cls, slow: int, info) -> int:
-        """Ensure slow span is greater than fast span."""
-        if "fast_span" in info.data and slow <= info.data["fast_span"]:
-            raise ValueError("slow_span must be greater than fast_span")
-        return slow
+    def model_post_init(self, context: Any, /) -> None:
+        if self.slow_span >= self.fast_span:
+            raise ValueError(f"slow_span: {self.slow_span} must be smaller than fast_span: {self.fast_span}")
+
+    def __str__(self):
+        return f"EWMACStrategy(slow={self.slow_span}, fast={self.fast_span})"
 
 
-class CarryConfig(BaseModel):
+class CarryStrategyDTO(BaseModel):
     """Carry-based strategy configuration."""
 
     smoothing_span: int = Field(default=30, ge=1, description="EWMA span for smoothing carry signal")
 
+    def __str__(self):
+        return f"CarryStrategy(smoothening={self.smoothing_span})"
 
-class MeanReversionConfig(BaseModel):
+
+class MeanReversionStrategyDTO(BaseModel):
     """Mean reversion strategy configuration."""
 
     lookback: int = Field(default=30, ge=2, description="Lookback period for mean/std calculation")
     entry_threshold: float = Field(default=2.0, gt=0, description="Standard deviations for entry signal")
 
+    def __str__(self):
+        return f"MeanReversionStrategy(lookback={self.lookback}, std={self.entry_threshold})"
 
-class TurtleConfig(BaseModel):
+
+class TurtleStrategy(BaseModel):
     """Turtle Trading breakout strategy configuration."""
 
     entry_window: int = Field(default=20, ge=2, description="Entry breakout window (Donchian Channel)")
     exit_window: int = Field(default=10, ge=1, description="Exit breakout window")
 
-    @field_validator("exit_window")
-    @classmethod
-    def validate_windows(cls, exit_w: int, info) -> int:
-        """Warn if exit window >= entry window (typically exit should be smaller)."""
-        if "entry_window" in info.data and exit_w >= info.data["entry_window"]:
-            # Just log a note, don't raise - this is a soft recommendation
-            pass
-        return exit_w
+    def __str__(self):
+        return f"TurtleStrategy(entry_window={self.entry_window}, exit_window={self.exit_window})"
