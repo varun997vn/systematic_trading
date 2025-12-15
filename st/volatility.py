@@ -66,14 +66,14 @@ class VolatilityResult(BaseModel):
         """Get most recent daily volatility."""
         if len(self.daily_vol) == 0:
             return None
-        return self.daily_vol[-1]
+        return self.daily_vol.iloc[-1]
 
     @property
     def current_annual_vol(self) -> Optional[float]:
         """Get most recent annual volatility."""
         if len(self.annual_vol) == 0:
             return None
-        return self.annual_vol[-1]
+        return self.annual_vol.iloc[-1]
 
 
 # ---- Volatility Estimators ---- #
@@ -146,7 +146,7 @@ class EWMAVolatility:
 
         logger.info(
             f"Calculated EWMA volatility for {ticker or 'series'} "
-            f"(span={self.config.span}, current={daily_vol[-1]:.4f})"
+            f"(span={self.config.span}, current={daily_vol.iloc[-1]:.4f})"
         )
 
         return VolatilityResult(

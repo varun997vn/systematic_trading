@@ -74,7 +74,7 @@ class Forecast(BaseModel):
         """Get most recent forecast value."""
         if len(self.scaled_forecast) == 0:
             return None
-        return self.scaled_forecast[-1]
+        return self.scaled_forecast.iloc[-1]
 
 
 # ---- Forecast Scaler ---- #
@@ -214,7 +214,7 @@ class ForecastCombiner:
 
         logger.info(
             f"Combined {len(forecasts)} forecasts "
-            f"(current={combined[-1]:.4f})"
+            f"(current={combined.iloc[-1]:.4f})"
         )
 
         return combined

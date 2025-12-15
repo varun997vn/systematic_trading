@@ -51,7 +51,7 @@ class MeanReversion:
 
         logger.debug(
             f"Mean reversion calculated for {ticker or 'series'} "
-            f"(current={signal[-1]:.4f})"
+            f"(current={signal.iloc[-1]:.4f})"
         )
 
         return signal

@@ -9,6 +9,7 @@ REFACTORED: Modular forecast system with configurable trading rules
 from enum import Enum
 from typing import Dict, List, Optional, Tuple, Any
 
+import pandas as pd
 import polars as pl
 from pydantic import BaseModel, Field
 
@@ -220,7 +221,7 @@ class TradingPipeline(BaseModel):
 
     # Data
     tickers: List[str]
-    prices: Dict[str, pl.Series]
+    prices: Dict[str, pd.Series]
 
     # Volatilities
     volatilities: Dict[str, VolatilityResult]
@@ -229,7 +230,7 @@ class TradingPipeline(BaseModel):
     raw_forecasts: Dict[
         str, Dict[str, Forecast]]  # ticker -> rule_name -> Forecast
     combined_forecasts: Dict[
-        str, pl.Series]  # ticker -> combined forecast series
+        str, pd.Series]  # ticker -> combined forecast series
     current_forecasts: Dict[str, float]  # ticker -> current forecast value
 
     # Portfolio
@@ -403,7 +404,7 @@ class Trader:
         self.pipeline_output = TradingPipeline(
             tickers=self.tickers,
             prices={
-                ticker: self.price_data[ticker].data["close"]
+                ticker: self.price_data[ticker].data["Close"]
                 for ticker in self.tickers
             },
             volatilities=volatilities,
@@ -447,7 +448,7 @@ class Trader:
             self.price_data[ticker] = price_data
             logger.info(
                 f"  Loaded {ticker}: {len(price_data.data)} rows, "
-                f"last price: ${float(price_data.data['Close'][-1]):.2f}"
+                f"last price: ${float(price_data.data['Close'].iloc[-1]):.2f}"
             )
 
         logger.info(f" Loaded data for {len(self.tickers)} instruments")
@@ -521,8 +522,8 @@ class Trader:
     def _generate_single_forecast(
             self,
             ticker: str,
-            prices: pl.Series,
-            price_volatility: pl.Series,
+            prices: pd.Series,
+            price_volatility: pd.Series,
             rule_config: TradingRuleConfig,
     ) -> Forecast:
         """
@@ -589,7 +590,7 @@ class Trader:
             self,
             raw_forecasts: Dict[str, Dict[str, Forecast]],
             rules_config: TradingRulesConfig,
-    ) -> Tuple[Dict[str, pl.Series], Dict[str, float]]:
+    ) -> Tuple[Dict[str, pd.Series], Dict[str, float]]:
         """
         Step 4: Combine forecasts using configured weights (MODULAR).
 
@@ -613,7 +614,7 @@ class Trader:
             )
 
             combined_forecasts[ticker] = combined_series
-            current_forecasts[ticker] = float(combined_series[-1])
+            current_forecasts[ticker] = float(combined_series.iloc[-1])
 
             logger.info(
                 f"  {ticker}: combined_forecast={current_forecasts[ticker]:.2f}, "
@@ -634,7 +635,8 @@ class Trader:
             for ticker, vol in volatilities.items()
         }
 
-        portfolio_weights = self.portfolio_manager.calculate_weights(
+        portfolio_weights = self.portfolio_manager.calculate_portfolio_weights(
+            tickers=self.tickers,
             volatilities=vols, method=method
         )
 
@@ -665,7 +667,7 @@ class Trader:
         """Step 6: Size positions using Carver's formula with volatility targeting."""
         # Get current prices
         prices = {
-            ticker: float(self.price_data[ticker].data["Close"][-1])
+            ticker: float(self.price_data[ticker].data["Close"].iloc[-1])
             for ticker in self.tickers
         }
 

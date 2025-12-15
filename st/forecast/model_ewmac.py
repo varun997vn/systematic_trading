@@ -50,7 +50,7 @@ class EWMAC:
 
         logger.debug(
             f"EWMAC {self.name} calculated for {ticker or 'series'} "
-            f"(current={raw_ewmac[-1]:.4f})"
+            f"(current={raw_ewmac.iloc[-1]:.4f})"
         )
 
         return raw_ewmac
