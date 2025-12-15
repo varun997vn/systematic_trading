@@ -1,5 +1,5 @@
 import polars as pl
-
+import pandas as pd
 from utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -26,7 +26,7 @@ class EWMAC:
         self.slow_span = slow_span
         self.name = f"ewmac_{fast_span}_{slow_span}"
 
-    def calculate(self, prices: pl.Series, ticker: str = "") -> pl.Series:
+    def calculate(self, prices: pd.Series, ticker: str = "") -> pd.Series:
         """
         Calculate raw EWMAC forecast.
 
@@ -38,12 +38,12 @@ class EWMAC:
             Series of raw EWMAC values
         """
         # Calculate EMAs
-        fast_ema = prices.ewm_mean(
+        fast_ema = prices.ewm(
             span=self.fast_span, min_periods=self.fast_span
-        )
-        slow_ema = prices.ewm_mean(
+        ).mean()
+        slow_ema = prices.ewm(
             span=self.slow_span, min_periods=self.slow_span
-        )
+        ).mean()
 
         # Raw forecast is the difference
         raw_ewmac = fast_ema - slow_ema
@@ -56,9 +56,9 @@ class EWMAC:
         return raw_ewmac
 
     def calculate_normalized(
-            self, prices: pl.Series, price_volatility: pl.Series,
+            self, prices: pd.Series, price_volatility: pd.Series,
             ticker: str = ""
-    ) -> pl.Series:
+    ) -> pd.Series:
         """
         Calculate risk-adjusted EWMAC forecast.
 

@@ -13,7 +13,7 @@ import polars as pl
 from pydantic import BaseModel, Field
 
 from st.config.settings import Settings
-from st.data import DataManager
+from st.data import DataManager, PriceData
 from st.forecast import ForecastConfig, ForecastManager, Forecast
 from st.portfolio import PortfolioManager, PortfolioConfig, PortfolioWeights
 from st.position import PositionManager, PositionConfig, PositionSet
@@ -94,7 +94,7 @@ class TradingRulesConfig(BaseModel):
         """
         if self.equal_weights or all(
                 rule.weight is None for rule in self.rules
-                ):
+        ):
             # Equal weighting
             n = len(self.rules)
             return {rule.rule_name: 1.0 / n for rule in self.rules}
@@ -304,7 +304,7 @@ class Trader:
                                      TradingRulesConfig.multi_strategy_suite())
 
         # Pipeline state
-        self.price_data: Dict[str, pl.DataFrame] = {}
+        self.price_data: Dict[str, PriceData] = {}
         self.current_positions: Dict[str, float] = {t: 0.0 for t in tickers}
         self.pipeline_output: Optional[TradingPipeline] = None
 
@@ -355,7 +355,7 @@ class Trader:
         for rule in rules_config.rules:
             logger.info(
                 f"  - {rule.rule_name} (weight: {rule.weight or 'equal'})"
-                )
+            )
 
         # ---- STEP 1: Data Ingestion ---- #
         logger.info("\n[STEP 1] Loading Data...")
@@ -369,7 +369,7 @@ class Trader:
         logger.info("\n[STEP 3] Generating Forecasts...")
         raw_forecasts = self._generate_forecasts_modular(
             rules_config, volatilities
-            )
+        )
 
         # ---- STEP 4: Forecast Combination ---- #
         logger.info("\n[STEP 4] Combining Forecasts...")
@@ -399,10 +399,11 @@ class Trader:
 
         # ---- Store Pipeline Output ---- #
         from datetime import datetime
+
         self.pipeline_output = TradingPipeline(
             tickers=self.tickers,
             prices={
-                ticker: self.price_data[ticker]["close"]
+                ticker: self.price_data[ticker].data["close"]
                 for ticker in self.tickers
             },
             volatilities=volatilities,
@@ -424,7 +425,7 @@ class Trader:
         logger.info(f"Total notional: ${trade_set.total_notional:,.0f}")
         logger.info(
             f"Portfolio leverage: {position_set.portfolio_leverage:.2f}x"
-            )
+        )
         logger.info("=" * 60)
 
         return trade_set
@@ -439,11 +440,14 @@ class Trader:
     ) -> None:
         """Step 1: Load and validate price data for all tickers."""
         for ticker in self.tickers:
-            df = self.data_manager.get_data(ticker, start_date, end_date)
-            self.price_data[ticker] = df
+            price_data = self.data_manager.get_data(
+                ticker, start_date,
+                end_date
+            )
+            self.price_data[ticker] = price_data
             logger.info(
-                f"  Loaded {ticker}: {len(df)} rows, "
-                f"last price: ${float(df['close'][-1]):.2f}"
+                f"  Loaded {ticker}: {len(price_data.data)} rows, "
+                f"last price: ${float(price_data.data['Close'][-1]):.2f}"
             )
 
         logger.info(f" Loaded data for {len(self.tickers)} instruments")
@@ -453,8 +457,8 @@ class Trader:
         volatilities = {}
 
         for ticker in self.tickers:
-            prices = self.price_data[ticker]["close"]
-            vol_result = self.volatility_manager.calculate_volatility(
+            prices = self.price_data[ticker].data["Close"]
+            vol_result = self.volatility_manager.estimate_from_prices(
                 prices, ticker
             )
             volatilities[ticker] = vol_result
@@ -466,7 +470,7 @@ class Trader:
 
         logger.info(
             f" Calculated volatilities for {len(volatilities)} instruments"
-            )
+        )
         return volatilities
 
     def _generate_forecasts_modular(
@@ -487,8 +491,8 @@ class Trader:
         raw_forecasts = {}
 
         for ticker in self.tickers:
-            prices = self.price_data[ticker]["close"]
-            price_volatility = volatilities[ticker].volatility_series
+            prices = self.price_data[ticker].data["Close"]
+            price_volatility = volatilities[ticker].daily_vol
 
             ticker_forecasts = {}
 
@@ -548,7 +552,7 @@ class Trader:
             # This is a placeholder - you'll need to provide this data
             logger.warning(
                 f"Carry strategy for {ticker} requires forward/yield data - using placeholder"
-                )
+            )
             # You would call: self.forecast_manager.generate_carry_from_prices(...)
             # For now, return a dummy forecast
             return self.forecast_manager.generate_ewmac(
@@ -649,7 +653,7 @@ class Trader:
 
         logger.info(
             f" Allocated capital across {len(capital_allocation)} instruments"
-            )
+        )
         return portfolio_weights, capital_allocation
 
     def _size_positions(
@@ -661,7 +665,7 @@ class Trader:
         """Step 6: Size positions using Carver's formula with volatility targeting."""
         # Get current prices
         prices = {
-            ticker: float(self.price_data[ticker]["close"][-1])
+            ticker: float(self.price_data[ticker].data["Close"][-1])
             for ticker in self.tickers
         }
 
@@ -790,13 +794,13 @@ class Trader:
                 self.current_positions[trade.ticker] = (
                         self.current_positions.get(
                             trade.ticker, 0.0
-                            ) + trade.contracts
+                        ) + trade.contracts
                 )
             else:  # SELL
                 self.current_positions[trade.ticker] = (
                         self.current_positions.get(
                             trade.ticker, 0.0
-                            ) - trade.contracts
+                        ) - trade.contracts
                 )
 
         logger.info(" Updated current positions")
@@ -811,7 +815,7 @@ class Trader:
         self.trading_rules_config = rules_config
         logger.info(
             f"Updated trading rules: {len(rules_config.rules)} rules configured"
-            )
+        )
 
     def get_pipeline_summary(self) -> Dict:
         """Get summary of last pipeline execution."""
@@ -845,7 +849,7 @@ class Trader:
         }
 
         prices = {
-            ticker: float(self.price_data[ticker]["close"][-1])
+            ticker: float(self.price_data[ticker].data["Close"][-1])
             for ticker in self.tickers
         }
 
@@ -857,14 +861,14 @@ class Trader:
         # Get correlations (simplified - using returns)
         returns_data = {}
         for ticker in self.tickers:
-            prices_series = self.price_data[ticker]["close"]
+            prices_series = self.price_data[ticker].data["Close"]
             returns = (prices_series / prices_series.shift(1)).log()
             returns_data[ticker] = returns
 
         returns_df = pl.DataFrame(returns_data)
         correlation_matrix = self.risk_manager.estimate_correlations(
             returns_df
-            )
+        )
 
         portfolio_risk = self.risk_manager.calculate_portfolio_risk(
             positions=positions_dict,

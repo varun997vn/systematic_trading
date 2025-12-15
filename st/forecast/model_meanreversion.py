@@ -1,4 +1,4 @@
-import polars as pl
+import pandas as pd
 
 from utils.logger import setup_logger
 
@@ -23,7 +23,7 @@ class MeanReversion:
         self.entry_threshold = entry_threshold
         self.name = f"mean_reversion_{lookback}"
 
-    def calculate(self, prices: pl.Series, ticker: str = "") -> pl.Series:
+    def calculate(self, prices: pd.Series, ticker: str = "") -> pd.Series:
         """
         Calculate mean reversion forecast.
 
@@ -35,12 +35,12 @@ class MeanReversion:
             Series of mean reversion signals
         """
         # Calculate z-score
-        rolling_mean = prices.rolling_mean(
-            window_size=self.lookback, min_periods=self.lookback
+        rolling = prices.rolling(
+            window=self.lookback,
+            center=False
         )
-        rolling_std = prices.rolling_std(
-            window_size=self.lookback, min_periods=self.lookback
-        )
+        rolling_mean = rolling.mean()
+        rolling_std = rolling.std()
 
         z_score = (prices - rolling_mean) / rolling_std
 
@@ -57,9 +57,9 @@ class MeanReversion:
         return signal
 
     def calculate_normalized(
-            self, prices: pl.Series, price_volatility: pl.Series,
+            self, prices: pd.Series, price_volatility: pd.Series,
             ticker: str = ""
-    ) -> pl.Series:
+    ) -> pd.Series:
         """
         Calculate volatility-standardized mean reversion forecast.
 

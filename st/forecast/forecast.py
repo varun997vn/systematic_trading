@@ -13,6 +13,7 @@ Core responsibilities:
 from typing import Dict, List, Optional, Tuple
 
 import polars as pl
+import pandas as pd
 from pydantic import BaseModel, Field, field_validator
 
 from utils.logger import setup_logger
@@ -64,8 +65,8 @@ class Forecast(BaseModel):
 
     rule_name: str
     ticker: str
-    raw_forecast: pl.Series
-    scaled_forecast: pl.Series
+    raw_forecast: pd.Series
+    scaled_forecast: pd.Series
     params: Dict = Field(default_factory=dict)
 
     @property
@@ -88,7 +89,7 @@ class ForecastScaler:
     def __init__(self, config: Optional[ForecastConfig] = None):
         self.config = config or ForecastConfig()
 
-    def calculate_scalar(self, raw_forecast: pl.Series) -> float:
+    def calculate_scalar(self, raw_forecast: pd.Series) -> float:
         """
         Calculate scaling factor for forecast.
 
@@ -117,7 +118,7 @@ class ForecastScaler:
 
         return scalar
 
-    def scale(self, raw_forecast: pl.Series) -> pl.Series:
+    def scale(self, raw_forecast: pd.Series) -> pd.Series:
         """
         Scale forecast to target range.
 
@@ -139,8 +140,8 @@ class ForecastScaler:
         return scaled
 
     def scale_with_fixed_scalar(
-            self, raw_forecast: pl.Series, scalar: float
-    ) -> pl.Series:
+            self, raw_forecast: pd.Series, scalar: float
+    ) -> pd.Series:
         """
         Scale forecast using pre-calculated scalar.
 
@@ -174,8 +175,8 @@ class ForecastCombiner:
         self.config = config or ForecastConfig()
 
     def weighted_average(
-            self, forecasts: Dict[str, pl.Series], weights: Dict[str, float]
-    ) -> pl.Series:
+            self, forecasts: Dict[str, pd.Series], weights: Dict[str, float]
+    ) -> pd.Series:
         """
         Combine forecasts using weighted average.
 
@@ -218,7 +219,7 @@ class ForecastCombiner:
 
         return combined
 
-    def equal_weight(self, forecasts: Dict[str, pl.Series]) -> pl.Series:
+    def equal_weight(self, forecasts: Dict[str, pd.Series]) -> pd.Series:
         """
         Combine forecasts with equal weights.
 
@@ -267,8 +268,8 @@ class ForecastManager:
 
     def generate_ewmac(
             self,
-            prices: pl.Series,
-            price_volatility: Optional[pl.Series] = None,
+            prices: pd.Series,
+            price_volatility: Optional[pd.Series] = None,
             fast_span: int = 16,
             slow_span: int = 64,
             ticker: str = "",
@@ -319,8 +320,8 @@ class ForecastManager:
 
     def generate_ewmac_normalized(
             self,
-            prices: pl.Series,
-            price_volatility: pl.Series,
+            prices: pd.Series,
+            price_volatility: pd.Series,
             fast_span: int = 16,
             slow_span: int = 64,
             ticker: str = "",
@@ -356,9 +357,9 @@ class ForecastManager:
 
     def generate_carry(
             self,
-            spot_prices: pl.Series,
-            forward_prices: pl.Series,
-            price_volatility: Optional[pl.Series] = None,
+            spot_prices: pd.Series,
+            forward_prices: pd.Series,
+            price_volatility: Optional[pd.Series] = None,
             smoothing_span: int = 30,
             ticker: str = "",
             use_volatility_standardization: bool = True,
@@ -410,8 +411,8 @@ class ForecastManager:
 
     def generate_mean_reversion(
             self,
-            prices: pl.Series,
-            price_volatility: Optional[pl.Series] = None,
+            prices: pd.Series,
+            price_volatility: Optional[pd.Series] = None,
             lookback: int = 30,
             entry_threshold: float = 2.0,
             ticker: str = "",
@@ -464,8 +465,8 @@ class ForecastManager:
 
     def generate_turtle(
             self,
-            prices: pl.Series,
-            price_volatility: Optional[pl.Series] = None,
+            prices: pd.Series,
+            price_volatility: Optional[pd.Series] = None,
             entry_window: int = 20,
             exit_window: int = 10,
             ticker: str = "",
@@ -517,7 +518,7 @@ class ForecastManager:
     def combine_forecasts(
             self, forecasts: List[Forecast],
             weights: Optional[Dict[str, float]] = None
-    ) -> Tuple[pl.Series, float]:
+    ) -> Tuple[pd.Series, float]:
         """
         Combine multiple forecasts.
 
@@ -543,8 +544,8 @@ class ForecastManager:
 
     def generate_standard_suite(
             self,
-            prices: pl.Series,
-            price_volatility: Optional[pl.Series] = None,
+            prices: pd.Series,
+            price_volatility: Optional[pd.Series] = None,
             ticker: str = "",
             use_volatility_standardization: bool = True,
     ) -> Dict[str, Forecast]:
@@ -593,7 +594,7 @@ class ForecastManager:
 
 
 def calculate_forecast_correlation(
-        forecast1: pl.Series, forecast2: pl.Series
+        forecast1: pd.Series, forecast2: pd.Series
 ) -> float:
     """
     Calculate correlation between two forecasts.
@@ -614,7 +615,7 @@ def calculate_forecast_correlation(
 
 
 def calculate_forecast_diversity(
-        forecasts: Dict[str, pl.Series]
+        forecasts: Dict[str, pd.Series]
 ) -> pl.DataFrame:
     """
     Calculate pairwise correlations between forecasts.
@@ -631,7 +632,7 @@ def calculate_forecast_diversity(
     return corr_matrix
 
 
-def validate_forecast(forecast: pl.Series, config: ForecastConfig) -> bool:
+def validate_forecast(forecast: pd.Series, config: ForecastConfig) -> bool:
     """
     Validate forecast values are within expected range.
 

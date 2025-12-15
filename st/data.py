@@ -32,7 +32,9 @@ class PriceData(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
     ticker: str
-    data: pd.DataFrame = Field(..., description="OHLCV DataFrame with DatetimeIndex")
+    data: pd.DataFrame = Field(
+        ..., description="OHLCV DataFrame with DatetimeIndex"
+    )
 
     def __init__(self, ticker: str, data: pd.DataFrame):
         super().__init__(ticker=ticker, data=data)
@@ -220,13 +222,17 @@ class DataValidator:
         # Check for missing values
         missing = df.isnull().sum()
         if missing.any():
-            logger.warning(f"{price_data.ticker}: Missing values found\n{missing}")
+            logger.warning(
+                f"{price_data.ticker}: Missing values found\n{missing}"
+            )
             return False
 
         # Check for zero/negative prices
         price_cols = ["Open", "High", "Low", "Close"]
         if (df[price_cols] <= 0).any().any():
-            logger.warning(f"{price_data.ticker}: Zero or negative prices found")
+            logger.warning(
+                f"{price_data.ticker}: Zero or negative prices found"
+            )
             return False
 
         # Check high >= low
@@ -406,7 +412,9 @@ class DataManager:
         close_prices = {}
 
         for ticker in tickers:
-            price_data = self.get_data(ticker, start_date, end_date, validate=False)
+            price_data = self.get_data(
+                ticker, start_date, end_date, validate=False
+            )
             if price_data is not None:
                 close_prices[ticker] = price_data.close
 
@@ -445,7 +453,9 @@ class DataManager:
         # Get returns for all tickers
         returns_dict = {}
         for ticker in tickers:
-            returns = self.get_returns(ticker, return_type, start_date, end_date)
+            returns = self.get_returns(
+                ticker, return_type, start_date, end_date
+            )
             if returns is not None:
                 if len(returns) >= min_periods:
                     returns_dict[ticker] = returns
@@ -458,13 +468,16 @@ class DataManager:
                 logger.warning(f"No data available for {ticker}")
 
         if len(returns_dict) < 2:
-            logger.error("Insufficient tickers with valid data for correlation")
+            logger.error(
+                "Insufficient tickers with valid data for correlation"
+            )
             return pd.DataFrame()
 
         # Debug: Check what we have
         for ticker, returns in returns_dict.items():
             logger.info(
-                f"Debug - {ticker}: type={type(returns)}, len={len(returns) if hasattr(returns, '__len__') else 'N/A'}")
+                f"Debug - {ticker}: type={type(returns)}, len={len(returns) if hasattr(returns, '__len__') else 'N/A'}"
+            )
 
         # Create returns DataFrame
         returns_df = pd.DataFrame(returns_dict)

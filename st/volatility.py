@@ -11,7 +11,8 @@ Core responsibilities:
 
 from typing import Optional
 
-import polars as pl
+import numpy as np
+import pandas as pd
 from pydantic import BaseModel, Field, field_validator
 
 from st.config.settings import Settings
@@ -44,7 +45,9 @@ class VolatilityConfig(BaseModel):
         if v < 2:
             raise ValueError("Span must be at least 2")
         if v > 200:
-            logger.warning(f"Unusual span value: {v}. Carver recommends 32-36.")
+            logger.warning(
+                f"Unusual span value: {v}. Carver recommends 32-36."
+            )
         return v
 
 
@@ -54,8 +57,8 @@ class VolatilityResult(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
     ticker: str
-    daily_vol: pl.Series
-    annual_vol: pl.Series
+    daily_vol: pd.Series
+    annual_vol: pd.Series
     config: VolatilityConfig
 
     @property
@@ -81,8 +84,8 @@ class StandardVolatility:
 
     @staticmethod
     def calculate(
-            returns: pl.Series, window: int = 36, min_periods: int = 10
-    ) -> pl.Series:
+            returns: pd.Series, window: int = 36, min_periods: int = 10
+    ) -> pd.Series:
         """
         Calculate rolling standard deviation of returns.
 
@@ -94,11 +97,14 @@ class StandardVolatility:
         Returns:
             Series of volatility estimates
         """
-        vol = returns.rolling_std(window_size=window, min_periods=min_periods)
+        vol = returns.rolling().std(
+            window_size=window,
+            min_periods=min_periods
+        )
         return vol
 
     @staticmethod
-    def annualize(daily_vol: pl.Series, factor: int = 256) -> pl.Series:
+    def annualize(daily_vol: pd.Series, factor: int = 256) -> pd.Series:
         """Convert daily volatility to annual."""
         return daily_vol * (factor ** 0.5)
 
@@ -112,7 +118,9 @@ class EWMAVolatility:
     def __init__(self, config: Optional[VolatilityConfig] = None):
         self.config = config or VolatilityConfig()
 
-    def calculate(self, returns: pl.Series, ticker: str = "") -> VolatilityResult:
+    def calculate(
+            self, returns: pd.Series, ticker: str = ""
+    ) -> VolatilityResult:
         """
         Calculate EWMA volatility.
 
@@ -125,7 +133,10 @@ class EWMAVolatility:
         """
         # EWMA of squared returns
         squared_returns = returns ** 2
-        ewma_var = squared_returns.ewm_mean(span=self.config.span, min_periods=self.config.min_periods)
+        ewma_var = squared_returns.ewm(
+            span=self.config.span,
+            min_periods=self.config.min_periods
+        ).mean()
 
         # Volatility is square root of variance
         daily_vol = ewma_var ** 0.5
@@ -146,7 +157,7 @@ class EWMAVolatility:
         )
 
     def calculate_from_prices(
-            self, prices: pl.Series, ticker: str = ""
+            self, prices: pd.Series, ticker: str = ""
     ) -> VolatilityResult:
         """
         Calculate EWMA volatility from price series.
@@ -159,7 +170,7 @@ class EWMAVolatility:
             VolatilityResult
         """
         # Calculate log returns
-        log_returns = (prices / prices.shift(1)).log()
+        log_returns = np.log(prices / prices.shift(1))
 
         return self.calculate(log_returns, ticker)
 
@@ -172,8 +183,8 @@ class RobustVolatility:
 
     @staticmethod
     def calculate(
-            returns: pl.Series, window: int = 36, scale_factor: float = 1.4826
-    ) -> pl.Series:
+            returns: pd.Series, window: int = 36, scale_factor: float = 1.4826
+    ) -> pd.Series:
         """
         Calculate rolling MAD-based volatility.
 
@@ -186,7 +197,7 @@ class RobustVolatility:
             Series of volatility estimates
         """
 
-        def rolling_mad(series: pl.Series) -> float:
+        def rolling_mad(series: pd.Series) -> float:
             """Calculate median absolute deviation."""
             median = series.median()
             if median is None:
@@ -195,7 +206,7 @@ class RobustVolatility:
             return mad * scale_factor if mad is not None else None
 
         # Use rolling_map for custom aggregation
-        vol = returns.rolling_map(rolling_mad, window_size=window)
+        vol = returns.rolling().apply(rolling_mad, window_size=window)
 
         return vol
 
@@ -208,8 +219,8 @@ class VolatilityForecaster:
 
     @staticmethod
     def simple_forecast(
-            volatility: pl.Series, horizon: int = 1, method: str = "last"
-    ) -> pl.Series:
+            volatility: pd.Series, horizon: int = 1, method: str = "last"
+    ) -> pd.Series:
         """
         Simple volatility forecast.
 
@@ -226,7 +237,7 @@ class VolatilityForecaster:
             forecast = volatility
         elif method == "mean":
             # Rolling mean forecast
-            forecast = volatility.rolling_mean(window_size=10, min_periods=1)
+            forecast = volatility.rolling().mean(window_size=10, min_periods=1)
         else:
             raise ValueError(f"Unknown method: {method}")
 
@@ -238,8 +249,8 @@ class VolatilityForecaster:
 
     @staticmethod
     def ewma_forecast(
-            volatility: pl.Series, span: int = 10, horizon: int = 1
-    ) -> pl.Series:
+            volatility: pd.Series, span: int = 10, horizon: int = 1
+    ) -> pd.Series:
         """
         EWMA-based volatility forecast.
 
@@ -288,7 +299,9 @@ class VolatilityTargeter:
             Scaling factor (target_vol / current_vol)
         """
         if current_vol <= 0:
-            logger.warning(f"Invalid volatility: {current_vol}, returning 0 scalar")
+            logger.warning(
+                f"Invalid volatility: {current_vol}, returning 0 scalar"
+            )
             return 0.0
 
         scalar = self.target_vol / current_vol
@@ -300,7 +313,7 @@ class VolatilityTargeter:
 
         return scalar
 
-    def calculate_scalars(self, volatilities: pl.Series) -> pl.Series:
+    def calculate_scalars(self, volatilities: pd.Series) -> pd.Series:
         """
         Calculate scaling factors for a series of volatilities.
 
@@ -313,9 +326,8 @@ class VolatilityTargeter:
         scalars = self.target_vol / volatilities
 
         # Handle invalid values
-        scalars = scalars.fill_nan(0.0)
-        scalars = pl.when(scalars.is_infinite()).then(0.0).otherwise(scalars)
-
+        scalars = scalars.fillna(0.0)
+        scalars[np.isinf(scalars)] = 0.0
         return scalars
 
     def target_position(
@@ -355,7 +367,7 @@ class VolatilityManager:
         self.forecaster = VolatilityForecaster()
 
     def estimate_from_returns(
-            self, returns: pl.Series, ticker: str = ""
+            self, returns: pd.Series, ticker: str = ""
     ) -> VolatilityResult:
         """
         Estimate volatility from returns.
@@ -370,7 +382,7 @@ class VolatilityManager:
         return self.estimator.calculate(returns, ticker)
 
     def estimate_from_prices(
-            self, prices: pl.Series, ticker: str = ""
+            self, prices: pd.Series, ticker: str = ""
     ) -> VolatilityResult:
         """
         Estimate volatility from prices.
@@ -386,7 +398,7 @@ class VolatilityManager:
 
     def forecast(
             self, volatility_result: VolatilityResult, horizon: int = 1
-    ) -> pl.Series:
+    ) -> pd.Series:
         """
         Forecast future volatility.
 
@@ -401,7 +413,9 @@ class VolatilityManager:
             volatility_result.annual_vol, horizon, method="last"
         )
 
-    def get_position_scalar(self, volatility_result: VolatilityResult) -> float:
+    def get_position_scalar(
+            self, volatility_result: VolatilityResult
+    ) -> float:
         """
         Get current position scaling factor.
 
@@ -419,7 +433,7 @@ class VolatilityManager:
         return self.targeter.calculate_scalar(current_vol)
 
     def calculate_multi_instrument_vols(
-            self, returns_df: pl.DataFrame
+            self, returns_df: pd.DataFrame
     ) -> dict[str, VolatilityResult]:
         """
         Calculate volatilities for multiple instruments.
@@ -448,7 +462,7 @@ class VolatilityManager:
 
 
 def calculate_correlation_adjusted_vol(
-        volatilities: pl.Series, correlation_matrix: pl.DataFrame
+        volatilities: pd.Series, correlation_matrix: pd.DataFrame
 ) -> float:
     """
     Calculate portfolio volatility accounting for correlations.
@@ -466,7 +480,7 @@ def calculate_correlation_adjusted_vol(
 
     # Portfolio variance = w^T * Σ * w (assuming equal weights)
     n = len(vols)
-    weights = pl.Series([1.0 / n] * n)
+    weights = pd.Series([1.0 / n] * n)
     w = weights.to_numpy().reshape(-1, 1)
 
     # Covariance matrix
@@ -479,7 +493,9 @@ def calculate_correlation_adjusted_vol(
     return portfolio_vol
 
 
-def validate_volatility(vol: float, min_vol: float = 0.01, max_vol: float = 2.0) -> bool:
+def validate_volatility(
+        vol: float, min_vol: float = 0.01, max_vol: float = 2.0
+) -> bool:
     """
     Validate volatility is within reasonable bounds.
 

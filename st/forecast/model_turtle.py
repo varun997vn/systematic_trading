@@ -1,4 +1,4 @@
-import polars as pl
+import pandas as pd
 
 from utils.logger import setup_logger
 
@@ -32,7 +32,7 @@ class TurtleStrategy:
         self.exit_window = exit_window
         self.name = f"turtle_{entry_window}_{exit_window}"
 
-    def calculate(self, prices: pl.Series, ticker: str = "") -> pl.Series:
+    def calculate(self, prices: pd.Series, ticker: str = "") -> pd.Series:
         """
         Calculate Turtle Trading forecast.
 
@@ -44,22 +44,21 @@ class TurtleStrategy:
             Series of turtle signals
         """
         # Calculate Donchian Channels for entry
-        upper_channel = prices.rolling_max(
-            window_size=self.entry_window, min_periods=self.entry_window
-        )
-        lower_channel = prices.rolling_min(
-            window_size=self.entry_window, min_periods=self.entry_window
-        )
+        channel = prices.rolling(window=self.entry_window)
+        upper_channel = channel.max()
+        lower_channel = channel.min()
 
         # Calculate channel midpoint and width
         channel_mid = (upper_channel + lower_channel) / 2.0
         channel_width = upper_channel - lower_channel
 
         # Prevent division by zero
-        channel_width = channel_width.fill_null(1.0)
-        channel_width = pl.when(channel_width == 0).then(1.0).otherwise(
-            channel_width
-        )
+        channel_width = channel_width.fillna(
+            1.0
+        )  # pandas uses fillna(), not fill_null()
+        channel_width = channel_width.where(
+            channel_width != 0, 1.0
+        )  # pandas uses where(), not pl.when()
 
         # Signal is distance from midpoint, normalized by channel width
         # Positive when price above midpoint (bullish)
@@ -74,9 +73,9 @@ class TurtleStrategy:
         return signal
 
     def calculate_normalized(
-            self, prices: pl.Series, price_volatility: pl.Series,
+            self, prices: pd.Series, price_volatility: pd.Series,
             ticker: str = ""
-    ) -> pl.Series:
+    ) -> pd.Series:
         """
         Calculate volatility-standardized Turtle forecast.
 
@@ -96,8 +95,8 @@ class TurtleStrategy:
         return normalized
 
     def get_breakout_levels(
-            self, prices: pl.Series
-    ) -> tuple[pl.Series, pl.Series, pl.Series, pl.Series]:
+            self, prices: pd.Series
+    ) -> tuple[pd.Series, pd.Series, pd.Series, pd.Series]:
         """
         Get current Donchian Channel levels.
 
