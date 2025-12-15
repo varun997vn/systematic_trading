@@ -27,7 +27,7 @@ def simple_example():
         capital=capital,
     )
 
-    print(f"\n✓ Trader initialized with {len(tickers)} instruments")
+    print(f"\n Trader initialized with {len(tickers)} instruments")
     print(f"  Portfolio: {', '.join(tickers)}")
     print(f"  Capital: ${capital:,.0f}")
 
@@ -38,7 +38,7 @@ def simple_example():
     )
 
     # Step 4: Review the trades
-    print(f"\n✓ Pipeline complete!")
+    print(f"\n Pipeline complete!")
     print(f"  Generated {trade_set.num_trades} trades")
     print(f"  Total notional: ${trade_set.total_notional:,.2f}")
 
@@ -67,11 +67,11 @@ def simple_example():
 
     print("\n" + "=" * 60)
     print("That's it! The system handled everything:")
-    print("  ✓ Data loading & validation")
-    print("  ✓ Volatility estimation")
-    print("  ✓ Trend signal generation")
-    print("  ✓ Position sizing")
-    print("  ✓ Risk management")
+    print("   Data loading & validation")
+    print("   Volatility estimation")
+    print("   Trend signal generation")
+    print("   Position sizing")
+    print("   Risk management")
     print("=" * 60 + "\n")
 
     return trader, trade_set

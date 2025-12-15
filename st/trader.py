@@ -300,7 +300,7 @@ class Trader:
 
             self.price_data[ticker] = df.sort("date")
 
-        logger.info(f"✓ Loaded data for {len(self.tickers)} instruments")
+        logger.info(f" Loaded data for {len(self.tickers)} instruments")
 
     def _estimate_volatilities(self) -> Dict[str, VolatilityResult]:
         """Step 2: Estimate EWMA volatilities for all instruments."""
@@ -315,7 +315,7 @@ class Trader:
                 f"  {ticker}: Current vol = {vol_result.current_annual_vol:.2%}"
             )
 
-        logger.info(f"✓ Calculated volatilities for {len(volatilities)} instruments")
+        logger.info(f" Calculated volatilities for {len(volatilities)} instruments")
         return volatilities
 
     def _generate_forecasts(
@@ -341,7 +341,7 @@ class Trader:
             logger.info(f"    Generated {len(ticker_forecasts)} EWMAC rules")
 
         total_forecasts = sum(len(f) for f in raw_forecasts.values())
-        logger.info(f"✓ Generated {total_forecasts} total forecasts")
+        logger.info(f" Generated {total_forecasts} total forecasts")
         return raw_forecasts
 
     def _combine_forecasts(
@@ -369,7 +369,7 @@ class Trader:
                 f"FDM = {fdm:.3f}"
             )
 
-        logger.info(f"✓ Combined forecasts for {len(combined_forecasts)} instruments")
+        logger.info(f" Combined forecasts for {len(combined_forecasts)} instruments")
         return combined_forecasts, current_forecasts
 
     def _calculate_portfolio_weights(
@@ -406,7 +406,7 @@ class Trader:
                 f"capital=${capital:,.0f}"
             )
 
-        logger.info(f"✓ Allocated capital across {len(capital_allocation)} instruments")
+        logger.info(f" Allocated capital across {len(capital_allocation)} instruments")
         return portfolio_weights, capital_allocation
 
     def _size_positions(
@@ -445,7 +445,7 @@ class Trader:
             )
 
         logger.info(
-            f"✓ Sized {len(position_set.positions)} positions, "
+            f" Sized {len(position_set.positions)} positions, "
             f"total notional: ${position_set.total_notional:,.0f}"
         )
         return position_set
@@ -471,7 +471,7 @@ class Trader:
                     position.leverage *= scale_factor
 
         logger.info(
-            f"✓ Risk limits applied, portfolio leverage: "
+            f" Risk limits applied, portfolio leverage: "
             f"{position_set.portfolio_leverage:.2f}x"
         )
         return position_set
@@ -528,7 +528,7 @@ class Trader:
             timestamp=datetime.now().isoformat(),
         )
 
-        logger.info(f"✓ Generated {len(trades)} trade orders")
+        logger.info(f" Generated {len(trades)} trade orders")
         return trade_set
 
     # ==========================================
@@ -552,7 +552,7 @@ class Trader:
                         self.current_positions.get(trade.ticker, 0.0) - trade.contracts
                 )
 
-        logger.info("✓ Updated current positions")
+        logger.info(" Updated current positions")
 
     def get_pipeline_summary(self) -> Dict:
         """Get summary of last pipeline execution."""
