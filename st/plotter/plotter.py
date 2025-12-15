@@ -1,1049 +1,1006 @@
 """
-Plotter class for visualizing trading system components.
-Supports both matplotlib and plotly backends with plotly as default.
+Interactive Plotter for Systematic Trading Framework
+Generates interactive Plotly visualizations for trading signals, forecasts, and portfolio analysis.
 """
 
-from abc import ABC, abstractmethod
-from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
-
-import matplotlib.pyplot as plt
 import pandas as pd
-from pydantic import BaseModel, Field
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 from utils.logger import setup_logger
 
 logger = setup_logger(__name__)
 
 
-# ==========================================
-# Enums and Constants
-# ==========================================
+class Plotter:
+    """
+    Interactive plotting class for systematic trading analysis.
 
+    Initializes with a Trader object and extracts all necessary data
+    for comprehensive visualization of trading signals, forecasts, and positions.
+    """
 
-class PlotBackend(str, Enum):
-    """Available plotting backends."""
+    def __init__(self, trader):
+        """
+        Initialize plotter with a Trader object.
 
-    MATPLOTLIB = "matplotlib"
-    PLOTLY = "plotly"
+        Args:
+            trader: Trader instance with executed pipeline
+        """
+        self.trader = trader
+        self.pipeline_output = trader.pipeline_output
 
-
-class PlotTheme(str, Enum):
-    """Plot themes/styles."""
-
-    DEFAULT = "default"
-    DARK = "dark"
-    LIGHT = "light"
-    SEABORN = "seaborn"
-
-
-# ==========================================
-# Abstract Base Plotter
-# ==========================================
-
-
-class BasePlotter(ABC):
-    """Abstract base class for plotting backends."""
-
-    @abstractmethod
-    def plot_price_history(
-            self, data: pd.DataFrame, title: str = "Price History", **kwargs
-    ) -> Any:
-        """Plot price history."""
-        pass
-
-    @abstractmethod
-    def plot_portfolio_value(
-            self, history: pd.DataFrame, title: str = "Portfolio Value", **kwargs
-    ) -> Any:
-        """Plot portfolio value over time."""
-        pass
-
-    @abstractmethod
-    def plot_portfolio_composition(
-            self, weights: Dict[str, float], title: str = "Portfolio Composition", **kwargs
-    ) -> Any:
-        """Plot portfolio composition as pie chart."""
-        pass
-
-    @abstractmethod
-    def plot_returns(
-            self, returns: pd.Series, title: str = "Returns Distribution", **kwargs
-    ) -> Any:
-        """Plot returns distribution."""
-        pass
-
-    @abstractmethod
-    def plot_drawdown(
-            self, equity_curve: pd.Series, title: str = "Drawdown", **kwargs
-    ) -> Any:
-        """Plot drawdown over time."""
-        pass
-
-    @abstractmethod
-    def plot_multiple_series(
-            self, data: Dict[str, pd.Series], title: str = "Multiple Series", **kwargs
-    ) -> Any:
-        """Plot multiple time series."""
-        pass
-
-    @abstractmethod
-    def save(self, fig: Any, filename: str, **kwargs) -> None:
-        """Save figure to file."""
-        pass
-
-
-# ==========================================
-# Matplotlib Backend
-# ==========================================
-
-
-class MatplotlibPlotter(BasePlotter):
-    """Matplotlib plotting backend."""
-
-    def __init__(
-            self, theme: PlotTheme = PlotTheme.DEFAULT, figsize: Tuple[int, int] = (12, 6)
-    ):
-        try:
-            import matplotlib.dates as mdates
-            import matplotlib.pyplot as plt
-            from matplotlib.figure import Figure
-
-            self.plt = plt
-            self.mdates = mdates
-            self.Figure = Figure
-            self.figsize = figsize
-
-            # Apply theme
-            self._apply_theme(theme)
-
-        except ImportError:
-            raise ImportError(
-                "matplotlib is required for this backend. Install with: pip install matplotlib"
+        if self.pipeline_output is None:
+            raise ValueError(
+                "Trader must have executed pipeline (call generate_trades() first)"
             )
 
-    def _apply_theme(self, theme: PlotTheme) -> None:
-        """Apply theme to matplotlib."""
-        if theme == PlotTheme.DARK:
-            self.plt.style.use("dark_background")
-        elif theme == PlotTheme.SEABORN:
-            try:
-                import seaborn as sns
+        logger.info(
+            f"Plotter initialized for {len(trader.tickers)} instruments"
+            )
 
-                sns.set_theme()
-            except ImportError:
-                logger.warning("Seaborn not installed, using default theme")
-        elif theme == PlotTheme.LIGHT:
-            self.plt.style.use("default")
-
-    def plot_price_history(
+    def plot_prices_with_signals(
             self,
-            data: pd.DataFrame,
-            title: str = "Price History",
-            columns: Optional[List[str]] = None,
-            **kwargs,
-    ) -> Any:
-        """Plot price history with optional volume."""
-        fig, axes = self.plt.subplots(
-            2,
-            1,
-            figsize=kwargs.get("figsize", self.figsize),
-            gridspec_kw={"height_ratios": [3, 1]},
-            sharex=True,
-        )
+            ticker: str,
+            show_ema: bool = True,
+            show_forecast: bool = True,
+            height: int = 800
+    ) -> go.Figure:
+        """
+        Plot price with trading signals and optional EMA overlays.
 
-        # Price plot
-        if columns is None:
-            if "Close" in data.columns:
-                columns = ["Close"]
-            else:
-                columns = [col for col in data.columns if col not in ["Volume"]]
+        Args:
+            ticker: Instrument ticker
+            show_ema: Show EMA lines from EWMAC rules
+            show_forecast: Show combined forecast in subplot
+            height: Figure height
 
-        for col in columns:
-            if col in data.columns:
-                axes[0].plot(data.index, data[col], label=col, linewidth=1.5)
+        Returns:
+            Plotly figurel
+        """
+        if ticker not in self.trader.tickers:
+            raise ValueError(f"Ticker {ticker} not in trader portfolio")
 
-        axes[0].set_ylabel("Price ($)", fontsize=10)
-        axes[0].set_title(title, fontsize=12, fontweight="bold")
-        axes[0].legend(loc="upper left")
-        axes[0].grid(True, alpha=0.3)
+        # Get price data
+        prices = self.pipeline_output.prices[ticker]
 
-        # Volume plot
-        if "Volume" in data.columns:
-            axes[1].bar(data.index, data["Volume"], alpha=0.5, color="gray")
-            axes[1].set_ylabel("Volume", fontsize=10)
-            axes[1].set_xlabel("Date", fontsize=10)
-            axes[1].grid(True, alpha=0.3)
-        else:
-            fig.delaxes(axes[1])
-
-        self.plt.tight_layout()
-        return fig
-
-    def plot_portfolio_value(
-            self, history: pd.DataFrame, title: str = "Portfolio Value", **kwargs
-    ) -> Any:
-        """Plot portfolio value over time."""
-        fig, ax = self.plt.subplots(figsize=kwargs.get("figsize", self.figsize))
-
-        if "total_value" in history.columns:
-            ax.plot(
-                history.index,
-                history["total_value"],
-                linewidth=2,
-                color="#2E86AB",
-                label="Total Value",
-            )
-
-        if "cash" in history.columns:
-            ax.plot(
-                history.index,
-                history["cash"],
-                linewidth=1.5,
-                color="#A23B72",
-                alpha=0.7,
-                label="Cash",
-            )
-
-        if "positions_value" in history.columns:
-            ax.plot(
-                history.index,
-                history["positions_value"],
-                linewidth=1.5,
-                color="#F18F01",
-                alpha=0.7,
-                label="Positions",
-            )
-
-        ax.set_xlabel("Date", fontsize=10)
-        ax.set_ylabel("Value ($)", fontsize=10)
-        ax.set_title(title, fontsize=12, fontweight="bold")
-        ax.legend(loc="upper left")
-        ax.grid(True, alpha=0.3)
-
-        # Format y-axis as currency
-        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f"${x:,.0f}"))
-
-        self.plt.tight_layout()
-        return fig
-
-    def plot_portfolio_composition(
-            self, weights: Dict[str, float], title: str = "Portfolio Composition", **kwargs
-    ) -> Any:
-        """Plot portfolio composition as pie chart."""
-        fig, ax = self.plt.subplots(figsize=kwargs.get("figsize", (8, 8)))
-
-        # Filter out very small weights
-        min_weight = kwargs.get("min_weight", 0.5)
-        filtered_weights = {k: v for k, v in weights.items() if v >= min_weight}
-
-        if len(filtered_weights) < len(weights):
-            other_weight = sum(
-                v for k, v in weights.items() if k not in filtered_weights
-            )
-            if other_weight > 0:
-                filtered_weights["Other"] = other_weight
-
-        labels = list(filtered_weights.keys())
-        sizes = list(filtered_weights.values())
-
-        colors = self.plt.cm.Set3(range(len(labels)))
-
-        wedges, texts, autotexts = ax.pie(
-            sizes, labels=labels, autopct="%1.1f%%", startangle=90, colors=colors
-        )
-
-        # Enhance text
-        for text in texts:
-            text.set_fontsize(10)
-        for autotext in autotexts:
-            autotext.set_color("white")
-            autotext.set_fontweight("bold")
-            autotext.set_fontsize(9)
-
-        ax.set_title(title, fontsize=12, fontweight="bold")
-        self.plt.tight_layout()
-        return fig
-
-    def plot_returns(
-            self, returns: pd.Series, title: str = "Returns Distribution", **kwargs
-    ) -> Any:
-        """Plot returns distribution."""
-        fig, axes = self.plt.subplots(1, 2, figsize=kwargs.get("figsize", (14, 5)))
-
-        # Histogram
-        axes[0].hist(
-            returns.dropna(), bins=50, alpha=0.7, color="#2E86AB", edgecolor="black"
-        )
-        axes[0].axvline(
-            returns.mean(),
-            color="red",
-            linestyle="--",
-            linewidth=2,
-            label=f"Mean: {returns.mean():.2%}",
-        )
-        axes[0].set_xlabel("Returns", fontsize=10)
-        axes[0].set_ylabel("Frequency", fontsize=10)
-        axes[0].set_title("Returns Histogram", fontsize=11, fontweight="bold")
-        axes[0].legend()
-        axes[0].grid(True, alpha=0.3)
-
-        # Time series
-        axes[1].plot(
-            returns.index, returns.values, linewidth=1, alpha=0.7, color="#2E86AB"
-        )
-        axes[1].axhline(0, color="black", linestyle="-", linewidth=0.5)
-        axes[1].set_xlabel("Date", fontsize=10)
-        axes[1].set_ylabel("Returns", fontsize=10)
-        axes[1].set_title("Returns Over Time", fontsize=11, fontweight="bold")
-        axes[1].grid(True, alpha=0.3)
-
-        fig.suptitle(title, fontsize=12, fontweight="bold", y=1.02)
-        self.plt.tight_layout()
-        return fig
-
-    def plot_drawdown(
-            self, equity_curve: pd.Series, title: str = "Drawdown", **kwargs
-    ) -> Any:
-        """Plot drawdown over time."""
-        # Calculate drawdown
-        running_max = equity_curve.expanding().max()
-        drawdown = (equity_curve - running_max) / running_max * 100
-
-        fig, axes = self.plt.subplots(
-            2, 1, figsize=kwargs.get("figsize", self.figsize), sharex=True
-        )
-
-        # Equity curve
-        axes[0].plot(
-            equity_curve.index, equity_curve.values, linewidth=2, color="#2E86AB"
-        )
-        axes[0].set_ylabel("Portfolio Value ($)", fontsize=10)
-        axes[0].set_title("Equity Curve", fontsize=11, fontweight="bold")
-        axes[0].grid(True, alpha=0.3)
-
-        # Drawdown
-        axes[1].fill_between(
-            drawdown.index, drawdown.values, 0, alpha=0.5, color="#A23B72"
-        )
-        axes[1].set_xlabel("Date", fontsize=10)
-        axes[1].set_ylabel("Drawdown (%)", fontsize=10)
-        axes[1].set_title("Drawdown", fontsize=11, fontweight="bold")
-        axes[1].grid(True, alpha=0.3)
-
-        fig.suptitle(title, fontsize=12, fontweight="bold", y=1.01)
-        self.plt.tight_layout()
-        return fig
-
-    def plot_multiple_series(
-            self, data: Dict[str, pd.Series], title: str = "Multiple Series", **kwargs
-    ) -> Any:
-        """Plot multiple time series."""
-        fig, ax = self.plt.subplots(figsize=kwargs.get("figsize", self.figsize))
-
-        for label, series in data.items():
-            ax.plot(series.index, series.values, label=label, linewidth=1.5, alpha=0.8)
-
-        ax.set_xlabel("Date", fontsize=10)
-        ax.set_ylabel("Value", fontsize=10)
-        ax.set_title(title, fontsize=12, fontweight="bold")
-        ax.legend(loc="best")
-        ax.grid(True, alpha=0.3)
-
-        self.plt.tight_layout()
-        return fig
-
-    def save(self, fig: Any, filename: str, **kwargs) -> None:
-        """Save figure to file."""
-        dpi = kwargs.get("dpi", 150)
-        bbox_inches = kwargs.get("bbox_inches", "tight")
-
-        fig.savefig(filename, dpi=dpi, bbox_inches=bbox_inches)
-        logger.info(f"Saved plot to {filename}")
-
-
-# ==========================================
-# Plotly Backend
-# ==========================================
-
-
-class PlotlyPlotter(BasePlotter):
-    """Plotly plotting backend."""
-
-    def __init__(self, theme: PlotTheme = PlotTheme.DEFAULT):
-        try:
-            import plotly.express as px
-            import plotly.graph_objects as go
-            from plotly.subplots import make_subplots
-
-            self.go = go
-            self.px = px
-            self.make_subplots = make_subplots
-
-            # Set theme template
-            self.template = self._get_template(theme)
-
-        except ImportError:
-            raise ImportError(
-                "plotly is required for this backend. Install with: pip install plotly"
-            )
-
-    def _get_template(self, theme: PlotTheme) -> str:
-        """Get plotly template for theme."""
-        theme_map = {
-            PlotTheme.DEFAULT: "plotly",
-            PlotTheme.DARK: "plotly_dark",
-            PlotTheme.LIGHT: "plotly_white",
-            PlotTheme.SEABORN: "seaborn",
-        }
-        return theme_map.get(theme, "plotly")
-
-    def plot_price_history(
-            self,
-            data: pd.DataFrame,
-            title: str = "Price History",
-            columns: Optional[List[str]] = None,
-            **kwargs,
-    ) -> Any:
-        """Plot price history with optional volume."""
-        if columns is None:
-            if "Close" in data.columns:
-                columns = ["Close"]
-            else:
-                columns = [col for col in data.columns if col not in ["Volume"]]
-
-        # Create subplot with volume
-        has_volume = "Volume" in data.columns
-        specs = (
-            [[{"secondary_y": False}], [{"secondary_y": False}]]
-            if has_volume
-            else [[{"secondary_y": False}]]
-        )
-        row_heights = [0.7, 0.3] if has_volume else [1.0]
-
-        fig = self.make_subplots(
-            rows=2 if has_volume else 1,
-            cols=1,
+        # Create subplots
+        rows = 2 if show_forecast else 1
+        fig = make_subplots(
+            rows=rows, cols=1,
             shared_xaxes=True,
-            vertical_spacing=0.03,
-            row_heights=row_heights,
-            subplot_titles=(["Price", "Volume"] if has_volume else ["Price"]),
+            vertical_spacing=0.05,
+            row_heights=[0.7, 0.3] if show_forecast else [1.0],
+            subplot_titles=(f'{ticker} Price & Signals',
+                            'Combined Forecast') if show_forecast else (
+            f'{ticker} Price & Signals',)
         )
 
-        # Add price traces
-        for col in columns:
-            if col in data.columns:
+        # Plot price
+        fig.add_trace(
+            go.Scatter(
+                x=prices.index,
+                y=prices.values,
+                name='Price',
+                line=dict(color='black', width=2),
+                hovertemplate='%{x}<br>Price: $%{y:.2f}<extra></extra>'
+            ),
+            row=1, col=1
+        )
+
+        # Plot EMAs if requested and EWMAC rules exist
+        if show_ema:
+            self._add_ema_lines(fig, ticker, prices, row=1, col=1)
+
+        # Get current position and forecast
+        if ticker in self.pipeline_output.position_set.positions:
+            position = self.pipeline_output.position_set.positions[ticker]
+            current_forecast = self.pipeline_output.current_forecasts.get(
+                ticker, 0
+                )
+
+            # Add position marker
+            last_price = prices.iloc[-1]
+            last_date = prices.index[-1]
+
+            if position.contracts and abs(position.contracts) > 0.01:
+                marker_color = 'green' if position.contracts > 0 else 'red'
+                marker_symbol = 'triangle-up' if position.contracts > 0 else 'triangle-down'
+
                 fig.add_trace(
-                    self.go.Scatter(
-                        x=data.index,
-                        y=data[col],
-                        mode="lines",
-                        name=col,
-                        line=dict(width=2),
+                    go.Scatter(
+                        x=[last_date],
+                        y=[last_price],
+                        mode='markers',
+                        name=f'Position: {position.contracts:.2f}',
+                        marker=dict(
+                            size=15,
+                            color=marker_color,
+                            symbol=marker_symbol,
+                            line=dict(width=2, color='white')
+                        ),
+                        hovertemplate=f'Forecast: {current_forecast:.2f}<br>Position: {position.contracts:.2f} contracts<extra></extra>'
                     ),
-                    row=1,
-                    col=1,
+                    row=1, col=1
                 )
 
-        # Add volume trace
-        if has_volume:
+        # Plot forecast in subplot
+        if show_forecast:
+            forecast_series = self.pipeline_output.combined_forecasts[ticker]
+
+            # Create color based on forecast value
+            colors = ['red' if x < 0 else 'green' for x in
+                      forecast_series.values]
+
             fig.add_trace(
-                self.go.Bar(
-                    x=data.index,
-                    y=data["Volume"],
-                    name="Volume",
-                    marker_color="rgba(158, 158, 158, 0.5)",
+                go.Scatter(
+                    x=forecast_series.index,
+                    y=forecast_series.values,
+                    name='Combined Forecast',
+                    line=dict(color='blue', width=1.5),
+                    fill='tozeroy',
+                    fillcolor='rgba(0, 123, 255, 0.2)',
+                    hovertemplate='%{x}<br>Forecast: %{y:.2f}<extra></extra>'
                 ),
-                row=2,
-                col=1,
+                row=2, col=1
             )
 
-        fig.update_xaxes(title_text="Date", row=2 if has_volume else 1, col=1)
+            # Add zero line
+            fig.add_hline(
+                y=0, line_dash="dash", line_color="gray", row=2, col=1
+                )
+
+            # Add forecast thresholds
+            fig.add_hline(
+                y=10, line_dash="dot", line_color="lightgray", row=2, col=1
+                )
+            fig.add_hline(
+                y=-10, line_dash="dot", line_color="lightgray", row=2, col=1
+                )
+
+        # Update layout
+        fig.update_xaxes(title_text="Date", row=rows, col=1)
         fig.update_yaxes(title_text="Price ($)", row=1, col=1)
-        if has_volume:
-            fig.update_yaxes(title_text="Volume", row=2, col=1)
+        if show_forecast:
+            fig.update_yaxes(
+                title_text="Forecast", row=2, col=1, range=[-22, 22]
+                )
 
         fig.update_layout(
-            title=title,
-            template=self.template,
-            hovermode="x unified",
-            height=kwargs.get("height", 600),
+            height=height,
+            title_text=f"{ticker} - Price & Trading Signals",
+            hovermode='x unified',
+            showlegend=True,
+            legend=dict(
+                yanchor="top",
+                y=0.99,
+                xanchor="left",
+                x=0.01
+            )
         )
 
         return fig
 
-    def plot_portfolio_value(
-            self, history: pd.DataFrame, title: str = "Portfolio Value", **kwargs
-    ) -> Any:
-        """Plot portfolio value over time."""
-        fig = self.go.Figure()
+    def plot_individual_forecasts(
+            self,
+            ticker: str,
+            height: int = 600
+    ) -> go.Figure:
+        """
+        Plot all individual rule forecasts for a ticker.
 
-        if "total_value" in history.columns:
+        Args:
+            ticker: Instrument ticker
+            height: Figure height
+
+        Returns:
+            Plotly figure
+        """
+        if ticker not in self.trader.tickers:
+            raise ValueError(f"Ticker {ticker} not in trader portfolio")
+
+        # Get forecasts for this ticker
+        ticker_forecasts = self.pipeline_output.forecasts[ticker]
+
+        fig = go.Figure()
+
+        # Plot each rule's forecast
+        for rule_name, forecast in ticker_forecasts.items():
             fig.add_trace(
-                self.go.Scatter(
-                    x=history.index,
-                    y=history["total_value"],
-                    mode="lines",
-                    name="Total Value",
-                    line=dict(width=3, color="#2E86AB"),
+                go.Scatter(
+                    x=forecast.scaled_forecast.index,
+                    y=forecast.scaled_forecast.values,
+                    name=rule_name,
+                    mode='lines',
+                    hovertemplate=f'{rule_name}<br>%{{x}}<br>Forecast: %{{y:.2f}}<extra></extra>'
                 )
             )
 
-        if "cash" in history.columns:
-            fig.add_trace(
-                self.go.Scatter(
-                    x=history.index,
-                    y=history["cash"],
-                    mode="lines",
-                    name="Cash",
-                    line=dict(width=2, color="#A23B72"),
-                    opacity=0.7,
-                )
+        # Add combined forecast
+        combined = self.pipeline_output.combined_forecasts[ticker]
+        fig.add_trace(
+            go.Scatter(
+                x=combined.index,
+                y=combined.values,
+                name='Combined',
+                line=dict(color='black', width=3, dash='dash'),
+                hovertemplate='Combined<br>%{x}<br>Forecast: %{y:.2f}<extra></extra>'
             )
+        )
 
-        if "positions_value" in history.columns:
-            fig.add_trace(
-                self.go.Scatter(
-                    x=history.index,
-                    y=history["positions_value"],
-                    mode="lines",
-                    name="Positions",
-                    line=dict(width=2, color="#F18F01"),
-                    opacity=0.7,
-                )
-            )
+        # Add reference lines
+        fig.add_hline(y=0, line_dash="dash", line_color="gray")
+        fig.add_hline(y=10, line_dash="dot", line_color="lightgray")
+        fig.add_hline(y=-10, line_dash="dot", line_color="lightgray")
+        fig.add_hline(y=20, line_dash="dot", line_color="red", opacity=0.5)
+        fig.add_hline(y=-20, line_dash="dot", line_color="red", opacity=0.5)
 
         fig.update_layout(
-            title=title,
+            title=f"{ticker} - Individual Rule Forecasts",
             xaxis_title="Date",
-            yaxis_title="Value ($)",
-            template=self.template,
-            hovermode="x unified",
-            height=kwargs.get("height", 500),
+            yaxis_title="Forecast",
+            height=height,
+            hovermode='x unified',
+            yaxis=dict(range=[-22, 22])
         )
 
         return fig
 
-    def plot_portfolio_composition(
-            self, weights: Dict[str, float], title: str = "Portfolio Composition", **kwargs
-    ) -> Any:
-        """Plot portfolio composition as pie chart."""
-        # Filter out very small weights
-        min_weight = kwargs.get("min_weight", 0.5)
-        filtered_weights = {k: v for k, v in weights.items() if v >= min_weight}
+    def plot_forecast_weights(self) -> go.Figure:
+        """
+        Plot forecast weights distribution.
 
-        if len(filtered_weights) < len(weights):
-            other_weight = sum(
-                v for k, v in weights.items() if k not in filtered_weights
-            )
-            if other_weight > 0:
-                filtered_weights["Other"] = other_weight
+        Returns:
+            Plotly figure
+        """
+        weights = self.trader.trading_rules_config.get_weights()
 
-        labels = list(filtered_weights.keys())
-        values = list(filtered_weights.values())
-
-        fig = self.go.Figure(
+        fig = go.Figure(
             data=[
-                self.go.Pie(
-                    labels=labels,
-                    values=values,
-                    hole=0.3,
-                    textposition="inside",
-                    textinfo="label+percent",
+                go.Bar(
+                    x=list(weights.keys()),
+                    y=list(weights.values()),
+                    text=[f'{v * 100:.1f}%' for v in weights.values()],
+                    textposition='auto',
+                    marker_color='steelblue'
                 )
             ]
         )
 
         fig.update_layout(
-            title=title, template=self.template, height=kwargs.get("height", 500)
+            title="Trading Rule Weights",
+            xaxis_title="Rule",
+            yaxis_title="Weight",
+            height=400,
+            yaxis=dict(tickformat='.0%')
         )
 
         return fig
 
-    def plot_returns(
-            self, returns: pd.Series, title: str = "Returns Distribution", **kwargs
-    ) -> Any:
-        """Plot returns distribution."""
-        fig = self.make_subplots(
-            rows=1, cols=2, subplot_titles=("Returns Histogram", "Returns Over Time")
-        )
+    def plot_volatility(
+            self,
+            ticker: str,
+            show_price: bool = True,
+            height: int = 600
+    ) -> go.Figure:
+        """
+        Plot volatility over time with optional price overlay.
 
-        # Histogram
+        Args:
+            ticker: Instrument ticker
+            show_price: Show price in secondary y-axis
+            height: Figure height
+
+        Returns:
+            Plotly figure
+        """
+        if ticker not in self.trader.tickers:
+            raise ValueError(f"Ticker {ticker} not in trader portfolio")
+
+        vol_result = self.pipeline_output.volatilities[ticker]
+        vol_series = vol_result.price_volatility
+
+        fig = make_subplots(specs=[[{"secondary_y": show_price}]])
+
+        # Plot volatility
         fig.add_trace(
-            self.go.Histogram(
-                x=returns.dropna(),
-                nbinsx=50,
-                name="Returns",
-                marker_color="#2E86AB",
-                opacity=0.7,
+            go.Scatter(
+                x=vol_series.index,
+                y=vol_series.values,
+                name='Volatility',
+                line=dict(color='purple', width=2),
+                fill='tozeroy',
+                fillcolor='rgba(128, 0, 128, 0.2)',
+                hovertemplate='%{x}<br>Volatility: %{y:.4f}<extra></extra>'
             ),
-            row=1,
-            col=1,
+            secondary_y=False
         )
 
-        # Add mean line
-        mean_return = returns.mean()
-        fig.add_vline(
-            x=mean_return,
-            line_dash="dash",
-            line_color="red",
-            annotation_text=f"Mean: {mean_return:.2%}",
-            row=1,
-            col=1,
-        )
-
-        # Time series
-        fig.add_trace(
-            self.go.Scatter(
-                x=returns.index,
-                y=returns.values,
-                mode="lines",
-                name="Returns",
-                line=dict(width=1, color="#2E86AB"),
-                opacity=0.7,
-            ),
-            row=1,
-            col=2,
-        )
-
-        # Add zero line
+        # Add current volatility line
+        current_vol = vol_result.current_annual_vol
         fig.add_hline(
-            y=0, line_dash="solid", line_color="black", line_width=0.5, row=1, col=2
+            y=current_vol,
+            line_dash="dash",
+            line_color="purple",
+            annotation_text=f"Current: {current_vol:.4f}",
+            annotation_position="right",
+            secondary_y=False
         )
 
-        fig.update_xaxes(title_text="Returns", row=1, col=1)
-        fig.update_xaxes(title_text="Date", row=1, col=2)
-        fig.update_yaxes(title_text="Frequency", row=1, col=1)
-        fig.update_yaxes(title_text="Returns", row=1, col=2)
+        # Plot price on secondary axis if requested
+        if show_price:
+            prices = self.pipeline_output.prices[ticker]
+            fig.add_trace(
+                go.Scatter(
+                    x=prices.index,
+                    y=prices.values,
+                    name='Price',
+                    line=dict(color='black', width=1, dash='dot'),
+                    opacity=0.5,
+                    hovertemplate='%{x}<br>Price: $%{y:.2f}<extra></extra>'
+                ),
+                secondary_y=True
+            )
+
+        fig.update_xaxes(title_text="Date")
+        fig.update_yaxes(title_text="Volatility", secondary_y=False)
+        if show_price:
+            fig.update_yaxes(title_text="Price ($)", secondary_y=True)
 
         fig.update_layout(
-            title=title,
-            template=self.template,
-            showlegend=False,
-            height=kwargs.get("height", 500),
+            title=f"{ticker} - Volatility Over Time",
+            height=height,
+            hovermode='x unified'
         )
 
         return fig
 
-    def plot_drawdown(
-            self, equity_curve: pd.Series, title: str = "Drawdown", **kwargs
-    ) -> Any:
-        """Plot drawdown over time."""
-        # Calculate drawdown
-        running_max = equity_curve.expanding().max()
-        drawdown = (equity_curve - running_max) / running_max * 100
+    def plot_portfolio_forecasts(
+            self,
+            height: int = 500
+    ) -> go.Figure:
+        """
+        Plot current forecast for all instruments in portfolio.
 
-        fig = self.make_subplots(
-            rows=2,
-            cols=1,
+        Args:
+            height: Figure height
+
+        Returns:
+            Plotly figure
+        """
+        forecasts = self.pipeline_output.current_forecasts
+        tickers = list(forecasts.keys())
+        values = list(forecasts.values())
+
+        # Color based on direction
+        colors = ['green' if v > 0 else 'red' for v in values]
+
+        fig = go.Figure(
+            data=[
+                go.Bar(
+                    x=tickers,
+                    y=values,
+                    text=[f'{v:.2f}' for v in values],
+                    textposition='outside',
+                    marker_color=colors,
+                    hovertemplate='%{x}<br>Forecast: %{y:.2f}<extra></extra>'
+                )
+            ]
+        )
+
+        fig.add_hline(y=0, line_dash="dash", line_color="gray")
+        fig.add_hline(y=10, line_dash="dot", line_color="lightgray")
+        fig.add_hline(y=-10, line_dash="dot", line_color="lightgray")
+
+        fig.update_layout(
+            title="Portfolio Forecasts (Current)",
+            xaxis_title="Instrument",
+            yaxis_title="Forecast",
+            height=height,
+            yaxis=dict(range=[-22, 22])
+        )
+
+        return fig
+
+    def plot_positions(
+            self,
+            height: int = 500
+    ) -> go.Figure:
+        """
+        Plot current positions for all instruments.
+
+        Args:
+            height: Figure height
+
+        Returns:
+            Plotly figure
+        """
+        positions = {}
+        for ticker, pos in self.pipeline_output.position_set.positions.items():
+            if pos.contracts:
+                positions[ticker] = pos.contracts
+
+        if not positions:
+            logger.warning("No positions to plot")
+            return go.Figure().add_annotation(
+                text="No current positions",
+                xref="paper", yref="paper",
+                x=0.5, y=0.5, showarrow=False
+            )
+
+        tickers = list(positions.keys())
+        values = list(positions.values())
+        colors = ['green' if v > 0 else 'red' for v in values]
+
+        fig = go.Figure(
+            data=[
+                go.Bar(
+                    x=tickers,
+                    y=values,
+                    text=[f'{v:.2f}' for v in values],
+                    textposition='outside',
+                    marker_color=colors,
+                    hovertemplate='%{x}<br>Contracts: %{y:.2f}<extra></extra>'
+                )
+            ]
+        )
+
+        fig.add_hline(y=0, line_dash="dash", line_color="gray")
+
+        fig.update_layout(
+            title="Current Positions (Contracts)",
+            xaxis_title="Instrument",
+            yaxis_title="Contracts",
+            height=height
+        )
+
+        return fig
+
+    def plot_ewmac_components(
+            self,
+            ticker: str,
+            fast_span: int = 16,
+            slow_span: int = 64,
+            height: int = 800
+    ) -> go.Figure:
+        """
+        Plot EWMAC components: price, fast EMA, slow EMA, and raw signal.
+
+        Args:
+            ticker: Instrument ticker
+            fast_span: Fast EMA span
+            slow_span: Slow EMA span
+            height: Figure height
+
+        Returns:
+            Plotly figure
+        """
+        if ticker not in self.trader.tickers:
+            raise ValueError(f"Ticker {ticker} not in trader portfolio")
+
+        prices = self.pipeline_output.prices[ticker]
+
+        # Calculate EMAs
+        fast_ema = prices.ewm(span=fast_span, min_periods=fast_span).mean()
+        slow_ema = prices.ewm(span=slow_span, min_periods=slow_span).mean()
+        raw_signal = fast_ema - slow_ema
+
+        # Create subplots
+        fig = make_subplots(
+            rows=2, cols=1,
             shared_xaxes=True,
             vertical_spacing=0.05,
-            subplot_titles=("Equity Curve", "Drawdown"),
-            row_heights=[0.6, 0.4],
+            row_heights=[0.7, 0.3],
+            subplot_titles=(f'{ticker} Price & EMAs',
+                            f'Raw EWMAC Signal ({fast_span}/{slow_span})')
         )
 
-        # Equity curve
+        # Plot price and EMAs
         fig.add_trace(
-            self.go.Scatter(
-                x=equity_curve.index,
-                y=equity_curve.values,
-                mode="lines",
-                name="Equity",
-                line=dict(width=2, color="#2E86AB"),
+            go.Scatter(
+                x=prices.index,
+                y=prices.values,
+                name='Price',
+                line=dict(color='black', width=2),
+                hovertemplate='Price: $%{y:.2f}<extra></extra>'
             ),
-            row=1,
-            col=1,
+            row=1, col=1
         )
 
-        # Drawdown
         fig.add_trace(
-            self.go.Scatter(
-                x=drawdown.index,
-                y=drawdown.values,
-                mode="lines",
-                name="Drawdown",
-                fill="tozeroy",
-                line=dict(width=0),
-                fillcolor="rgba(162, 59, 114, 0.5)",
+            go.Scatter(
+                x=fast_ema.index,
+                y=fast_ema.values,
+                name=f'Fast EMA ({fast_span})',
+                line=dict(color='blue', width=1.5),
+                hovertemplate='Fast EMA: $%{y:.2f}<extra></extra>'
             ),
-            row=2,
-            col=1,
+            row=1, col=1
         )
 
+        fig.add_trace(
+            go.Scatter(
+                x=slow_ema.index,
+                y=slow_ema.values,
+                name=f'Slow EMA ({slow_span})',
+                line=dict(color='red', width=1.5),
+                hovertemplate='Slow EMA: $%{y:.2f}<extra></extra>'
+            ),
+            row=1, col=1
+        )
+
+        # Plot raw signal
+        colors = ['red' if x < 0 else 'green' for x in raw_signal.values]
+
+        fig.add_trace(
+            go.Scatter(
+                x=raw_signal.index,
+                y=raw_signal.values,
+                name='Raw Signal',
+                line=dict(color='purple', width=1.5),
+                fill='tozeroy',
+                fillcolor='rgba(128, 0, 128, 0.2)',
+                hovertemplate='Signal: %{y:.4f}<extra></extra>'
+            ),
+            row=2, col=1
+        )
+
+        fig.add_hline(y=0, line_dash="dash", line_color="gray", row=2, col=1)
+
+        # Update layout
         fig.update_xaxes(title_text="Date", row=2, col=1)
-        fig.update_yaxes(title_text="Value ($)", row=1, col=1)
-        fig.update_yaxes(title_text="Drawdown (%)", row=2, col=1)
+        fig.update_yaxes(title_text="Price ($)", row=1, col=1)
+        fig.update_yaxes(title_text="Raw Signal", row=2, col=1)
 
         fig.update_layout(
-            title=title,
-            template=self.template,
-            hovermode="x unified",
-            height=kwargs.get("height", 600),
-            showlegend=False,
+            height=height,
+            title_text=f"{ticker} - EWMAC Components ({fast_span}/{slow_span})",
+            hovermode='x unified',
+            showlegend=True
         )
 
         return fig
 
-    def plot_multiple_series(
-            self, data: Dict[str, pd.Series], title: str = "Multiple Series", **kwargs
-    ) -> Any:
-        """Plot multiple time series."""
-        fig = self.go.Figure()
+    def plot_turtle_breakout(
+            self,
+            ticker: str,
+            entry_window: int = 20,
+            exit_window: int = 10,
+            height: int = 600
+    ) -> go.Figure:
+        """
+        Plot Turtle Trading breakout channels.
 
-        for label, series in data.items():
-            fig.add_trace(
-                self.go.Scatter(
-                    x=series.index,
-                    y=series.values,
-                    mode="lines",
-                    name=label,
-                    line=dict(width=2),
-                    opacity=0.8,
-                )
+        Args:
+            ticker: Instrument ticker
+            entry_window: Entry breakout window
+            exit_window: Exit breakout window
+            height: Figure height
+
+        Returns:
+            Plotly figure
+        """
+        if ticker not in self.trader.tickers:
+            raise ValueError(f"Ticker {ticker} not in trader portfolio")
+
+        prices = self.pipeline_output.prices[ticker]
+
+        # Calculate channels
+        entry_upper = prices.rolling(window=entry_window).max()
+        entry_lower = prices.rolling(window=entry_window).min()
+        exit_upper = prices.rolling(window=exit_window).max()
+        exit_lower = prices.rolling(window=exit_window).min()
+
+        fig = go.Figure()
+
+        # Plot price
+        fig.add_trace(
+            go.Scatter(
+                x=prices.index,
+                y=prices.values,
+                name='Price',
+                line=dict(color='black', width=2),
+                hovertemplate='Price: $%{y:.2f}<extra></extra>'
             )
+        )
+
+        # Plot entry channels
+        fig.add_trace(
+            go.Scatter(
+                x=entry_upper.index,
+                y=entry_upper.values,
+                name=f'Entry Upper ({entry_window}d)',
+                line=dict(color='green', width=1.5, dash='dash'),
+                hovertemplate='Entry Upper: $%{y:.2f}<extra></extra>'
+            )
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=entry_lower.index,
+                y=entry_lower.values,
+                name=f'Entry Lower ({entry_window}d)',
+                line=dict(color='red', width=1.5, dash='dash'),
+                hovertemplate='Entry Lower: $%{y:.2f}<extra></extra>'
+            )
+        )
+
+        # Plot exit channels
+        fig.add_trace(
+            go.Scatter(
+                x=exit_upper.index,
+                y=exit_upper.values,
+                name=f'Exit Upper ({exit_window}d)',
+                line=dict(color='lightgreen', width=1, dash='dot'),
+                opacity=0.7,
+                hovertemplate='Exit Upper: $%{y:.2f}<extra></extra>'
+            )
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=exit_lower.index,
+                y=exit_lower.values,
+                name=f'Exit Lower ({exit_window}d)',
+                line=dict(color='lightcoral', width=1, dash='dot'),
+                opacity=0.7,
+                hovertemplate='Exit Lower: $%{y:.2f}<extra></extra>'
+            )
+        )
 
         fig.update_layout(
-            title=title,
+            title=f"{ticker} - Turtle Trading Breakout Channels",
             xaxis_title="Date",
-            yaxis_title="Value",
-            template=self.template,
-            hovermode="x unified",
-            height=kwargs.get("height", 500),
+            yaxis_title="Price ($)",
+            height=height,
+            hovermode='x unified'
         )
 
         return fig
 
-    def save(self, fig: Any, filename: str, **kwargs) -> None:
-        """Save figure to file."""
-        if filename.endswith(".html"):
-            fig.write_html(filename)
-        elif filename.endswith(".png"):
-            fig.write_image(filename, **kwargs)
-        elif filename.endswith(".jpg") or filename.endswith(".jpeg"):
-            fig.write_image(filename, **kwargs)
-        elif filename.endswith(".svg"):
-            fig.write_image(filename, format="svg", **kwargs)
-        else:
-            # Default to HTML
-            fig.write_html(filename + ".html")
-
-        logger.info(f"Saved plot to {filename}")
-
-
-# ==========================================
-# Main Plotter Class
-# ==========================================
-
-
-class Plotter(BaseModel):
-    """
-    Main plotter class that supports multiple backends.
-
-    Features:
-    - Multiple backends: matplotlib, plotly (default)
-    - Comprehensive trading visualizations
-    - Portfolio and universe analysis
-    - Performance metrics plotting
-    """
-
-    backend: PlotBackend = Field(
-        default=PlotBackend.PLOTLY, description="Plotting backend"
-    )
-    theme: PlotTheme = Field(default=PlotTheme.DEFAULT, description="Plot theme")
-    output_dir: Optional[str] = Field(None, description="Directory for saving plots")
-
-    # Backend instance (not serialized)
-    _plotter: Optional[BasePlotter] = None
-
-    model_config = {"arbitrary_types_allowed": True}
-
-    def __init__(self, **data):
-        """Initialize plotter with selected backend."""
-        super().__init__(**data)
-        self._initialize_backend()
-
-        if self.output_dir:
-            Path(self.output_dir).mkdir(parents=True, exist_ok=True)
-
-    def _initialize_backend(self) -> None:
-        """Initialize the plotting backend."""
-        if self.backend == PlotBackend.MATPLOTLIB:
-            self._plotter = MatplotlibPlotter(theme=self.theme)
-        elif self.backend == PlotBackend.PLOTLY:
-            self._plotter = PlotlyPlotter(theme=self.theme)
-        else:
-            raise ValueError(f"Unknown backend: {self.backend}")
-
-        logger.info(f"Initialized {self.backend} plotter with {self.theme} theme")
-
-    def change_backend(self, backend: PlotBackend) -> None:
-        """Change plotting backend."""
-        self.backend = backend
-        self._initialize_backend()
-
-    def change_theme(self, theme: PlotTheme) -> None:
-        """Change plot theme."""
-        self.theme = theme
-        self._initialize_backend()
-
-    # ==========================================
-    # Core Plotting Methods
-    # ==========================================
-
-    def plot_price_history(
+    def plot_mean_reversion(
             self,
-            data: Union[pd.DataFrame, Dict[str, pd.DataFrame]],
-            title: str = "Price History",
-            **kwargs,
-    ) -> Any:
+            ticker: str,
+            lookback: int = 30,
+            height: int = 800
+    ) -> go.Figure:
         """
-        Plot price history for single or multiple tickers.
+        Plot mean reversion components: price, moving average, and z-score.
 
         Args:
-            data: DataFrame with OHLCV data or dict of {ticker: DataFrame}
-            title: Plot title
-            **kwargs: Additional arguments passed to backend
-        """
-        if isinstance(data, dict):
-            # Multiple tickers - combine close prices
-            close_prices = {}
-            for ticker, df in data.items():
-                if "Close" in df.columns:
-                    close_prices[ticker] = df["Close"]
+            ticker: Instrument ticker
+            lookback: Lookback period
+            height: Figure height
 
-            if close_prices:
-                combined_df = pd.DataFrame(close_prices)
-                return self._plotter.plot_multiple_series(
-                    {ticker: series for ticker, series in combined_df.items()},
-                    title=title,
-                    **kwargs,
+        Returns:
+            Plotly figure
+        """
+        if ticker not in self.trader.tickers:
+            raise ValueError(f"Ticker {ticker} not in trader portfolio")
+
+        prices = self.pipeline_output.prices[ticker]
+
+        # Calculate components
+        rolling_mean = prices.rolling(window=lookback).mean()
+        rolling_std = prices.rolling(window=lookback).std()
+        z_score = (prices - rolling_mean) / rolling_std
+        upper_band = rolling_mean + 2 * rolling_std
+        lower_band = rolling_mean - 2 * rolling_std
+
+        # Create subplots
+        fig = make_subplots(
+            rows=2, cols=1,
+            shared_xaxes=True,
+            vertical_spacing=0.05,
+            row_heights=[0.7, 0.3],
+            subplot_titles=(
+            f'{ticker} Price & Bands', f'Z-Score ({lookback}d)')
+        )
+
+        # Plot price and bands
+        fig.add_trace(
+            go.Scatter(
+                x=prices.index,
+                y=prices.values,
+                name='Price',
+                line=dict(color='black', width=2),
+                hovertemplate='Price: $%{y:.2f}<extra></extra>'
+            ),
+            row=1, col=1
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=rolling_mean.index,
+                y=rolling_mean.values,
+                name=f'Mean ({lookback}d)',
+                line=dict(color='blue', width=1.5),
+                hovertemplate='Mean: $%{y:.2f}<extra></extra>'
+            ),
+            row=1, col=1
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=upper_band.index,
+                y=upper_band.values,
+                name='Upper Band (+2σ)',
+                line=dict(color='red', width=1, dash='dash'),
+                hovertemplate='Upper: $%{y:.2f}<extra></extra>'
+            ),
+            row=1, col=1
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=lower_band.index,
+                y=lower_band.values,
+                name='Lower Band (-2σ)',
+                line=dict(color='green', width=1, dash='dash'),
+                hovertemplate='Lower: $%{y:.2f}<extra></extra>'
+            ),
+            row=1, col=1
+        )
+
+        # Plot z-score
+        fig.add_trace(
+            go.Scatter(
+                x=z_score.index,
+                y=z_score.values,
+                name='Z-Score',
+                line=dict(color='purple', width=1.5),
+                fill='tozeroy',
+                fillcolor='rgba(128, 0, 128, 0.2)',
+                hovertemplate='Z-Score: %{y:.2f}<extra></extra>'
+            ),
+            row=2, col=1
+        )
+
+        # Add reference lines to z-score
+        fig.add_hline(y=0, line_dash="dash", line_color="gray", row=2, col=1)
+        fig.add_hline(y=2, line_dash="dot", line_color="red", row=2, col=1)
+        fig.add_hline(y=-2, line_dash="dot", line_color="green", row=2, col=1)
+
+        # Update layout
+        fig.update_xaxes(title_text="Date", row=2, col=1)
+        fig.update_yaxes(title_text="Price ($)", row=1, col=1)
+        fig.update_yaxes(title_text="Z-Score", row=2, col=1)
+
+        fig.update_layout(
+            height=height,
+            title_text=f"{ticker} - Mean Reversion Components ({lookback}d)",
+            hovermode='x unified',
+            showlegend=True
+        )
+
+        return fig
+
+    def plot_portfolio_summary(
+            self,
+            height: int = 900
+    ) -> go.Figure:
+        """
+        Plot comprehensive portfolio summary with multiple panels.
+
+        Args:
+            height: Figure height
+
+        Returns:
+            Plotly figure
+        """
+        # Create subplots
+        fig = make_subplots(
+            rows=3, cols=2,
+            subplot_titles=(
+                'Current Forecasts',
+                'Current Positions',
+                'Forecast Weights',
+                'Instrument Volatilities',
+                'Capital Allocation',
+                'Portfolio Metrics'
+            ),
+            specs=[
+                [{"type": "bar"}, {"type": "bar"}],
+                [{"type": "bar"}, {"type": "bar"}],
+                [{"type": "bar"}, {"type": "table"}]
+            ],
+            vertical_spacing=0.12,
+            horizontal_spacing=0.1
+        )
+
+        # 1. Current Forecasts
+        forecasts = self.pipeline_output.current_forecasts
+        tickers = list(forecasts.keys())
+        forecast_values = list(forecasts.values())
+        forecast_colors = ['green' if v > 0 else 'red' for v in
+                           forecast_values]
+
+        fig.add_trace(
+            go.Bar(
+                x=tickers,
+                y=forecast_values,
+                marker_color=forecast_colors,
+                name='Forecast',
+                showlegend=False
+            ),
+            row=1, col=1
+        )
+
+        # 2. Current Positions
+        positions = {}
+        for ticker, pos in self.pipeline_output.position_set.positions.items():
+            if pos.contracts:
+                positions[ticker] = pos.contracts
+
+        if positions:
+            pos_tickers = list(positions.keys())
+            pos_values = list(positions.values())
+            pos_colors = ['green' if v > 0 else 'red' for v in pos_values]
+
+            fig.add_trace(
+                go.Bar(
+                    x=pos_tickers,
+                    y=pos_values,
+                    marker_color=pos_colors,
+                    name='Position',
+                    showlegend=False
+                ),
+                row=1, col=2
+            )
+
+        # 3. Forecast Weights
+        weights = self.trader.trading_rules_config.get_weights()
+
+        fig.add_trace(
+            go.Bar(
+                x=list(weights.keys()),
+                y=list(weights.values()),
+                marker_color='steelblue',
+                name='Weight',
+                showlegend=False
+            ),
+            row=2, col=1
+        )
+
+        # 4. Volatilities
+        vols = {
+            ticker: vol.current_annual_vol
+            for ticker, vol in self.pipeline_output.volatilities.items()
+        }
+
+        fig.add_trace(
+            go.Bar(
+                x=list(vols.keys()),
+                y=list(vols.values()),
+                marker_color='purple',
+                name='Volatility',
+                showlegend=False
+            ),
+            row=2, col=2
+        )
+
+        # 5. Capital Allocation
+        capital_alloc = self.pipeline_output.capital_allocation
+
+        fig.add_trace(
+            go.Bar(
+                x=list(capital_alloc.keys()),
+                y=list(capital_alloc.values()),
+                marker_color='orange',
+                name='Capital',
+                showlegend=False
+            ),
+            row=3, col=1
+        )
+
+        # 6. Portfolio Metrics Table
+        metrics_data = {
+            'Metric': [
+                'Total Capital',
+                'Portfolio Leverage',
+                'Diversification Multiplier (IDM)',
+                'Number of Instruments',
+                'Number of Trades',
+                'Total Notional'
+            ],
+            'Value':  [
+                f'${self.trader.capital:,.0f}',
+                f'{self.pipeline_output.position_set.portfolio_leverage:.2f}x',
+                f'{self.pipeline_output.portfolio_weights.diversification_multiplier:.2f}',
+                f'{len(self.trader.tickers)}',
+                f'{self.pipeline_output.trade_set.num_trades}',
+                f'${self.pipeline_output.trade_set.total_notional:,.0f}'
+            ]
+        }
+
+        fig.add_trace(
+            go.Table(
+                header=dict(
+                    values=['<b>Metric</b>', '<b>Value</b>'],
+                    fill_color='steelblue',
+                    font=dict(color='white', size=12),
+                    align='left'
+                ),
+                cells=dict(
+                    values=[metrics_data['Metric'], metrics_data['Value']],
+                    fill_color='lavender',
+                    align='left',
+                    height=25
                 )
-        else:
-            return self._plotter.plot_price_history(data, title=title, **kwargs)
+            ),
+            row=3, col=2
+        )
 
-    def plot_portfolio_value(
-            self, history: pd.DataFrame, title: str = "Portfolio Value Over Time", **kwargs
-    ) -> Any:
-        """
-        Plot portfolio value over time.
+        # Update axes
+        fig.update_yaxes(title_text="Forecast", row=1, col=1)
+        fig.update_yaxes(title_text="Contracts", row=1, col=2)
+        fig.update_yaxes(title_text="Weight", row=2, col=1, tickformat='.0%')
+        fig.update_yaxes(title_text="Ann. Vol", row=2, col=2, tickformat='.2%')
+        fig.update_yaxes(title_text="Capital ($)", row=3, col=1)
 
-        Args:
-            history: DataFrame with columns: total_value, cash, positions_value
-            title: Plot title
-        """
-        return self._plotter.plot_portfolio_value(history, title=title, **kwargs)
+        fig.update_layout(
+            height=height,
+            title_text="Portfolio Summary Dashboard",
+            showlegend=False
+        )
 
-    def plot_portfolio_composition(
+        return fig
+
+    def _add_ema_lines(
             self,
-            portfolio,  # Portfolio object
-            title: str = "Portfolio Composition",
-            **kwargs,
-    ) -> Any:
-        """
-        Plot portfolio composition.
+            fig: go.Figure,
+            ticker: str,
+            prices: pd.Series,
+            row: int,
+            col: int
+    ):
+        """Helper to add EMA lines to a figure."""
+        # Find EWMAC rules in forecasts
+        ticker_forecasts = self.pipeline_output.raw_forecasts[ticker]
 
-        Args:
-            portfolio: Portfolio object
-            title: Plot title
-        """
-        weights = portfolio.get_position_weights()
+        # Extract EWMAC parameters
+        ewmac_params = []
+        for rule_name in ticker_forecasts.keys():
+            if 'ewmac' in rule_name.lower():
+                # Parse spans from rule name (e.g., 'ewmac_16_64_normalized')
+                parts = rule_name.split('_')
+                if len(parts) >= 3 and parts[1].isdigit() and parts[
+                    2].isdigit():
+                    fast_span = int(parts[1])
+                    slow_span = int(parts[2])
+                    ewmac_params.append((fast_span, slow_span))
 
-        # Add cash as a position
-        if portfolio.cash_weight > 0:
-            weights["Cash"] = portfolio.cash_weight
+        # Remove duplicates and limit to 3 most important
+        ewmac_params = list(set(ewmac_params))[:3]
 
-        return self._plotter.plot_portfolio_composition(weights, title=title, **kwargs)
+        # Plot EMAs
+        colors = ['blue', 'red', 'green', 'orange', 'purple']
+        for i, (fast, slow) in enumerate(ewmac_params):
+            fast_ema = prices.ewm(span=fast, min_periods=fast).mean()
+            slow_ema = prices.ewm(span=slow, min_periods=slow).mean()
 
-    def plot_returns(
-            self, returns: pd.Series, title: str = "Returns Analysis", **kwargs
-    ) -> Any:
-        """
-        Plot returns distribution and time series.
+            color_idx = i % len(colors)
 
-        Args:
-            returns: Series of returns
-            title: Plot title
-        """
-        return self._plotter.plot_returns(returns, title=title, **kwargs)
-
-    def plot_drawdown(
-            self, equity_curve: pd.Series, title: str = "Drawdown Analysis", **kwargs
-    ) -> Any:
-        """
-        Plot equity curve and drawdown.
-
-        Args:
-            equity_curve: Series of portfolio values
-            title: Plot title
-        """
-        return self._plotter.plot_drawdown(equity_curve, title=title, **kwargs)
-
-    def plot_multiple_series(
-            self, data: Dict[str, pd.Series], title: str = "Comparison", **kwargs
-    ) -> Any:
-        """
-        Plot multiple time series.
-
-        Args:
-            data: Dict of {label: Series}
-            title: Plot title
-        """
-        return self._plotter.plot_multiple_series(data, title=title, **kwargs)
-
-    # ==========================================
-    # Specialized Trading Plots
-    # ==========================================
-
-    def plot_correlation_matrix(
-            self, returns: pd.DataFrame, title: str = "Correlation Matrix", **kwargs
-    ) -> Any:
-        """Plot correlation matrix of returns."""
-        corr = returns.corr()
-
-        if self.backend == PlotBackend.PLOTLY:
-            fig = self._plotter.go.Figure(
-                data=self._plotter.go.Heatmap(
-                    z=corr.values,
-                    x=corr.columns,
-                    y=corr.columns,
-                    colorscale="RdBu",
-                    zmid=0,
-                )
+            fig.add_trace(
+                go.Scatter(
+                    x=fast_ema.index,
+                    y=fast_ema.values,
+                    name=f'EMA {fast}',
+                    line=dict(color=colors[color_idx], width=1, dash='dot'),
+                    opacity=0.6,
+                    hovertemplate=f'EMA {fast}: $%{{y:.2f}}<extra></extra>'
+                ),
+                row=row, col=col
             )
-            fig.update_layout(title=title, template=self._plotter.template)
-            return fig
-        else:
-            import matplotlib.pyplot as plt
 
-            fig, ax = plt.subplots(figsize=(10, 8))
-            im = ax.imshow(corr, cmap="RdBu", vmin=-1, vmax=1)
-            ax.set_xticks(range(len(corr.columns)))
-            ax.set_yticks(range(len(corr.columns)))
-            ax.set_xticklabels(corr.columns, rotation=45, ha="right")
-            ax.set_yticklabels(corr.columns)
-            plt.colorbar(im, ax=ax)
-            ax.set_title(title)
-            plt.tight_layout()
-            return fig
-
-    def plot_performance_summary(
-            self, metrics: Dict[str, float], title: str = "Performance Metrics", **kwargs
-    ) -> Any:
-        """Plot performance metrics as a bar chart."""
-        if self.backend == PlotBackend.PLOTLY:
-            fig = self._plotter.go.Figure(
-                data=[
-                    self._plotter.go.Bar(
-                        x=list(metrics.keys()),
-                        y=list(metrics.values()),
-                        marker_color="#2E86AB",
-                    )
-                ]
+            fig.add_trace(
+                go.Scatter(
+                    x=slow_ema.index,
+                    y=slow_ema.values,
+                    name=f'EMA {slow}',
+                    line=dict(color=colors[color_idx], width=1.5, dash='dash'),
+                    opacity=0.6,
+                    hovertemplate=f'EMA {slow}: $%{{y:.2f}}<extra></extra>'
+                ),
+                row=row, col=col
             )
-            fig.update_layout(
-                title=title,
-                xaxis_title="Metric",
-                yaxis_title="Value",
-                template=self._plotter.template,
-            )
-            return fig
-        else:
-            import matplotlib.pyplot as plt
-
-            fig, ax = plt.subplots(figsize=(10, 6))
-            ax.bar(metrics.keys(), metrics.values(), color="#2E86AB")
-            ax.set_xlabel("Metric")
-            ax.set_ylabel("Value")
-            ax.set_title(title)
-            plt.xticks(rotation=45, ha="right")
-            plt.tight_layout()
-            return fig
-
-    def plot_universe_analysis(
-            self,
-            universe,  # Universe object
-            data_manager,  # DataManager object
-            metric: str = "price",
-            title: Optional[str] = None,
-            **kwargs,
-    ) -> Any:
-        """
-        Plot analysis of universe tickers.
-
-        Args:
-            universe: Universe object
-            data_manager: DataManager object
-            metric: Metric to plot ('price', 'volume', 'volatility')
-        """
-        if title is None:
-            title = f"Universe Analysis - {metric.title()}"
-
-        tickers = universe.get_tickers()
-        values = []
-        labels = []
-
-        for ticker in tickers:
-            df = data_manager.load_data(ticker)
-            if not df.empty:
-                if metric == "price":
-                    values.append(df["Close"].iloc[-1])
-                elif metric == "volume":
-                    values.append(df["Volume"].mean())
-                elif metric == "volatility":
-                    returns = df["Close"].pct_change()
-                    values.append(returns.std() * 100)
-                labels.append(ticker)
-
-        if self.backend == PlotBackend.PLOTLY:
-            fig = self._plotter.go.Figure(
-                data=[self._plotter.go.Bar(x=labels, y=values, marker_color="#F18F01")]
-            )
-            fig.update_layout(
-                title=title,
-                xaxis_title="Ticker",
-                yaxis_title=metric.title(),
-                template=self._plotter.template,
-            )
-            return fig
-        else:
-            import matplotlib.pyplot as plt
-
-            fig, ax = plt.subplots(figsize=(12, 6))
-            ax.bar(labels, values, color="#F18F01")
-            ax.set_xlabel("Ticker")
-            ax.set_ylabel(metric.title())
-            ax.set_title(title)
-            plt.xticks(rotation=45, ha="right")
-            plt.tight_layout()
-            return fig
-
-    # ==========================================
-    # Utility Methods
-    # ==========================================
-
-    def save(self, fig: Any, filename: str, **kwargs) -> None:
-        """
-        Save figure to file.
-
-        Args:
-            fig: Figure object from plotting backend
-            filename: Output filename
-        """
-        if self.output_dir:
-            filepath = Path(self.output_dir) / filename
-        else:
-            filepath = Path(filename)
-
-        self._plotter.save(fig, str(filepath), **kwargs)
-
-    def show(self, fig: Any) -> None:
-        """Display figure (backend-dependent)."""
-        if self.backend == PlotBackend.MATPLOTLIB:
-            self._plotter.plt.show()
-        elif self.backend == PlotBackend.PLOTLY:
-            fig.show()
-
-    def __repr__(self) -> str:
-        """String representation."""
-        return f"Plotter(backend={self.backend.value}, theme={self.theme.value})"

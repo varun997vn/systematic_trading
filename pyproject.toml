@@ -11,7 +11,7 @@ authors = [
 ]
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
 dependencies = [
     # Data and Analysis
@@ -42,6 +42,8 @@ dependencies = [
     "fastapi>=0.124.0",
     "click>=8.3.1",
     "uvicorn>=0.38.0",
+    "plotly>=6.5.0",
+    "kaleido>=1.2.0",
 ]
 
 [tool.coverage.run]

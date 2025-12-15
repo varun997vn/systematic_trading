@@ -5,8 +5,12 @@ Minimal example showing how to use the systematic trading framework.
 UPDATED: Now demonstrates the modular forecast configuration system
 """
 
+from st.plotter import Plotter
 from st.trader import Trader, TradingRulesConfig, TradingRuleConfig, RuleType
 from utils.logger import setup_logger
+import plotly.io as pio
+pio.renderers.default = "browser"
+
 
 logger = setup_logger(__name__)
 
@@ -82,6 +86,11 @@ def simple_example():
     print("  ✓ Position sizing")
     print("  ✓ Risk management")
     print("=" * 60 + "\n")
+
+    plotter = Plotter(trader)
+    fig = plotter.plot_prices_with_signals("SPY")
+    # fig = plotter.plot_portfolio_summary()
+    fig.show()
 
     return trader, trade_set
 
