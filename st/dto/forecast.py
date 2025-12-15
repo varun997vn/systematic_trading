@@ -5,11 +5,11 @@ Minimal Pydantic models for configuration and data transfer.
 Follows Robert Carver's "Systematic Trading" methodology.
 """
 
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 
 from pydantic import BaseModel, Field, field_validator
 
-from .strategy import EWMACConfig
+from .strategy import EWMACStrategyDTO
 
 
 # ---- Forecast Configuration DTO ---- #
@@ -31,22 +31,9 @@ class ForecastConfig(BaseModel):
         description="Normalize forecasts by price volatility"
     )
 
-    @field_validator("target_abs_forecast")
-    @classmethod
-    def validate_target(cls, v: float) -> float:
-        """Validate target forecast is reasonable (Carver uses 10)."""
-        if v > 20:
-            # Log warning but don't fail - user may have good reason
-            pass
-        return v
-
-    @field_validator("max_forecast")
-    @classmethod
-    def validate_range(cls, max_f: float, info) -> float:
-        """Ensure max > min forecast."""
-        if "min_forecast" in info.data and max_f <= info.data["min_forecast"]:
-            raise ValueError("max_forecast must be greater than min_forecast")
-        return max_f
+    def model_post_init(self, context: Any, /) -> None:
+        if self.max_forecast < self.min_forecast:
+            raise ValueError(f"max_forecast {self.max_forecast} must be greater than min_forecast {self.min_forecast}")
 
 
 # ---- Position Sizing DTO ---- #
@@ -80,24 +67,16 @@ class ForecastWeights(BaseModel):
 
     weights: Dict[str, float] = Field(description="Map of rule_name to weight")
 
-    @field_validator("weights")
-    @classmethod
-    def validate_weights(cls, w: Dict[str, float]) -> Dict[str, float]:
-        """Ensure weights are positive and sum to ~1.0."""
-        if not w:
-            raise ValueError("weights dictionary cannot be empty")
-
-        for rule, weight in w.items():
+    def model_post_init(self, context: Any, /) -> None:
+        for rule, weight in self.weights.items():
             if weight < 0:
                 raise ValueError(f"Negative weight for {rule}: {weight}")
 
-        weight_sum = sum(w.values())
-        if not (0.99 <= weight_sum <= 1.01):
+        total_weights = sum(self.weights.values())
+        if not (0.99 <= total_weights <= 1.01):
             raise ValueError(
-                f"Weights must sum to 1.0, got {weight_sum:.4f}. "
-                "Use normalize=True or adjust weights."
+                f"Weights must sum to 1.0, got {total_weights:.4f}. "
             )
-        return w
 
     def normalize(self) -> "ForecastWeights":
         """Return a new ForecastWeights with normalized weights summing to 1.0."""
@@ -166,12 +145,12 @@ class PresetConfigs:
 
     # Carver's standard EWMAC suite
     EWMAC_SUITE = [
-        EWMACConfig(fast_span=2, slow_span=8),
-        EWMACConfig(fast_span=4, slow_span=16),
-        EWMACConfig(fast_span=8, slow_span=32),
-        EWMACConfig(fast_span=16, slow_span=64),
-        EWMACConfig(fast_span=32, slow_span=128),
-        EWMACConfig(fast_span=64, slow_span=256),
+        EWMACStrategyDTO(fast_span=2, slow_span=8),
+        EWMACStrategyDTO(fast_span=4, slow_span=16),
+        EWMACStrategyDTO(fast_span=8, slow_span=32),
+        EWMACStrategyDTO(fast_span=16, slow_span=64),
+        EWMACStrategyDTO(fast_span=32, slow_span=128),
+        EWMACStrategyDTO(fast_span=64, slow_span=256),
     ]
 
     # Default forecast weights (equal weight)
