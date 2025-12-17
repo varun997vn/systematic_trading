@@ -77,6 +77,7 @@ class ReturnsDTO(BaseModel):
     returns: pd.Series = None  # Calculated returns
     return_type: str = 'log'  # 'log' or 'percentage'
     periods: int = 1  # Period length (1 = daily)
+    skew: float = None  # Skewness of returns
 
     class Config:
         arbitrary_types_allowed = True
@@ -95,10 +96,15 @@ class ReturnsDTO(BaseModel):
         # Remove NaN values created by the shift/pct_change operation
         # Keep the index aligned with the original data
         self.returns = self.returns.fillna(0) if len(self.returns) > 0 else self.returns
+
+        # Calculate skewness
+        self.skew = self.returns.skew()
+
         logger.info(f"Creation completed: {self}")
 
     def __str__(self):
-        return f"Returns(ticker={self.ticker}, return_type={self.return_type}, shape={self.returns.shape})"
+        return (f"Returns(ticker={self.ticker}, return_type={self.return_type}, "
+                f"shape={self.returns.shape}, skew={self.skew:.4f})")
 
     __repr__ = __str__
 

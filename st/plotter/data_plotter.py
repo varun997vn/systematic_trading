@@ -99,7 +99,7 @@ class PriceDataPlotter(BaseModel):
     def show(self):
         """Display the interactive plot."""
         if not self.price_data:
-            print("No data to plot. Use add() to add PriceDataDTO objects first.")
+            logger.warning("No data to plot. Use add() to add PriceDataDTO objects first.")
             return
 
         self._create_figure()
@@ -113,14 +113,14 @@ class PriceDataPlotter(BaseModel):
             filename: Output filename
         """
         if not self.price_data:
-            print("No data to plot. Use add() to add PriceDataDTO objects first.")
+            logger.warning("No data to plot. Use add() to add PriceDataDTO objects first.")
             return
 
         if self.fig is None:
             self._create_figure()
 
         self.fig.write_html(filename)
-        print(f"Plot saved to {filename}")
+        logger.info(f"Plot saved to {filename}")
 
     def __str__(self):
         return f"PriceDataPlotter: title={self.title}, price_data={self.price_data.keys()}"
@@ -169,7 +169,7 @@ class ReturnsPlotter(BaseModel):
 
         self.returns_data[ticker] = returns_dto
 
-        print(f"Added {ticker}: {len(returns_dto.returns)} returns calculated")
+        logger.info(f"Added {ticker}: {len(returns_dto.returns)} returns calculated")
         return self
 
     def show(self, plot_type: str = 'both') -> None:
@@ -183,7 +183,7 @@ class ReturnsPlotter(BaseModel):
                 - 'both': Both plots in subplots
         """
         if not self.returns_data:
-            print("No data to plot. Use add() to add price data first.")
+            logger.warning("No data to plot. Use add() to add price data first.")
             return
 
         if plot_type == 'both':
@@ -341,6 +341,96 @@ class ReturnsPlotter(BaseModel):
 
         fig.show()
 
+    def show_distribution(self) -> None:
+        """
+        Display distribution of returns with skew annotation.
+        """
+        if not self.returns_data:
+            logger.warning("No data to plot. Use add() to add price data first.")
+            return
+
+        fig = go.Figure()
+
+        for ticker, returns_dto in self.returns_data.items():
+            returns = returns_dto.returns * 100  # Convert to percentage
+
+            fig.add_trace(go.Histogram(
+                x=returns,
+                name=ticker,
+                opacity=0.5,
+                histnorm='probability density',
+                hovertemplate=f'{ticker}<br>Return: %{{x:.2f}}%<br>Density: %{{y:.4f}}<extra></extra>'
+            ))
+
+        # Add annotations for skew
+        annotations = []
+        for i, (ticker, returns_dto) in enumerate(self.returns_data.items()):
+            annotations.append(
+                dict(
+                    x=0.9,
+                    y=0.98 - (i * 0.05),
+                    xref='paper',
+                    yref='paper',
+                    text=f'{ticker} Skew: {returns_dto.skew:.3f}',
+                    showarrow=False,
+                    xanchor='right',
+                    bgcolor='white',
+                    bordercolor='black',
+                    borderwidth=1
+                )
+            )
+
+        fig.update_layout(
+            title=f'Returns Distribution with Skewness',
+            xaxis_title='Return (%)',
+            yaxis_title='Density',
+            template='plotly_white',
+            width=1200,
+            height=600,
+            barmode='overlay',
+            annotations=annotations
+        )
+
+        fig.show()
+
+    def show_skew_comparison(self) -> None:
+        """
+        Display bar chart comparing skewness across tickers.
+        """
+        if not self.returns_data:
+            logger.warning("No data to plot. Use add() to add price data first.")
+            return
+
+        tickers = list(self.returns_data.keys())
+        skews = [self.returns_data[ticker].skew for ticker in tickers]
+
+        # Color bars based on skew direction
+        colors = ['green' if s > 0 else 'red' for s in skews]
+
+        fig = go.Figure(data=[
+            go.Bar(
+                x=tickers,
+                y=skews,
+                marker_color=colors,
+                text=[f'{s:.3f}' for s in skews],
+                textposition='outside',
+                hovertemplate='%{x}<br>Skewness: %{y:.3f}<extra></extra>'
+            )
+        ])
+
+        fig.add_hline(y=0, line_dash="dash", line_color="black", opacity=0.5)
+
+        fig.update_layout(
+            title='Skewness Comparison',
+            xaxis_title='Ticker',
+            yaxis_title='Skewness',
+            template='plotly_white',
+            width=800,
+            height=500
+        )
+
+        fig.show()
+
     def get_summary_stats(self) -> pd.DataFrame:
         """
         Get summary statistics for all tickers.
@@ -358,6 +448,7 @@ class ReturnsPlotter(BaseModel):
                 'Ticker': ticker,
                 'Mean Return (%)': returns.mean() * 100,
                 'Std Dev (%)': returns.std() * 100,
+                'Skewness': returns_dto.skew,
                 'Cumulative Return (%)': cumulative.iloc[-1] * 100,
                 'Sharpe Ratio': returns.mean() / returns.std() if returns.std() > 0 else 0,
                 'Min Return (%)': returns.min() * 100,
