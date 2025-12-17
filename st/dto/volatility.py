@@ -1,3 +1,4 @@
+from abc import ABC
 from copy import deepcopy
 from typing import Any, Literal
 
@@ -14,7 +15,7 @@ logger = setup_logger(__name__)
 
 # ---- Volatility Estimators ---- #
 
-class VolatilityDTO(BaseModel):
+class VolatilityDTO(BaseModel, ABC):
     returns: ReturnsDTO
     annualization_factor: int = Field(
         default=Settings.BUSINESS_DAYS_PER_YEAR,
@@ -128,21 +129,20 @@ class VolatilityStandardizationDTO(BaseModel):
 
 # ---- Volatility Forecasting ---- #
 
-class VolatilityForecastDTO(BaseModel):
+class VolatilityForecastDTO(BaseModel, ABC):
     volatility: VolatilityDTO
-    forecast: pd.Series = None
+    forecast: float = None
 
     class Config:
         arbitrary_types_allowed = True
 
     def __str__(self):
-        return f"{self.__class__.__name__}({self.volatility})"
+        return f"{self.__class__.__name__}(volatility={self.volatility}, forecast={self.forecast:.4f})"
 
     __repr__ = __str__
 
 
 class SimpleVolatilityForecastDTO(VolatilityForecastDTO):
-    horizon: int = Field(default=1, description="Forecast horizon (days)")
     method: Literal["last", "mean"] = Field(default="last", description="Forecast method")
 
     class Config:
@@ -151,16 +151,13 @@ class SimpleVolatilityForecastDTO(VolatilityForecastDTO):
     def model_post_init(self, __context: Any):
         if self.method == "last":
             # Use last observation (Carver's simple approach)
-            self.forecast = self.volatility.daily_vol.copy()
+            self.forecast = self.volatility.daily_vol.copy().iloc[-1]
         elif self.method == "mean":
             # Rolling mean forecast
-            self.forecast = self.volatility.daily_vol.rolling(window=10, min_periods=1).mean()
+            self.forecast = self.volatility.daily_vol.rolling(window=10, min_periods=1).mean().iloc[-1]
         else:
             raise ValueError(f"Unknown method: {self.method}")
 
-        # Scale by sqrt(horizon) for multi-day forecasts
-        if self.horizon > 1:
-            self.forecast = self.forecast * (self.horizon ** 0.5)
         logger.info(f"Creation Complete: {self}")
 
 
@@ -172,9 +169,7 @@ class EWMAVolatilityForecastDTO(VolatilityForecastDTO):
         arbitrary_types_allowed = True
 
     def model_post_init(self, __context: Any):
-        self.forecast = self.volatility.daily_vol.ewm(span=self.span, min_periods=1).mean()
-        if self.horizon > 1:
-            self.forecast = self.forecast * (self.horizon ** 0.5)
+        self.forecast = self.volatility.daily_vol.ewm(span=self.span, min_periods=1).mean().iloc[-1]
         logger.info(f"Creation Complete: {self}")
 
 
