@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Any, Literal
 
 import numpy as np
@@ -6,7 +7,7 @@ from pydantic import BaseModel, Field
 
 from st.config import Settings
 from utils.logger import setup_logger
-from .data import ReturnsDTO
+from .data import ReturnsDTO, PriceDataDTO
 
 logger = setup_logger(__name__)
 
@@ -20,10 +21,15 @@ class VolatilityDTO(BaseModel):
         description="Trading days per year (256 for Carver)",
     )
     daily_vol: pd.Series = None
-    annul_vol: pd.Series = None
+    annual_vol: pd.Series = None
+
+    class Config:
+        arbitrary_types_allowed = True
 
     def __str__(self):
-        return f"{self.__class__.__name__}({self.daily_vol})"
+        return f"{self.__class__.__name__}(ticker={self.returns.price_data.ticker}, shape={self.daily_vol.shape})"
+
+    __repr__ = __str__
 
 
 class StandardVolatilityDTO(VolatilityDTO):
@@ -35,7 +41,7 @@ class StandardVolatilityDTO(VolatilityDTO):
 
     def model_post_init(self, __context: Any):
         self.daily_vol = self.returns.returns.rolling(window=self.window, min_periods=self.min_periods).std()
-        self.annul_vol = self.daily_vol * (self.annualization_factor ** 0.5)
+        self.annual_vol = self.daily_vol * (self.annualization_factor ** 0.5)
         logger.info(f"Creation Complete: {self}")
 
 
@@ -63,7 +69,7 @@ class EWMAVolatilityDTO(VolatilityDTO):
         self.daily_vol = ewma_var ** 0.5
 
         # Annualize
-        self.annul_vol = self.daily_vol * (self.annualization_factor ** 0.5)
+        self.annual_vol = self.daily_vol * (self.annualization_factor ** 0.5)
         logger.info(f"Creation Complete: {self}")
 
 
@@ -84,8 +90,40 @@ class RobustVolatilityDTO(VolatilityDTO):
 
     def model_post_init(self, __context: Any):
         self.daily_vol = self.returns.returns.rolling(window=self.window).apply(self.rolling_mad, raw=False)
-        self.annul_vol = self.daily_vol * (self.annualization_factor ** 0.5)
+        self.annual_vol = self.daily_vol * (self.annualization_factor ** 0.5)
         logger.info(f"Creation Complete: {self}")
+
+
+class VolatilityStandardizationDTO(BaseModel):
+    price_data: PriceDataDTO
+    model: str = Field(default="standard")
+    parameters: dict = Field(default_factory=dict)
+    returns: ReturnsDTO = Field(default=None)
+    volatility: VolatilityDTO = Field(default=None)
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    def model_post_init(self, __context: Any):
+        # Create deep copies to avoid modifying originals
+        self.price_data = deepcopy(self.price_data)
+
+        self.returns = ReturnsDTO(price_data=self.price_data)
+        if self.model == "standard":
+            self.volatility = StandardVolatilityDTO(returns=self.returns, **self.parameters)
+        elif self.model == "robust":
+            self.volatility = RobustVolatilityDTO(returns=self.returns, **self.parameters)
+        elif self.model == "ewma":
+            self.volatility = EWMAVolatilityDTO(returns=self.returns, **self.parameters)
+
+        self.returns.returns /= self.volatility.daily_vol
+        self.returns.cumulative_returns /= self.volatility.daily_vol
+
+    def __str__(self):
+        return (f"{self.__class__.__name__}(ticker={self.price_data.ticker}, "
+                f"volatility_model={self.model}, parameters={self.parameters})")
+
+    __repr__ = __str__
 
 
 # ---- Volatility Forecasting ---- #
@@ -94,8 +132,13 @@ class VolatilityForecastDTO(BaseModel):
     volatility: VolatilityDTO
     forecast: pd.Series = None
 
+    class Config:
+        arbitrary_types_allowed = True
+
     def __str__(self):
         return f"{self.__class__.__name__}({self.volatility})"
+
+    __repr__ = __str__
 
 
 class SimpleVolatilityForecastDTO(VolatilityForecastDTO):
@@ -146,10 +189,12 @@ class VolatilityTargeter(BaseModel):
         arbitrary_types_allowed = True
 
     def model_post_init(self, __context: Any):
-        self.scalars = self.target_vol / self.volatility.annul_vol
+        self.scalars = self.target_vol / self.volatility.annual_vol
         self.scalars.fillna(value=0.0, inplace=True)
         self.scalars[np.isinf(self.scalars)] = 0.0
         logger.info(f"Creation Complete: {self}")
 
     def __str__(self):
         return f"{self.__class__.__name__}({self.volatility})"
+
+    __repr__ = __str__

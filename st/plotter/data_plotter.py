@@ -85,7 +85,7 @@ class PriceDataPlotter(BaseModel):
             xaxis_title="Date",
             yaxis_title="Price",
             xaxis_rangeslider_visible=False,
-            height=600,
+            height=500,
             hovermode='x unified',
             legend=dict(
                 orientation="h",
@@ -135,44 +135,29 @@ class ReturnsPlotter(BaseModel):
     Allows adding price data and creating interactive plots with
     toggleable tickers.
     """
-    price_data: Dict[str, 'PriceDataDTO'] = {}
-    returns_data: Dict[str, 'ReturnsDTO'] = {}
-    return_type: str = 'log'  # 'log' or 'percentage'
-    periods: int = 1
+    returns_data: list[ReturnsDTO] = []
     title: Optional[str] = None
 
     class Config:
         arbitrary_types_allowed = True
 
-    def add(self, price_dto: 'PriceDataDTO') -> 'ReturnsPlotter':
+    def add(self, returns: ReturnsDTO) -> 'ReturnsPlotter':
         """
         Add price data and calculate returns.
 
         Args:
-            price_dto: PriceDataDTO object containing price data
+            returns: ReturnsDTO object containing price data
 
         Returns:
             Self for method chaining
         """
-        ticker = price_dto.ticker
+        ticker = returns.price_data.ticker
+        self.returns_data.append(returns)
 
-        # Store price data
-        self.price_data[ticker] = price_dto
-
-        # Calculate returns
-        returns_dto = ReturnsDTO(
-            ticker=ticker,
-            data=price_dto.data,
-            return_type=self.return_type,
-            periods=self.periods
-        )
-
-        self.returns_data[ticker] = returns_dto
-
-        logger.info(f"Added {ticker}: {len(returns_dto.returns)} returns calculated")
+        logger.info(f"Added {ticker} to ReturnsPlotter.")
         return self
 
-    def show(self, plot_type: str = 'both') -> None:
+    def show(self, plot_type: str = 'both', width=None, height=None) -> None:
         """
         Display interactive plot with toggleable tickers.
 
@@ -187,34 +172,32 @@ class ReturnsPlotter(BaseModel):
             return
 
         if plot_type == 'both':
-            self._show_both()
+            self._show_both(width=width, height=height)
         elif plot_type == 'cumulative':
-            self._show_cumulative()
+            self._show_cumulative(width=width, height=height)
         elif plot_type == 'returns':
-            self._show_returns()
+            self._show_returns(width=width, height=height)
         else:
             raise ValueError(f"Invalid plot_type: {plot_type}. Must be 'cumulative', 'returns', or 'both'")
 
-    def _show_cumulative(self) -> None:
+    def _show_cumulative(self, width=None, height=None) -> None:
         """Show cumulative returns plot."""
+        if width is None:
+            width = 900
+        if height is None:
+            height = 400
         fig = go.Figure()
 
-        for ticker, returns_dto in self.returns_data.items():
-            price_dto = self.price_data[ticker]
-            dates = price_dto.data['Date']
-
-            # Calculate cumulative returns
-            cumulative_returns = (returns_dto.returns + 1).cumprod() - 1
-
+        for rt in self.returns_data:
             fig.add_trace(go.Scatter(
-                x=dates,
-                y=cumulative_returns * 100,  # Convert to percentage
+                x=rt.price_data.data['Date'],
+                y=rt.cumulative_returns * 100,  # Convert to percentage
                 mode='lines',
-                name=ticker,
-                hovertemplate=f'{ticker}<br>Date: %{{x}}<br>Cumulative Return: %{{y:.2f}}%<extra></extra>'
+                name=rt.price_data.ticker,
+                hovertemplate=f'{rt.price_data.ticker}<br>Date: %{{x}}<br>Cumulative Return: %{{y:.2f}}%<extra></extra>'
             ))
 
-        title = self.title or f'Cumulative Returns ({self.return_type.capitalize()}, {self.periods}-period)'
+        title = self.title or f'Cumulative Returns'
 
         fig.update_layout(
             title=title,
@@ -222,8 +205,8 @@ class ReturnsPlotter(BaseModel):
             yaxis_title='Cumulative Return (%)',
             hovermode='x unified',
             template='plotly_white',
-            width=1200,
-            height=600,
+            width=width,
+            height=height,
             legend=dict(
                 orientation="v",
                 yanchor="top",
@@ -235,23 +218,24 @@ class ReturnsPlotter(BaseModel):
 
         fig.show()
 
-    def _show_returns(self) -> None:
+    def _show_returns(self, width=None, height=None) -> None:
         """Show raw returns plot."""
+        if width is None:
+            width = 900
+        if height is None:
+            height = 400
         fig = go.Figure()
 
-        for ticker, returns_dto in self.returns_data.items():
-            price_dto = self.price_data[ticker]
-            dates = price_dto.data['Date']
-
+        for rt in self.returns_data:
             fig.add_trace(go.Scatter(
-                x=dates,
-                y=returns_dto.returns * 100,  # Convert to percentage
+                x=rt.price_data.data['Date'],
+                y=rt.returns * 100,  # Convert to percentage
                 mode='lines',
-                name=ticker,
-                hovertemplate=f'{ticker}<br>Date: %{{x}}<br>Return: %{{y:.2f}}%<extra></extra>'
+                name=rt.price_data.ticker,
+                hovertemplate=f'{rt.price_data.ticker}<br>Date: %{{x}}<br>Return: %{{y:.2f}}%<extra></extra>'
             ))
 
-        title = self.title or f'Returns ({self.return_type.capitalize()}, {self.periods}-period)'
+        title = self.title or f'Returns'
 
         fig.update_layout(
             title=title,
@@ -259,8 +243,8 @@ class ReturnsPlotter(BaseModel):
             yaxis_title='Return (%)',
             hovermode='x unified',
             template='plotly_white',
-            width=1200,
-            height=600,
+            width=width,
+            height=height,
             legend=dict(
                 orientation="v",
                 yanchor="top",
@@ -272,34 +256,28 @@ class ReturnsPlotter(BaseModel):
 
         fig.show()
 
-    def _show_both(self) -> None:
+    def _show_both(self, width=None, height=None) -> None:
         """Show both cumulative returns and raw returns in subplots."""
+        if width is None:
+            width = 900
+        if height is None:
+            height = 600
         fig = make_subplots(
             rows=2, cols=1,
-            subplot_titles=(
-                f'Cumulative Returns ({self.return_type.capitalize()})',
-                f'Period Returns ({self.return_type.capitalize()})'
-            ),
             vertical_spacing=0.12,
             row_heights=[0.6, 0.4]
         )
 
-        for ticker, returns_dto in self.returns_data.items():
-            price_dto = self.price_data[ticker]
-            dates = price_dto.data['Date']
-
-            # Calculate cumulative returns
-            cumulative_returns = (returns_dto.returns + 1).cumprod() - 1
-
+        for rt in self.returns_data:
             # Add cumulative returns trace
             fig.add_trace(
                 go.Scatter(
-                    x=dates,
-                    y=cumulative_returns * 100,
+                    x=rt.price_data.data['Date'],
+                    y=rt.cumulative_returns * 100,
                     mode='lines',
-                    name=ticker,
-                    legendgroup=ticker,
-                    hovertemplate=f'{ticker}<br>Date: %{{x}}<br>Cumulative: %{{y:.2f}}%<extra></extra>'
+                    name=rt.price_data.ticker,
+                    legendgroup=rt.price_data.ticker,
+                    hovertemplate=f'{rt.price_data.ticker}<br>Date: %{{x}}<br>Cumulative: %{{y:.2f}}%<extra></extra>'
                 ),
                 row=1, col=1
             )
@@ -307,18 +285,18 @@ class ReturnsPlotter(BaseModel):
             # Add raw returns trace
             fig.add_trace(
                 go.Scatter(
-                    x=dates,
-                    y=returns_dto.returns * 100,
+                    x=rt.price_data.data['Date'],
+                    y=rt.returns * 100,
                     mode='lines',
-                    name=ticker,
-                    legendgroup=ticker,
+                    name=rt.price_data.ticker,
+                    legendgroup=rt.price_data.ticker,
                     showlegend=False,
-                    hovertemplate=f'{ticker}<br>Date: %{{x}}<br>Return: %{{y:.2f}}%<extra></extra>'
+                    hovertemplate=f'{rt.price_data.ticker}<br>Date: %{{x}}<br>Return: %{{y:.2f}}%<extra></extra>'
                 ),
                 row=2, col=1
             )
 
-        title = self.title or f'Returns Analysis ({self.return_type.capitalize()}, {self.periods}-period)'
+        title = self.title or 'Returns Analysis'
 
         fig.update_xaxes(title_text='Date', row=2, col=1)
         fig.update_yaxes(title_text='Cumulative Return (%)', row=1, col=1)
@@ -328,8 +306,8 @@ class ReturnsPlotter(BaseModel):
             title_text=title,
             hovermode='x unified',
             template='plotly_white',
-            width=1200,
-            height=900,
+            width=width,
+            height=height,
             legend=dict(
                 orientation="v",
                 yanchor="top",
@@ -351,27 +329,27 @@ class ReturnsPlotter(BaseModel):
 
         fig = go.Figure()
 
-        for ticker, returns_dto in self.returns_data.items():
-            returns = returns_dto.returns * 100  # Convert to percentage
+        for rt in self.returns_data:
+            returns = rt.returns * 100  # Convert to percentage
 
             fig.add_trace(go.Histogram(
                 x=returns,
-                name=ticker,
+                name=rt.price_data.ticker,
                 opacity=0.5,
                 histnorm='probability density',
-                hovertemplate=f'{ticker}<br>Return: %{{x:.2f}}%<br>Density: %{{y:.4f}}<extra></extra>'
+                hovertemplate=f'{rt.price_data.ticker}<br>Return: %{{x:.2f}}%<br>Density: %{{y:.4f}}<extra></extra>'
             ))
 
         # Add annotations for skew
         annotations = []
-        for i, (ticker, returns_dto) in enumerate(self.returns_data.items()):
+        for i, rt in enumerate(self.returns_data):
             annotations.append(
                 dict(
                     x=0.9,
                     y=0.98 - (i * 0.05),
                     xref='paper',
                     yref='paper',
-                    text=f'{ticker} Skew: {returns_dto.skew:.3f}',
+                    text=f'{rt.price_data.ticker} Skew: {rt.skew:.3f}',
                     showarrow=False,
                     xanchor='right',
                     bgcolor='white',
@@ -385,8 +363,8 @@ class ReturnsPlotter(BaseModel):
             xaxis_title='Return (%)',
             yaxis_title='Density',
             template='plotly_white',
-            width=1200,
-            height=600,
+            width=900,
+            height=500,
             barmode='overlay',
             annotations=annotations
         )
@@ -401,8 +379,8 @@ class ReturnsPlotter(BaseModel):
             logger.warning("No data to plot. Use add() to add price data first.")
             return
 
-        tickers = list(self.returns_data.keys())
-        skews = [self.returns_data[ticker].skew for ticker in tickers]
+        skews = [rt.skew for rt in self.returns_data]
+        tickers = [rt.price_data.ticker for rt in self.returns_data]
 
         # Color bars based on skew direction
         colors = ['green' if s > 0 else 'red' for s in skews]
@@ -440,15 +418,15 @@ class ReturnsPlotter(BaseModel):
         """
         stats = []
 
-        for ticker, returns_dto in self.returns_data.items():
-            returns = returns_dto.returns
+        for rt in self.returns_data:
+            returns = rt.returns
             cumulative = (returns + 1).cumprod() - 1
 
             stats.append({
-                'Ticker': ticker,
+                'Ticker': rt.price_data.ticker,
                 'Mean Return (%)': returns.mean() * 100,
                 'Std Dev (%)': returns.std() * 100,
-                'Skewness': returns_dto.skew,
+                'Skewness': rt.skew,
                 'Cumulative Return (%)': cumulative.iloc[-1] * 100,
                 'Sharpe Ratio': returns.mean() / returns.std() if returns.std() > 0 else 0,
                 'Min Return (%)': returns.min() * 100,
@@ -459,9 +437,7 @@ class ReturnsPlotter(BaseModel):
         return pd.DataFrame(stats)
 
     def __str__(self) -> str:
-        tickers = list(self.returns_data.keys())
-        return (f"ReturnsPlotter(tickers={tickers}, "
-                f"return_type={self.return_type}, "
-                f"periods={self.periods})")
+        tickers = [rt.price_data.ticker for rt in self.returns_data]
+        return f"ReturnsPlotter(tickers={tickers})"
 
     __repr__ = __str__

@@ -1,6 +1,7 @@
+from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Any
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -72,9 +73,9 @@ class ReturnsDTO(BaseModel):
 
     Transfers calculated returns between layers.
     """
-    ticker: str  # Stock symbol
-    data: pd.DataFrame  # OHLCV data
+    price_data: PriceDataDTO  # Price Data
     returns: pd.Series = None  # Calculated returns
+    cumulative_returns: pd.Series = None  # Calculated cumulative returns
     return_type: str = 'log'  # 'log' or 'percentage'
     periods: int = 1  # Period length (1 = daily)
     skew: float = None  # Skewness of returns
@@ -83,13 +84,15 @@ class ReturnsDTO(BaseModel):
         arbitrary_types_allowed = True
 
     def model_post_init(self, context: Any, /) -> None:
+        self.price_data = deepcopy(self.price_data)
+        data = self.price_data.data
 
         if self.return_type == 'log':
             # Calculate log returns: ln(P_t / P_t-n)
-            self.returns = pd.Series(np.log(self.data['Close'] / self.data['Close'].shift(self.periods)))
+            self.returns = pd.Series(np.log(data['Close'] / data['Close'].shift(self.periods)))
         elif self.return_type == 'percentage':
             # Calculate percentage returns: (P_t - P_t-n) / P_t-n
-            self.returns = self.data['Close'].pct_change(periods=self.periods)
+            self.returns = data['Close'].pct_change(periods=self.periods)
         else:
             raise ValueError(f"Invalid return_type: {self.return_type}. Must be 'log' or 'percentage'")
 
@@ -97,13 +100,16 @@ class ReturnsDTO(BaseModel):
         # Keep the index aligned with the original data
         self.returns = self.returns.fillna(0) if len(self.returns) > 0 else self.returns
 
+        # cumulative returns
+        self.cumulative_returns = (self.returns + 1).cumprod() - 1
+
         # Calculate skewness
         self.skew = self.returns.skew()
 
         logger.info(f"Creation completed: {self}")
 
     def __str__(self):
-        return (f"Returns(ticker={self.ticker}, return_type={self.return_type}, "
+        return (f"Returns(ticker={self.price_data.ticker}, return_type={self.return_type}, "
                 f"shape={self.returns.shape}, skew={self.skew:.4f})")
 
     __repr__ = __str__
@@ -115,13 +121,10 @@ class CorrelationDTO(BaseModel):
 
     Transfers correlation matrices between layers.
     """
-    tickers: list[str] = None  # Analyzed tickers
-    data: dict[str, pd.DataFrame]  # ticker -> OHLCV data
+    price_datas: list[PriceDataDTO] = None  # list of PriceDataDTOs
     correlation_matrix: pd.DataFrame = None  # Pairwise correlations
     return_type: str = 'log'  # 'log' or 'percentage'
     observation_count: int = None  # Number of observations used
-    start_date: Optional[datetime] = None  # Analysis start date
-    end_date: Optional[datetime] = None  # Analysis end date
 
     class Config:
         arbitrary_types_allowed = True
@@ -131,23 +134,20 @@ class CorrelationDTO(BaseModel):
         Calculates returns, correlation matrix, and metadata after object creation.
         """
 
-        if self.tickers is None:
-            self.tickers = list(self.data.keys())
-
-        if set(self.tickers) != set(self.data.keys()):
-            raise ValueError(f"Tickers are not consistent: {self.tickers}")
+        self.price_datas = deepcopy(self.price_datas)
 
         # calculate returns
         returns_dict = {}
 
-        for ticker, df in self.data.items():
+        for pdata in self.price_datas:
+            df = pdata.data
             if df is None or df.empty:
                 raise ValueError(
-                    f"No data for ticker: {ticker}. Consider providing data or removing it from the tickers list.")
+                    f"No data for ticker: {pdata.ticker}. Provide data or removing it from the tickers list.")
 
             # Calculate returns based on return_type
-            returns_dto = ReturnsDTO(ticker=ticker, data=df, return_type=self.return_type)
-            returns_dict[ticker] = returns_dto.returns
+            returns_dto = ReturnsDTO(price_data=pdata, return_type=self.return_type)
+            returns_dict[pdata.ticker] = returns_dto.returns
 
         # Create returns DataFrame
         returns_df = pd.DataFrame(returns_dict)
@@ -159,18 +159,11 @@ class CorrelationDTO(BaseModel):
         # Set observation count
         self.observation_count = len(returns_df)
 
-        # Set date range
-        if self.start_date is None and not returns_df.empty:
-            self.start_date = returns_df.index.min()
-
-        if self.end_date is None and not returns_df.empty:
-            self.end_date = returns_df.index.max()
         logger.info(f"Creation completed: {self}")
 
     def __str__(self):
-        return (f"Correlation(tickers={self.tickers}, "
-                f"start_date={self.start_date}, "
-                f"end_date={self.end_date}, "
+        tickers = [i.ticker for i in self.price_datas]
+        return (f"Correlation(tickers={tickers}, "
                 f"total_observations={self.observation_count})")
 
     __repr__ = __str__
