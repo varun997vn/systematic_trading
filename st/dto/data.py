@@ -31,10 +31,11 @@ class PriceDataDTO(BaseModel):
 
     def model_post_init(self, context: Any, /) -> None:
         # save path
-        save_path = Path(Settings.DATA_DIR)
-        save_path.mkdir(parents=True, exist_ok=True)
-        save_path = save_path / f"{self.ticker.replace('.', '_')}.csv"
-        self.save_path = save_path
+        if self.save_path is None:
+            self.save_path = Path(Settings.DATA_DIR) / f"{self.ticker.replace('.', '_')}.csv"
+        else:
+            self.save_path = Path(self.save_path)
+        self.save_path.parent.mkdir(parents=True, exist_ok=True)
 
         # data
         self.start_date = self.start_date or Settings.DATA_START_DATE
@@ -51,11 +52,18 @@ class PriceDataDTO(BaseModel):
         self.data = df
 
         # save the data
-        df.to_csv(save_path, index=False)
+        df.to_csv(self.save_path, index=False)
         logger.info(f"Creation completed: {self}")
 
     def __str__(self):
-        return f"PriceData({self.ticker}, {self.start_date}, {self.end_date}, {self.interval})"
+        return (f"PriceData(ticker={self.ticker}, "
+                f"start_date={self.start_date}, "
+                f"end_date={self.end_date}, "
+                f"interval={self.interval}, "
+                f"shape={self.data.shape})"
+                )
+
+    __repr__ = __str__
 
 
 class ReturnsDTO(BaseModel):
@@ -90,7 +98,9 @@ class ReturnsDTO(BaseModel):
         logger.info(f"Creation completed: {self}")
 
     def __str__(self):
-        return f"Returns({self.ticker}, {self.return_type})"
+        return f"Returns(ticker={self.ticker}, return_type={self.return_type}, shape={self.returns.shape})"
+
+    __repr__ = __str__
 
 
 class CorrelationDTO(BaseModel):
@@ -99,7 +109,7 @@ class CorrelationDTO(BaseModel):
 
     Transfers correlation matrices between layers.
     """
-    tickers: list[str]  # Analyzed tickers
+    tickers: list[str] = None  # Analyzed tickers
     data: dict[str, pd.DataFrame]  # ticker -> OHLCV data
     correlation_matrix: pd.DataFrame = None  # Pairwise correlations
     return_type: str = 'log'  # 'log' or 'percentage'
@@ -114,6 +124,12 @@ class CorrelationDTO(BaseModel):
         """
         Calculates returns, correlation matrix, and metadata after object creation.
         """
+
+        if self.tickers is None:
+            self.tickers = list(self.data.keys())
+
+        if set(self.tickers) != set(self.data.keys()):
+            raise ValueError(f"Tickers are not consistent: {self.tickers}")
 
         # calculate returns
         returns_dict = {}
@@ -146,4 +162,9 @@ class CorrelationDTO(BaseModel):
         logger.info(f"Creation completed: {self}")
 
     def __str__(self):
-        return f"Correlation({self.ticker}, {self.start_date}, {self.end_date}, {self.observation_count})"
+        return (f"Correlation(tickers={self.tickers}, "
+                f"start_date={self.start_date}, "
+                f"end_date={self.end_date}, "
+                f"total_observations={self.observation_count})")
+
+    __repr__ = __str__
