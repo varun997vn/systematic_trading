@@ -35,14 +35,18 @@ class VolatilityDTO(BaseModel, ABC):
 
 class StandardVolatilityDTO(VolatilityDTO):
     window: int = Field(default=36, description="Rolling window size")
-    min_periods: int = Field(default=10, description="Minimum observations required")
+    min_periods: int = Field(
+        default=10, description="Minimum observations required"
+    )
 
     class Config:
         arbitrary_types_allowed = True
 
     def model_post_init(self, __context: Any):
-        self.daily_vol = self.returns.returns.rolling(window=self.window, min_periods=self.min_periods).std()
-        self.daily_vol = self.daily_vol * 100
+        self.daily_vol = self.returns.returns.rolling(
+            window=self.window, min_periods=self.min_periods
+        ).std()
+        self.daily_vol = self.daily_vol
         self.annual_vol = self.daily_vol * (self.annualization_factor ** 0.5)
         logger.info(f"Creation Complete: {self}")
 
@@ -51,7 +55,9 @@ class EWMAVolatilityDTO(VolatilityDTO):
     span: int = Field(
         default=36, ge=2, description="EWMA span (Carver recommends 32-36)"
     )
-    min_periods: int = Field(default=10, description="Minimum observations required")
+    min_periods: int = Field(
+        default=10, description="Minimum observations required"
+    )
 
     class Config:
         arbitrary_types_allowed = True
@@ -69,7 +75,7 @@ class EWMAVolatilityDTO(VolatilityDTO):
 
         # Volatility is square root of variance
         self.daily_vol = ewma_var ** 0.5
-        self.daily_vol = self.daily_vol * 100
+        self.daily_vol = self.daily_vol
 
         # Annualize
         self.annual_vol = self.daily_vol * (self.annualization_factor ** 0.5)
@@ -78,7 +84,10 @@ class EWMAVolatilityDTO(VolatilityDTO):
 
 class RobustVolatilityDTO(VolatilityDTO):
     window: int = Field(default=36, description="Rolling window size")
-    scale_factor: float = Field(default=1.4826, description="Scale to match std dev (1.4826 for normal distribution)")
+    scale_factor: float = Field(
+        default=1.4826,
+        description="Scale to match std dev (1.4826 for normal distribution)"
+    )
 
     class Config:
         arbitrary_types_allowed = True
@@ -92,15 +101,17 @@ class RobustVolatilityDTO(VolatilityDTO):
         return mad * self.scale_factor if mad is not None else None
 
     def model_post_init(self, __context: Any):
-        self.daily_vol = self.returns.returns.rolling(window=self.window).apply(self.rolling_mad, raw=False)
-        self.daily_vol = self.daily_vol * 100
+        self.daily_vol = self.returns.returns.rolling(
+            window=self.window
+        ).apply(self.rolling_mad, raw=False)
+        self.daily_vol = self.daily_vol
         self.annual_vol = self.daily_vol * (self.annualization_factor ** 0.5)
         logger.info(f"Creation Complete: {self}")
 
 
 class VolatilityStandardizationDTO(BaseModel):
     price_data: PriceDataDTO
-    model: str = Field(default="standard")
+    model: str = Field(default="ewma")
     parameters: dict = Field(default_factory=dict)
     returns: ReturnsDTO = Field(default=None)
     volatility: VolatilityDTO = Field(default=None)
@@ -114,14 +125,19 @@ class VolatilityStandardizationDTO(BaseModel):
 
         self.returns = ReturnsDTO(price_data=self.price_data)
         if self.model == "standard":
-            self.volatility = StandardVolatilityDTO(returns=self.returns, **self.parameters)
+            self.volatility = StandardVolatilityDTO(
+                returns=self.returns, **self.parameters
+            )
         elif self.model == "robust":
-            self.volatility = RobustVolatilityDTO(returns=self.returns, **self.parameters)
+            self.volatility = RobustVolatilityDTO(
+                returns=self.returns, **self.parameters
+            )
         elif self.model == "ewma":
-            self.volatility = EWMAVolatilityDTO(returns=self.returns, **self.parameters)
-
-        self.returns.returns /= self.volatility.daily_vol
-        self.returns.cumulative_returns /= self.volatility.daily_vol
+            self.volatility = EWMAVolatilityDTO(
+                returns=self.returns, **self.parameters
+            )
+        else:
+            raise ValueError("Model must be either standard or robust or ewma")
 
     def __str__(self):
         return (f"{self.__class__.__name__}(ticker={self.price_data.ticker}, "
@@ -146,7 +162,9 @@ class VolatilityForecastDTO(BaseModel, ABC):
 
 
 class SimpleVolatilityForecastDTO(VolatilityForecastDTO):
-    method: Literal["last", "mean"] = Field(default="last", description="Forecast method")
+    method: Literal["last", "mean"] = Field(
+        default="last", description="Forecast method"
+    )
 
     class Config:
         arbitrary_types_allowed = True
@@ -157,7 +175,9 @@ class SimpleVolatilityForecastDTO(VolatilityForecastDTO):
             self.forecast = self.volatility.daily_vol.copy().iloc[-1]
         elif self.method == "mean":
             # Rolling mean forecast
-            self.forecast = self.volatility.daily_vol.rolling(window=10, min_periods=1).mean().iloc[-1]
+            self.forecast = self.volatility.daily_vol.rolling(
+                window=10, min_periods=1
+            ).mean().iloc[-1]
         else:
             raise ValueError(f"Unknown method: {self.method}")
 
@@ -172,15 +192,19 @@ class EWMAVolatilityForecastDTO(VolatilityForecastDTO):
         arbitrary_types_allowed = True
 
     def model_post_init(self, __context: Any):
-        self.forecast = self.volatility.daily_vol.ewm(span=self.span, min_periods=1).mean().iloc[-1]
+        self.forecast = self.volatility.daily_vol.ewm(
+            span=self.span, min_periods=1
+        ).mean().iloc[-1]
         logger.info(f"Creation Complete: {self}")
 
 
 # ---- Volatility Targeting ---- #
 class VolatilityTargeter(BaseModel):
     volatility: VolatilityDTO
-    target_vol: float = Field(default=Settings.VOLATILITY_TARGET,
-                              description="Target annual volatility (e.g., 0.20 for 20%)")
+    target_vol: float = Field(
+        default=Settings.VOLATILITY_TARGET,
+        description="Target annual volatility (e.g., 0.20 for 20%)"
+    )
     scalars: pd.Series = None
 
     class Config:

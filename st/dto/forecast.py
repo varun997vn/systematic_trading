@@ -9,54 +9,10 @@ from typing import Dict, Optional, Any
 
 from pydantic import BaseModel, Field, field_validator
 
-from .strategy import EWMACStrategyDTO
+from .strategy import EWMACStrategyDTO, ForecastConfig
 
 
 # ---- Forecast Configuration DTO ---- #
-
-
-class ForecastConfig(BaseModel):
-    """Forecast generation and scaling configuration."""
-
-    target_abs_forecast: float = Field(
-        default=10.0,
-        gt=0,
-        description="Target average absolute forecast (Carver standard: 10)"
-    )
-    min_forecast: float = Field(default=-20.0, description="Minimum forecast value")
-    max_forecast: float = Field(default=20.0, description="Maximum forecast value")
-    cap_forecasts: bool = Field(default=True, description="Apply min/max capping")
-    use_volatility_standardization: bool = Field(
-        default=True,
-        description="Normalize forecasts by price volatility"
-    )
-
-    def model_post_init(self, context: Any, /) -> None:
-        if self.max_forecast < self.min_forecast:
-            raise ValueError(f"max_forecast {self.max_forecast} must be greater than min_forecast {self.min_forecast}")
-
-
-# ---- Position Sizing DTO ---- #
-
-
-class PositionSizingConfig(BaseModel):
-    """Position sizing and risk management configuration."""
-
-    instrument_weight: float = Field(
-        default=1.0,
-        ge=0,
-        le=1.0,
-        description="Portfolio weight for this instrument (0-1)"
-    )
-    volatility_target: float = Field(
-        default=0.16,
-        gt=0,
-        description="Annual volatility target (e.g., 16% = 0.16)"
-    )
-    notional_exposure_per_contract: Optional[float] = Field(
-        default=None,
-        description="Notional value per contract (for futures)"
-    )
 
 
 # ---- Forecast Weights DTO ---- #
@@ -98,14 +54,18 @@ class TradingSignal(BaseModel):
     timestamp: str = Field(description="Signal timestamp (ISO format)")
 
     # Forecast information
-    combined_forecast: float = Field(description="Combined scaled forecast (-20 to +20)")
+    combined_forecast: float = Field(
+        description="Combined scaled forecast (-20 to +20)"
+    )
     forecast_components: Dict[str, float] = Field(
         default_factory=dict,
         description="Individual forecast contributions"
     )
 
     # Position information
-    target_position: float = Field(description="Target position in contracts/units")
+    target_position: float = Field(
+        description="Target position in contracts/units"
+    )
     current_position: Optional[float] = Field(
         default=None,
         description="Current position (if known)"
@@ -155,10 +115,10 @@ class PresetConfigs:
 
     # Default forecast weights (equal weight)
     EQUAL_WEIGHTS = {
-        "ewmac_2_8": 1 / 6,
-        "ewmac_4_16": 1 / 6,
-        "ewmac_8_32": 1 / 6,
-        "ewmac_16_64": 1 / 6,
+        "ewmac_2_8":    1 / 6,
+        "ewmac_4_16":   1 / 6,
+        "ewmac_8_32":   1 / 6,
+        "ewmac_16_64":  1 / 6,
         "ewmac_32_128": 1 / 6,
         "ewmac_64_256": 1 / 6,
     }
