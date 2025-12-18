@@ -93,6 +93,7 @@ class RobustVolatilityDTO(VolatilityDTO):
 
     def model_post_init(self, __context: Any):
         self.daily_vol = self.returns.returns.rolling(window=self.window).apply(self.rolling_mad, raw=False)
+        self.daily_vol = self.daily_vol * 100
         self.annual_vol = self.daily_vol * (self.annualization_factor ** 0.5)
         logger.info(f"Creation Complete: {self}")
 
