@@ -95,8 +95,8 @@ class StrategyDTO(BaseModel, ABC):
 
         # Normalize forecasts by volatility (if enabled)
         if self.forecast_config.use_volatility_standardization and self.vol_standardization is not None:
-            price_vol = (self.volatility.daily_vol * self.price_data.data[
-                'Close'] / 100)
+            price_vol = (self.vol_standardization.volatility.daily_vol *
+                         self.price_data.data['Close'] / 100)
             self.forecasts_vol_normalized = self.forecasts_raw / price_vol
         else:
             self.forecasts_vol_normalized = self.forecasts_raw.fillna(0)
@@ -112,11 +112,11 @@ class StrategyDTO(BaseModel, ABC):
         self.forecasts_scaled = self.forecasts_vol_normalized.copy()
 
         # Calculate scaling factor to achieve target absolute forecast
-        current_abs_forecast = self.forecasts_scaled.abs().mean()
-        if current_abs_forecast > 0:
-            scaling_factor = (self.forecast_config.target_abs_forecast /
-                              self.forecast_normalized.abs().expanding().mean())
-            self.forecast_scaled = self.forecast_normalized * scaling_factor
+        scaling_factor = (self.forecast_config.target_abs_forecast /
+                          self.forecasts_vol_normalized.abs().rolling(
+                              window=36
+                          ).mean())
+        self.forecasts_scaled = self.forecasts_vol_normalized * scaling_factor
 
         # Apply forecast diversification multiplier
         self.forecasts_scaled = self.forecasts_scaled * self.forecast_config.forecast_div_multiplier

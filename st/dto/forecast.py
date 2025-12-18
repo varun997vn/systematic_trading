@@ -1,142 +1,182 @@
-"""
-Data Transfer Objects for Systematic Trading Framework
+from typing import Any
 
-Minimal Pydantic models for configuration and data transfer.
-Follows Robert Carver's "Systematic Trading" methodology.
-"""
+import numpy as np
+import pandas as pd
+from pydantic import BaseModel, Field
 
-from typing import Dict, Optional, Any
+from utils.logger import setup_logger
+from .strategy import StrategyDTO, ForecastConfig
 
-from pydantic import BaseModel, Field, field_validator
-
-from .strategy import EWMACStrategyDTO, ForecastConfig
-
-
-# ---- Forecast Configuration DTO ---- #
-
-
-# ---- Forecast Weights DTO ---- #
+logger = setup_logger(__name__)
 
 
 class ForecastWeights(BaseModel):
-    """Weights for combining multiple forecasts."""
+    """
+    Forecast weights configuration.
+    
+    Carver uses equal weights as default, but allows handcrafted or optimized weights.
+    """
+    strategy_names: list[str]
+    weights: dict[str, float] = Field(default_factory=dict)
+    auto_equal_weight: bool = Field(
+        default=True,
+        description="Automatically assign equal weights if weights not provided"
+    )
 
-    weights: Dict[str, float] = Field(description="Map of rule_name to weight")
+    class Config:
+        arbitrary_types_allowed = True
 
     def model_post_init(self, context: Any, /) -> None:
-        for rule, weight in self.weights.items():
-            if weight < 0:
-                raise ValueError(f"Negative weight for {rule}: {weight}")
+        if self.auto_equal_weight and not self.weights:
+            # Equal weighting - Carver's default
+            equal_weight = 1.0 / len(self.strategy_names)
+            self.weights = {name: equal_weight for name in self.strategy_names}
 
-        total_weights = sum(self.weights.values())
-        if not (0.99 <= total_weights <= 1.01):
+        # Validation
+        if set(self.weights.keys()) != set(self.strategy_names):
             raise ValueError(
-                f"Weights must sum to 1.0, got {total_weights:.4f}. "
+                f"Weights keys {set(self.weights.keys())} don't match "
+                f"strategy names {set(self.strategy_names)}"
             )
 
-    def normalize(self) -> "ForecastWeights":
-        """Return a new ForecastWeights with normalized weights summing to 1.0."""
-        total = sum(self.weights.values())
-        if total == 0:
-            raise ValueError("Cannot normalize - weights sum to zero")
+        total_weight = sum(self.weights.values())
+        if not np.isclose(total_weight, 1.0):
+            raise ValueError(
+                f"Weights must sum to 1.0, got {total_weight}"
+            )
 
-        normalized = {k: v / total for k, v in self.weights.items()}
-        return ForecastWeights(weights=normalized)
+    def __str__(self):
+        return f"ForecastWeights({self.weights})"
 
-
-# ---- Trading Signal DTO ---- #
-
-
-class TradingSignal(BaseModel):
-    """Output trading signal with all necessary information."""
-
-    ticker: str = Field(description="Instrument identifier")
-    timestamp: str = Field(description="Signal timestamp (ISO format)")
-
-    # Forecast information
-    combined_forecast: float = Field(
-        description="Combined scaled forecast (-20 to +20)"
-    )
-    forecast_components: Dict[str, float] = Field(
-        default_factory=dict,
-        description="Individual forecast contributions"
-    )
-
-    # Position information
-    target_position: float = Field(
-        description="Target position in contracts/units"
-    )
-    current_position: Optional[float] = Field(
-        default=None,
-        description="Current position (if known)"
-    )
-
-    # Risk metrics
-    position_risk: Optional[float] = Field(
-        default=None,
-        description="Position risk as % of capital"
-    )
-    volatility_scalar: Optional[float] = Field(
-        default=None,
-        description="Volatility adjustment scalar"
-    )
-
-    # Metadata
-    signal_strength: str = Field(
-        default="neutral",
-        description="Signal strength: 'strong_long', 'long', 'neutral', 'short', 'strong_short'"
-    )
-
-    @field_validator("signal_strength")
-    @classmethod
-    def validate_strength(cls, v: str) -> str:
-        """Ensure valid signal strength."""
-        valid = {"strong_long", "long", "neutral", "short", "strong_short"}
-        if v not in valid:
-            raise ValueError(f"signal_strength must be one of {valid}")
-        return v
+    __repr__ = __str__
 
 
-# ---- Preset Configurations ---- #
+class ForecastDiversificationMultiplier(BaseModel):
+    """
+    Calculate Forecast Diversification Multiplier (FDM) from forecast correlations.
+    
+    Carver: FDM = 1/sqrt(sum of weighted correlation matrix)
+    This accounts for diversification benefit when combining forecasts.
+    """
+    forecast_weights: ForecastWeights
+    correlation_matrix: pd.DataFrame = None  # Forecast correlations
+    fdm: float = Field(default=1.0, description="Calculated FDM")
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    def model_post_init(self, context: Any, /) -> None:
+        if self.correlation_matrix is None or self.correlation_matrix.empty:
+            logger.warning("No correlation matrix provided - using FDM = 1.0")
+            self.fdm = 1.0
+            return
+
+        # Carver's FDM formula
+        weights = np.array(
+            [
+                self.forecast_weights.weights[name]
+                for name in self.correlation_matrix.columns
+            ]
+        )
+
+        # Weighted correlation: w^T * Corr * w
+        weighted_corr = weights @ self.correlation_matrix.values @ weights
+
+        # FDM = 1 / sqrt(weighted_correlation)
+        self.fdm = 1.0 / np.sqrt(weighted_corr)
+
+        logger.info(f"Calculated FDM: {self.fdm:.4f}")
+
+    def __str__(self):
+        return f"FDM(value={self.fdm:.4f})"
+
+    __repr__ = __str__
 
 
-class PresetConfigs:
-    """Common preset configurations following Carver's recommendations."""
-
-    # Carver's standard EWMAC suite
-    EWMAC_SUITE = [
-        EWMACStrategyDTO(fast_span=2, slow_span=8),
-        EWMACStrategyDTO(fast_span=4, slow_span=16),
-        EWMACStrategyDTO(fast_span=8, slow_span=32),
-        EWMACStrategyDTO(fast_span=16, slow_span=64),
-        EWMACStrategyDTO(fast_span=32, slow_span=128),
-        EWMACStrategyDTO(fast_span=64, slow_span=256),
-    ]
-
-    # Default forecast weights (equal weight)
-    EQUAL_WEIGHTS = {
-        "ewmac_2_8":    1 / 6,
-        "ewmac_4_16":   1 / 6,
-        "ewmac_8_32":   1 / 6,
-        "ewmac_16_64":  1 / 6,
-        "ewmac_32_128": 1 / 6,
-        "ewmac_64_256": 1 / 6,
-    }
-
-    # Conservative forecast config
-    CONSERVATIVE = ForecastConfig(
-        target_abs_forecast=8.0,  # Lower target
-        min_forecast=-15.0,
-        max_forecast=15.0,
-        cap_forecasts=True,
-        use_volatility_standardization=True,
+class CombinedForecastDTO(BaseModel):
+    """
+    Combine multiple strategy forecasts into a single forecast.
+    
+    Carver's process:
+    1. Weight individual scaled forecasts
+    2. Sum weighted forecasts
+    3. Apply Forecast Diversification Multiplier (FDM)
+    4. Cap combined forecast to [-20, 20]
+    """
+    strategies: dict[str, StrategyDTO]  # Name -> StrategyDTO
+    forecast_weights: ForecastWeights = None
+    fdm_calculator: ForecastDiversificationMultiplier = None
+    forecast_config: ForecastConfig = Field(
+        default_factory=ForecastConfig,
+        description="Config for combined forecast (typically inherits from strategies)"
     )
 
-    # Aggressive forecast config
-    AGGRESSIVE = ForecastConfig(
-        target_abs_forecast=12.0,  # Higher target
-        min_forecast=-20.0,
-        max_forecast=20.0,
-        cap_forecasts=True,
-        use_volatility_standardization=True,
-    )
+    # Computed fields
+    combined_forecast_raw: pd.Series = None  # Before FDM
+    combined_forecast: pd.Series = None  # After FDM and capping
+    forecast_correlation: pd.DataFrame = None  # Correlation between strategy forecasts
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    def model_post_init(self, context: Any, /) -> None:
+        if not self.strategies:
+            raise ValueError("No strategies provided for combination")
+
+        strategy_names = list(self.strategies.keys())
+
+        # Auto-create equal weights if not provided
+        if self.forecast_weights is None:
+            self.forecast_weights = ForecastWeights(
+                strategy_names=strategy_names
+                )
+
+        # Collect scaled forecasts from each strategy
+        forecast_dict = {}
+        for name, strategy in self.strategies.items():
+            if strategy.forecasts_scaled is None:
+                raise ValueError(f"Strategy '{name}' has no scaled forecasts")
+            forecast_dict[name] = strategy.forecasts_scaled
+
+        # Create DataFrame of all forecasts (aligned by index)
+        forecasts_df = pd.DataFrame(forecast_dict)
+
+        # Calculate forecast correlations (for FDM calculation)
+        self.forecast_correlation = forecasts_df.corr()
+
+        # Calculate FDM if not provided
+        if self.fdm_calculator is None:
+            self.fdm_calculator = ForecastDiversificationMultiplier(
+                forecast_weights=self.forecast_weights,
+                correlation_matrix=self.forecast_correlation
+            )
+
+        # Step 1: Weight individual forecasts
+        weighted_forecasts = pd.DataFrame()
+        for name in strategy_names:
+            weight = self.forecast_weights.weights[name]
+            weighted_forecasts[name] = forecasts_df[name] * weight
+
+        # Step 2: Sum weighted forecasts
+        self.combined_forecast_raw = weighted_forecasts.sum(axis=1)
+
+        # Step 3: Apply FDM
+        self.combined_forecast = self.combined_forecast_raw * self.fdm_calculator.fdm
+
+        # Step 4: Cap to [-20, 20] (or custom range)
+        if self.forecast_config.cap_forecasts:
+            self.combined_forecast = self.combined_forecast.clip(
+                lower=self.forecast_config.min_forecast,
+                upper=self.forecast_config.max_forecast
+            )
+
+        logger.info(f"Creation completed: {self}")
+
+    def __str__(self):
+        ticker = list(self.strategies.values())[0].price_data.ticker
+        fdm = self.fdm_calculator.fdm
+        return (f"CombinedForecast(ticker={ticker}, "
+                f"strategies={list(self.strategies.keys())}, "
+                f"FDM={fdm:.4f})")
+
+    __repr__ = __str__
