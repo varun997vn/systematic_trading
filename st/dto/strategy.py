@@ -115,7 +115,7 @@ class StrategyDTO(BaseModel, ABC):
         scaling_factor = (self.forecast_config.target_abs_forecast /
                           self.forecasts_vol_normalized.abs().rolling(
                               window=36
-                          ).mean())
+                          ).mean().shift(1))
         self.forecasts_scaled = self.forecasts_vol_normalized * scaling_factor
 
         # Apply forecast diversification multiplier
@@ -215,7 +215,7 @@ class MeanReversionStrategyDTO(StrategyDTO):
         rolling_std = data['Close'].rolling(window=self.lookback).std()
 
         # Z-score: negative when price is above mean (sell signal)
-        z_score = -(data['Close'] - rolling_mean) / rolling_std
+        z_score = (data['Close'] - rolling_mean) / rolling_std
 
         # Raw forecast based on z-score scaled by entry threshold
         self.forecasts_raw = z_score / self.entry_threshold
