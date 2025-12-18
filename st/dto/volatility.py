@@ -42,6 +42,7 @@ class StandardVolatilityDTO(VolatilityDTO):
 
     def model_post_init(self, __context: Any):
         self.daily_vol = self.returns.returns.rolling(window=self.window, min_periods=self.min_periods).std()
+        self.daily_vol = self.daily_vol * 100
         self.annual_vol = self.daily_vol * (self.annualization_factor ** 0.5)
         logger.info(f"Creation Complete: {self}")
 
@@ -68,6 +69,7 @@ class EWMAVolatilityDTO(VolatilityDTO):
 
         # Volatility is square root of variance
         self.daily_vol = ewma_var ** 0.5
+        self.daily_vol = self.daily_vol * 100
 
         # Annualize
         self.annual_vol = self.daily_vol * (self.annualization_factor ** 0.5)
