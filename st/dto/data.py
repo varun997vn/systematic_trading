@@ -1,4 +1,3 @@
-from copy import deepcopy
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -29,6 +28,7 @@ class PriceDataDTO(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
+        frozen = True
 
     def model_post_init(self, context: Any, /) -> None:
         # save path
@@ -43,13 +43,26 @@ class PriceDataDTO(BaseModel):
         self.end_date = self.end_date or Settings.DATA_END_DATE
 
         df = yf.download(
-            self.ticker, start=self.start_date, end=self.end_date, auto_adjust=True, progress=False
+            self.ticker, start=self.start_date, end=self.end_date,
+            auto_adjust=True, progress=False
         )
+
+        if df.empty:
+            raise ValueError(f"No data downloaded for {self.ticker}")
+
+        # Handle multi-index columns from yfinance
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.droplevel('Ticker')
 
         df = df[["Open", "High", "Low", "Close", "Volume"]]
         df = df.reset_index()
         df.rename(columns={df.columns[0]: "Date"}, inplace=True)
-        df.columns = df.columns.droplevel("Ticker")
+
+        # Ensure no NaN in price data
+        if df[['Open', 'High', 'Low', 'Close']].isna().any().any():
+            logger.warning(f"{self.ticker}: Price data contains NaN values, forward-filling...")
+            df[['Open', 'High', 'Low', 'Close']] = df[['Open', 'High', 'Low', 'Close']].fillna(method='ffill')
+
         self.data = df
 
         # save the data
@@ -72,6 +85,9 @@ class ReturnsDTO(BaseModel):
     Returns data transfer object.
 
     Transfers calculated returns between layers.
+
+    IMPORTANT: First 'periods' observations will be NaN - this is correct!
+    Downstream code should handle NaN appropriately (usually fillna(0) for forecasts).
     """
     price_data: PriceDataDTO  # Price Data
     returns: pd.Series = None  # Calculated returns
@@ -84,29 +100,44 @@ class ReturnsDTO(BaseModel):
         arbitrary_types_allowed = True
 
     def model_post_init(self, context: Any, /) -> None:
-        self.price_data = deepcopy(self.price_data)
+        # Don't deep copy - let Pydantic handle it
         data = self.price_data.data
 
         if self.return_type == 'log':
             # Calculate log returns: ln(P_t / P_t-n)
-            self.returns = pd.Series(np.log(data['Close'] / data['Close'].shift(self.periods)))
+            self.returns = pd.Series(
+                np.log(data['Close'] / data['Close'].shift(self.periods)),
+                index=data.index
+            )
         elif self.return_type == 'percentage':
             # Calculate percentage returns: (P_t - P_t-n) / P_t-n
             self.returns = data['Close'].pct_change(periods=self.periods)
         else:
-            raise ValueError(f"Invalid return_type: {self.return_type}. Must be 'log' or 'percentage'")
+            raise ValueError(
+                f"Invalid return_type: {self.return_type}. "
+                "Must be 'log' or 'percentage'"
+            )
 
-        # cumulative returns
-        self.cumulative_returns = (self.returns + 1).cumprod() - 1
+        # DON'T fill NaN with 0 - let downstream handle it
+        # The first 'periods' observations will be NaN, which is correct
 
-        # Calculate skewness
+        # Calculate cumulative returns (handle NaN properly)
+        self.cumulative_returns = (1 + self.returns.fillna(0)).cumprod() - 1
+
+        # Calculate skewness (excluding NaN)
         self.skew = self.returns.skew()
 
         logger.info(f"Creation completed: {self}")
 
     def __str__(self):
-        return (f"Returns(ticker={self.price_data.ticker}, return_type={self.return_type}, "
-                f"shape={self.returns.shape}, skew={self.skew:.4f})")
+        non_nan_count = self.returns.notna().sum()
+        return (
+            f"Returns(ticker={self.price_data.ticker}, "
+            f"return_type={self.return_type}, "
+            f"shape={self.returns.shape}, "
+            f"non_nan={non_nan_count}, "
+            f"skew={self.skew:.4f})"
+        )
 
     __repr__ = __str__
 
@@ -130,7 +161,8 @@ class CorrelationDTO(BaseModel):
         Calculates returns, correlation matrix, and metadata after object creation.
         """
 
-        self.price_datas = deepcopy(self.price_datas)
+        # Don't deep copy - unnecessary
+        # self.price_datas = deepcopy(self.price_datas)
 
         # calculate returns
         returns_dict = {}
@@ -139,7 +171,9 @@ class CorrelationDTO(BaseModel):
             df = pdata.data
             if df is None or df.empty:
                 raise ValueError(
-                    f"No data for ticker: {pdata.ticker}. Provide data or removing it from the tickers list.")
+                    f"No data for ticker: {pdata.ticker}. "
+                    "Provide data or remove it from the tickers list."
+                )
 
             # Calculate returns based on return_type
             returns_dto = ReturnsDTO(price_data=pdata, return_type=self.return_type)
@@ -148,12 +182,23 @@ class CorrelationDTO(BaseModel):
         # Create returns DataFrame
         returns_df = pd.DataFrame(returns_dict)
 
+        # Drop rows with ANY NaN to ensure clean correlation
+        returns_df_clean = returns_df.dropna()
+
+        if len(returns_df_clean) < 30:
+            logger.warning(
+                f"Only {len(returns_df_clean)} observations for correlation after "
+                "dropping NaN. Consider longer data history."
+            )
+
         # Calculate correlation matrix
-        if len(returns_df) > 1:
-            self.correlation_matrix = returns_df.corr()
+        if len(returns_df_clean) > 1:
+            self.correlation_matrix = returns_df_clean.corr()
+        else:
+            raise ValueError("Need at least 2 observations for correlation")
 
         # Set observation count
-        self.observation_count = len(returns_df)
+        self.observation_count = len(returns_df_clean)
 
         logger.info(f"Creation completed: {self}")
 

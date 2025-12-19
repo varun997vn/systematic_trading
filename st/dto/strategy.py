@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+import numpy as np
 import pandas as pd
 from pydantic import BaseModel, Field
 
@@ -32,11 +33,6 @@ class ForecastConfig(BaseModel):
         default=True,
         description="Normalize forecasts by price volatility"
     )
-    forecast_div_multiplier: float = Field(
-        default=1.0,
-        gt=0,
-        description="Forecast Diversification Multiplier (Carver: typically 1.0-1.3)"
-    )
 
     def model_post_init(self, context: Any, /) -> None:
         if self.max_forecast < self.min_forecast:
@@ -46,8 +42,7 @@ class ForecastConfig(BaseModel):
 
     def __str__(self):
         return (f"ForecastConfig(target={self.target_abs_forecast}, "
-                f"range=[{self.min_forecast}, {self.max_forecast}], "
-                f"fdm={self.forecast_div_multiplier})")
+                f"range=[{self.min_forecast}, {self.max_forecast}])")
 
     __repr__ = __str__
 
@@ -60,7 +55,7 @@ class StrategyDTO(BaseModel, ABC):
 
     price_data: PriceDataDTO
     volatility_model: str = Field(
-        default="standard",
+        default="ewma",
         description="Volatility model: 'standard', 'ewma', 'robust'"
     )
     volatility_params: dict = Field(
@@ -95,9 +90,17 @@ class StrategyDTO(BaseModel, ABC):
 
         # Normalize forecasts by volatility (if enabled)
         if self.forecast_config.use_volatility_standardization and self.vol_standardization is not None:
+            # Calculate instrument currency volatility (price volatility, not % volatility)
+            # ICVol = daily_vol (%) * price / 100
             price_vol = (self.vol_standardization.volatility.daily_vol *
                          self.price_data.data['Close'] / 100)
+
+            # Normalize forecast by price volatility
+            # This makes forecasts comparable across instruments
             self.forecasts_vol_normalized = self.forecasts_raw / price_vol
+
+            # Fill NaN with 0 (can't trade if no volatility estimate)
+            self.forecasts_vol_normalized = self.forecasts_vol_normalized.fillna(0)
         else:
             self.forecasts_vol_normalized = self.forecasts_raw.fillna(0)
 
@@ -107,15 +110,28 @@ class StrategyDTO(BaseModel, ABC):
         logger.info(f"Creation Completed: {self}")
 
     def _scale_forecasts(self) -> None:
-        """Scale forecasts to target absolute forecast and apply capping."""
-        # Start with normalized forecasts
-        self.forecasts_scaled = self.forecasts_vol_normalized.copy()
+        """
+        Scale forecasts to target absolute forecast and apply capping.
 
-        # Calculate scaling factor to achieve target absolute forecast
-        scaling_factor = (self.forecast_config.target_abs_forecast /
-                          self.forecasts_vol_normalized.abs().shift(1).rolling(
-                              window=36
-                          ).mean())
+        CRITICAL: Must avoid lookahead bias by using only past data for scaling.
+        """
+        # Calculate scaling factor using ONLY past data
+        # Shift first, then calculate rolling mean to ensure no lookahead
+        past_abs_forecast = (
+            self.forecasts_vol_normalized.abs()
+            .shift(1)  # Use yesterday's forecast to scale today
+            .rolling(window=36, min_periods=10)
+            .mean()
+        )
+
+        # Calculate scaling factor
+        scaling_factor = self.forecast_config.target_abs_forecast / past_abs_forecast
+
+        # Handle division by zero / NaN / Inf
+        scaling_factor = scaling_factor.replace([np.inf, -np.inf], np.nan)
+        scaling_factor = scaling_factor.fillna(1.0)  # Default to no scaling if no history
+
+        # Apply scaling
         self.forecasts_scaled = self.forecasts_vol_normalized * scaling_factor
 
         # Cap forecasts if enabled
@@ -124,6 +140,9 @@ class StrategyDTO(BaseModel, ABC):
                 lower=self.forecast_config.min_forecast,
                 upper=self.forecast_config.max_forecast
             )
+
+        # Fill any remaining NaN with 0
+        self.forecasts_scaled = self.forecasts_scaled.fillna(0)
 
     @abstractmethod
     def _calculate_forecasts(self) -> None:
@@ -163,10 +182,10 @@ class EWMACStrategyDTO(StrategyDTO):
         slow_ema = data['Close'].ewm(span=self.slow_span, adjust=False).mean()
 
         # Raw forecast = (fast_ema - slow_ema)
-        self.forecasts_raw = (fast_ema - slow_ema)
+        self.forecasts_raw = (fast_ema - slow_ema).fillna(0)
 
     def __str__(self):
-        return f"EWMACStrategy(ticker={self.price_data.ticker}, slow={self.slow_span}, fast={self.fast_span}, vol_model={self.volatility_model})"
+        return f"EWMACStrategy(ticker={self.price_data.ticker}, {self.fast_span}/{self.slow_span}, vol_model={self.volatility_model})"
 
     __repr__ = __str__
 
@@ -181,12 +200,14 @@ class CarryStrategyDTO(StrategyDTO):
     def _calculate_forecasts(self) -> None:
         """Calculate carry raw forecasts."""
         data = self.price_data.data.copy()
+
+        # Rolling return as proxy for carry
         rolling_return = data['Close'].pct_change(periods=self.smoothing_span)
 
         # Smooth the carry signal
         self.forecasts_raw = rolling_return.ewm(
             span=self.smoothing_span, adjust=False
-        ).mean()
+        ).mean().fillna(0)
 
     def __str__(self):
         return f"CarryStrategy(ticker={self.price_data.ticker}, smoothing={self.smoothing_span}, vol_model={self.volatility_model})"
@@ -215,7 +236,8 @@ class MeanReversionStrategyDTO(StrategyDTO):
         z_score = (data['Close'] - rolling_mean) / rolling_std
 
         # Raw forecast based on z-score scaled by entry threshold
-        self.forecasts_raw = z_score / self.entry_threshold
+        # Multiply by -1 so that high prices give negative signal (mean reversion)
+        self.forecasts_raw = (-z_score / self.entry_threshold).fillna(0)
 
     def __str__(self):
         return f"MeanReversionStrategy(ticker={self.price_data.ticker}, lookback={self.lookback}, std={self.entry_threshold}, vol_model={self.volatility_model})"
@@ -244,9 +266,14 @@ class TurtleStrategyDTO(StrategyDTO):
         # Raw forecast: position relative to channel
         # +1 when at upper band, -1 when at lower band
         channel_width = upper_band - lower_band
-        price_position = (data['Close'] - middle_band) / (channel_width / 2)
 
-        self.forecasts_raw = price_position.clip(-1, 1)
+        # Avoid division by zero
+        channel_width = channel_width.replace(0, np.nan)
+
+        price_position = (data['Close'] - middle_band) / (channel_width / 2)
+        price_position = price_position.clip(-1, 1)
+
+        self.forecasts_raw = price_position.fillna(0)
 
     def __str__(self):
         return f"TurtleStrategy(ticker={self.price_data.ticker}, entry_window={self.entry_window}, exit_window={self.exit_window}, vol_model={self.volatility_model})"
