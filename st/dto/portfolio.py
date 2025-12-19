@@ -738,7 +738,7 @@ class PortfolioDTO(BaseModel):
             f"Portfolio("
             f"instruments={n_instruments}, "
             f"method={self.weighting_method}, "
-            f"IDM={idm:.4f if idm else 'N/A'})"
+            f"IDM={idm})"
         )
 
     __repr__ = __str__

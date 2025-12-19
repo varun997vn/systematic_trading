@@ -28,7 +28,6 @@ class PriceDataDTO(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-        frozen = True
 
     def model_post_init(self, context: Any, /) -> None:
         # save path
