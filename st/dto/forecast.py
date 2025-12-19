@@ -344,7 +344,7 @@ class CombinedForecastDTO(BaseModel):
         description="Config for combined forecast (typically inherits from strategies)"
     )
     auto_filter_correlated: bool = Field(
-        default=True,
+        default=False,
         description="Automatically remove highly correlated forecasts"
     )
     correlation_analysis: ForecastCorrelationAnalysis = None

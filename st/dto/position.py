@@ -1,6 +1,7 @@
 from copy import deepcopy
 from typing import Any, Optional
 
+import numpy as np
 import pandas as pd
 from pydantic import BaseModel, Field
 
@@ -133,6 +134,12 @@ class InstrumentPositionDTO(BaseModel):
                 * self.idm
                 * self.volatility_scalar
         )
+
+        # scale according to available capital
+        required_curr_capital = self.position * self.price
+        avaliable_capital = self.portfolio_risk_target.notional_trading_capital * self.instrument_weight
+        self.position = self.position * avaliable_capital / required_curr_capital
+
 
         logger.info(f"Creation completed: {self}")
 
@@ -330,7 +337,7 @@ class RoundedPositionDTO(BaseModel):
         self.fractional_position = deepcopy(self.fractional_position)
 
         # Round to nearest integer
-        rounded = self.fractional_position.round()
+        rounded = self.fractional_position.apply(np.floor)
 
         # Zero out positions below minimum size
         rounded[rounded.abs() < self.min_position_size] = 0
@@ -407,6 +414,7 @@ class PositionPipelineDTO(BaseModel):
     instrument_position: InstrumentPositionDTO = None
     buffered: BufferedPositionDTO = None
     rounded: RoundedPositionDTO = None
+    rescaled_to_available_capital: RoundedPositionDTO = None
 
     class Config:
         arbitrary_types_allowed = True
