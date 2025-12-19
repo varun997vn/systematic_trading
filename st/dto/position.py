@@ -137,20 +137,24 @@ class InstrumentPositionDTO(BaseModel):
         logger.info(f"Creation completed: {self}")
 
     def _validate_aligned(self) -> None:
-        """Ensure all series have the same index."""
-        indices = [
-            self.combined_forecast.index,
-            self.instrument_volatility.index,
-            self.price.index
-        ]
+        """Ensure all series have identical indices."""
+        base_index = self.combined_forecast.index
 
-        first_index = indices[0]
-        for i, idx in enumerate(indices[1:], 1):
-            if not idx.equals(first_index):
-                raise ValueError(
-                    f"Series {i} has misaligned index with series 0. "
-                    "Align all inputs before creating InstrumentPositionDTO."
-                )
+        for name, series in [
+            ('instrument_volatility', self.instrument_volatility),
+            ('price', self.price)
+        ]:
+            if not series.index.equals(base_index):
+                # Attempt to align
+                self.combined_forecast, series_aligned = \
+                    self.combined_forecast.align(series, join='inner')
+
+                if name == 'instrument_volatility':
+                    self.instrument_volatility = series_aligned
+                else:
+                    self.price = series_aligned
+
+        logger.warning(f"Aligned to {len(self.combined_forecast)} common dates")
 
     def _calculate_volatility_scalar(self) -> pd.Series:
         """

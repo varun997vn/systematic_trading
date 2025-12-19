@@ -113,13 +113,10 @@ class StrategyDTO(BaseModel, ABC):
 
         # Calculate scaling factor to achieve target absolute forecast
         scaling_factor = (self.forecast_config.target_abs_forecast /
-                          self.forecasts_vol_normalized.abs().rolling(
+                          self.forecasts_vol_normalized.abs().shift(1).rolling(
                               window=36
-                          ).mean().shift(1))
+                          ).mean())
         self.forecasts_scaled = self.forecasts_vol_normalized * scaling_factor
-
-        # Apply forecast diversification multiplier
-        self.forecasts_scaled = self.forecasts_scaled * self.forecast_config.forecast_div_multiplier
 
         # Cap forecasts if enabled
         if self.forecast_config.cap_forecasts:

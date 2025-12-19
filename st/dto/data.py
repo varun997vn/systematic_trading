@@ -96,10 +96,6 @@ class ReturnsDTO(BaseModel):
         else:
             raise ValueError(f"Invalid return_type: {self.return_type}. Must be 'log' or 'percentage'")
 
-        # Remove NaN values created by the shift/pct_change operation
-        # Keep the index aligned with the original data
-        self.returns = self.returns.fillna(0) if len(self.returns) > 0 else self.returns
-
         # cumulative returns
         self.cumulative_returns = (self.returns + 1).cumprod() - 1
 
